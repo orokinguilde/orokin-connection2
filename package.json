@@ -2,7 +2,7 @@
   "name": "boteeidolon",
   "version": "1.0.0",
   "description": "",
-  "main": "eidolon.js",
+  "main": "teralyste.js",
   "dependencies": {
     "discord.js": "^11.3.2",
     "moment": "^2.22.0",

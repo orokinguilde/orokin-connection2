@@ -88,7 +88,7 @@ function update(discord_message, channel) {
                 data_expiry = moment(data.expiry);
                 is_day = data.isDay
                 expire_in = moment(data_expiry) - moment(); //=>moment
-                expire_in = moment(expire_in).add(-1, 'hour');
+                expire_in = moment(expire_in);//.add(-1, 'hour');
                 const message = {};
 
                 if (!is_day){

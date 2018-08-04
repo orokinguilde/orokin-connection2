@@ -8,7 +8,7 @@ const moment = require('moment');
 
 let servers = {};
 let rules = fs.readFileSync('./rules.md')// jai un dossier avec la chatre du serveur dans ./rules.md. je saios pas si il y'a une erreur ici 
-bot.login('process.env.TOKEN');
+bot.login(process.env.TOKEN);
 // let stop = false; // for use with while and setTimeout
 
         bot.on('message', function(message) {

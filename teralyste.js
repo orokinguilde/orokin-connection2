@@ -6,6 +6,8 @@ const request = require("request");
 const EventEmitter = require('events');
 const moment = require('moment');
 
+moment.local('fr');
+
 let servers = {};
 let rules = fs.readFileSync('./rules.md')// jai un dossier avec la chatre du serveur dans ./rules.md. je saios pas si il y'a une erreur ici 
 bot.login(process.env.TOKEN);

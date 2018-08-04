@@ -55,7 +55,7 @@ bot.on("guildMemberRemove" , member => {
         })
 })
 bot.on('ready', function () {
-        bot.user.setAvatar('./embleme alliance .png')
+        bot.user.setAvatar('./embleme alliance.png')
         bot.user.setActivity('connecter la guilde');
 })
 

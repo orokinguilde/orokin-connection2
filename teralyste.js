@@ -55,6 +55,7 @@ bot.on('message', function(message) {
 bot.on("guildMemberAdd" , member => {
     const channelNames = [
         /^g[eé]n[eé]ral$/img
+        /^discussion$/img
     ];
     
     const matchingChannels = member.guild.channels

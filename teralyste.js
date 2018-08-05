@@ -13,40 +13,44 @@ let rules = fs.readFileSync('./rules.md')// jai un dossier avec la chatre du ser
 bot.login(process.env.TOKEN);
 // let stop = false; // for use with while and setTimeout
 
-        bot.on('message', function(message) {
-                if(message.content.startsWith("oc")) {
-                            message.delete(message.author);
-                    let argson = message.content.split(" ").slice(1);
-                    let vcsmsg = argson.join(" ")
-                    if (!message.guild.channels.find("name", "orokin-connection")) return message.reply("Erreur: le channel `orokin connection` est introuvable");
-                    if(message.channel.name !== "orokin-connection") return message.reply("Commande a effectuer dans `orokin-connection`");
-                    if(!vcsmsg) return message.reply("Merci d'envoyer un ''message'' à envoyer dans la globalité des discords");
-                
-                    var replys = [
-                        '#01FEDC', 
-                        '#FE0101',
-                        '#FE6F01',
-                        '#FEF601',
-                        '#6FFE01',
-                        '#1201FE',
-                        '#7F01FE',
-                        '#FE01C3',
-                        '#0166FE',
-                        '#FE0177'
-                    ];
-                
-                    let reponse = (replys[Math.floor(Math.random() * replys.length)])
-                    var embed = new Discord.RichEmbed()
-                    .setColor(reponse)
-                    .setAuthor("Orokin Connection", bot.user.avatarURL)
-                    .addField("message en provenance de:", message.guild.name, true)
-                    .addField("_________________", message.author.tag)
-                    .addField("____", vcsmsg)
-                    .setFooter(" by Orokin Guilde")
-                    .setTimestamp()
-                    bot.channels.findAll('name', 'orokin-connection').map(channel => channel.send(embed))
-                    }
-                })
+bot.on('message', function(message) {
+    if(message.content.startsWith("oc"))
+    {
+        message.delete(message.author);
+        let argson = message.content.split(" ").slice(1);
+        let vcsmsg = argson.join(" ")
+        if (!message.guild.channels.find("name", "orokin-connection"))
+            return message.reply("Erreur: le channel `orokin connection` est introuvable");
+        if(message.channel.name !== "orokin-connection")
+            return message.reply("Commande a effectuer dans `orokin-connection`");
+        if(!vcsmsg)
+            return message.reply("Merci d'envoyer un ''message'' à envoyer dans la globalité des discords");
+
+        var replys = [
+            '#01FEDC', 
+            '#FE0101',
+            '#FE6F01',
+            '#FEF601',
+            '#6FFE01',
+            '#1201FE',
+            '#7F01FE',
+            '#FE01C3',
+            '#0166FE',
+            '#FE0177'
+        ];
+
+        let reponse = (replys[Math.floor(Math.random() * replys.length)])
+        var embed = new Discord.RichEmbed()
+            .setColor(reponse)
+            .setAuthor("Orokin Connection", bot.user.avatarURL)
+            .addField("message en provenance de:", message.guild.name, true)
+            .addField("_________________", message.author.tag)
+            .addField("____", vcsmsg)
+            .setFooter(" by Orokin Guilde")
+            .setTimestamp()
+        bot.channels.findAll('name', 'orokin-connection').map(channel => channel.send(embed))
+    }
+})
                 
 bot.on("guildMemberAdd" , member => {
     const channelNames = [

@@ -58,7 +58,7 @@ bot.on("guildMemberAdd" , member => {
     ];
     
     const matchingChannels = member.guild.channels
-        .filter(channel => channelNames.some(regex => regex.test(channel.name))
+        .filter(channel => channelNames.some(regex => regex.test(channel.name)))
         .array();
                 
     if(matchingChannels.length > 0)

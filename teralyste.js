@@ -49,7 +49,19 @@ bot.login(process.env.TOKEN);
                 })
                 
 bot.on("guildMemberAdd" , member => {
-        member.guild.channels.find("name" , "general").send(` Bienvenue ${member} ! have fun :wink: !`)
+    const channelNames = [
+        /^g[eé]n[eé]ral$/img
+    ];
+    
+    const matchingChannels = member.guild.channels
+        .filter(channel => channelNames.some(regex => regex.test(channel.name))
+        .array();
+                
+    if(matchingChannels.length > 0)
+    {
+        const firstMatchingChannel = matchingChannels[0];
+        firstMatchingChannel.send(` Bienvenue ${member} ! have fun :wink: !`);
+    }
 })              
 bot.on("guildMemberRemove" , member => {
         member.createDM().then(channel => {

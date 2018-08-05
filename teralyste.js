@@ -158,7 +158,7 @@ function pad(value) {
 function update(discord_message, channel) {
         getTimes(info => {
                 const message = {};
-                const expirationDate = moment().add(info.time.h, 'hours').add(info.time.m, 'minutes').add(info.time.s, 'seconds');
+                const expirationDate = moment().add(info.time.h + 2, 'hours').add(info.time.m, 'minutes').add(info.time.s, 'seconds');
                 const expirationTimeMs = info.time.h * 60 * 60 + info.time.m * 60 + info.time.s * 1000;
 
                 if (!info.isDay){

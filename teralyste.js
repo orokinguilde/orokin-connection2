@@ -77,7 +77,135 @@ bot.on('message', function (message) {
         }
 })
 
+function getTimes(callback) {
+    request({
+        url: 'https://whatever-origin.herokuapp.com/get?url=http://content.warframe.com/dynamic/worldState.php'
+    }, (e, res, body) => {
+        const contents = JSON.parse(JSON.parse(body.toString()).contents);
+
+        const syndicate = contents.SyndicateMissions.find(el => el.Tag === 'CetusSyndicate');
+
+        const eido_timestamp = Math.floor(syndicate["Expiry"]["$date"]["$numberLong"] / 1000);
+
+        const d = new Date();
+        const time = d.getTime() / 1000;
+        // This time is the end of night and start of day
+        const start_time = (eido_timestamp - 150 * 60)
+        const irltime_m = ((time - start_time)/60) % 150;  // 100m of day + 50m of night
+        
+        let eidotime_in_h = (irltime_m / 6.25) + 6;
+        if (eidotime_in_h < 0) eidotime_in_h += 24;
+        if (eidotime_in_h > 24) eidotime_in_h -= 24;
+        const eidotime_h = Math.floor(eidotime_in_h);
+        const eidotime_m = Math.floor((eidotime_in_h * 60) % 60);
+        const eidotime_s = Math.floor((eidotime_in_h * 60 * 60) % 60);
+
+        let next_interval;
+        let isDay = false;
+
+        // Night is from 9pm to 5am
+        // Day is from 5am to 9pm
+        if (150 - irltime_m > 50) {
+            isDay = true;
+            next_interval = 21;
+        } else {
+            isDay = false;
+            next_interval = 5;
+        }
+
+        let eido_until_h = next_interval - (eidotime_h % 24);
+        if(eido_until_h < 0)
+            eido_until_h += 24;
+        const eido_until_m = 60 - eidotime_m;
+        const eido_until_s = 60 - eidotime_s;
+
+        let irl_until_in_m = 150 - irltime_m;
+
+        if(irl_until_in_m > 50)
+            irl_until_in_m -= 50;
+
+        const irl_until_h = Math.floor(irl_until_in_m / 60);
+        const irl_until_m = Math.floor(irl_until_in_m % 60);
+        const irl_until_s = Math.floor((irl_until_in_m * 60) % 60);
+
+        callback({
+            isDay: isDay,
+            time: {
+                h: irl_until_h,
+                m: irl_until_m,
+                s: irl_until_s
+            },
+            eidotime: {
+                h: eidotime_h,
+                m: eidotime_m,
+                s: eidotime_s
+            },
+            irl: {
+                h: eido_until_h,
+                m: eido_until_m,
+                s: eido_until_s
+            }
+        });
+    })
+}
+
+function pad(value) {
+        value = value.toString();
+        while(value.length < 2)
+                value = '0' + value;
+        return value;
+}
 function update(discord_message, channel) {
+        getTimes(info => {
+                const message = {};
+                const expirationDate = moment().add(info.time.h, 'hours').add(info.time.m, 'minutes').add(info.time.s, 'seconds');
+                const expirationTimeMs = info.time.h * 60 * 60 + info.time.m * 60 + info.time.s * 1000;
+
+                if (!info.isDay){
+                        //Nuit
+                        message.content = `**\n \n Il fait nuit tenno! \n \n \n** **__Temps restant de cette nuit __**🕓 \n ${pad(info.time.h)}:${pad(info.time.m)}:${pad(info.time.s)} \n \n \n**__Debut du jour__ ** \n à ${expirationDate.format('LT')}`
+                        message.img = "https://vignette.wikia.nocookie.net/warframe/images/4/4c/Conclave_Moon.png/revision/latest?cb=20150327081658&path-prefix=fr"
+                }else{
+                        //Jour
+                        message.content = `**\n \n Il fait jour... \n \n \n** **__Temps restant avant la nuit__**🕓 \n ${pad(info.time.h)}:${pad(info.time.m)}:${pad(info.time.s)} \n \n \n**__Debut de la nuit__** \n à ${expirationDate.format('LT')}`
+                        let nuit = fs.readFileSync('./messagenuit.md')
+                        if(expirationTimeMs < 1200000){ // moins de 20 mins
+                                message.content += (nuit)
+                        }
+                        if(expirationTimeMs <= 600000 && (expirationTimeMs >= 585000)){
+                        bot.channels.get("336080127609929728").send('```<@444568556441698315> Les Eidolons arrivent dans quelques minutes! Préparez-vous!```');
+                        }
+                        if(expirationTimeMs <= 6000000 && (expirationTimeMs >= 5400000)){
+                        message.img = "https://cdn.discordapp.com/attachments/437388704072466433/437388980380499979/Warframe1h33_restant_du_jour_0000.jpg"
+                        }         
+                        if(expirationTimeMs <= 5399999 && (expirationTimeMs >= 4800000)){
+                        message.img = "https://cdn.discordapp.com/attachments/437388704072466433/437388972877152267/Warframe1h30_retant_du_jour0000.jpg"
+                        }
+                        if(expirationTimeMs <= 4799999 && (expirationTimeMs >= 4200000)){
+                        message.img = "https://cdn.discordapp.com/attachments/437388704072466433/437388932725080064/Warframe1h15_restant_du_jour0000.jpg"
+                        }
+                        if(expirationTimeMs <= 4199999 && (expirationTimeMs >= 3600000)){
+                        message.img = "https://cdn.discordapp.com/attachments/437388704072466433/437388902282559509/Warframe1h_restant_du_jour0000.jpg"
+                        }
+                        if(expirationTimeMs <= 3599999 && (expirationTimeMs >= 3000000)){
+                        message.img = "https://cdn.discordapp.com/attachments/437388704072466433/437389108193525760/Warframe50min_restant_du_jours0000.jpg"
+                        } 
+                        if(expirationTimeMs <= 2999999 && (expirationTimeMs >= 2400000)){
+                        message.img = "https://cdn.discordapp.com/attachments/437388704072466433/437389084227534848/Warframe40min_restant_du_jour_0000.jpg"
+                        }
+                        if(expirationTimeMs <= 2399999 && (expirationTimeMs >= 1800000)){
+                        message.img = "https://cdn.discordapp.com/attachments/437388704072466433/437389064732278785/Warframe30min_restant_du_jour0000.jpg"
+                        }
+                        if(expirationTimeMs <= 1799999 && (expirationTimeMs >= 600000)){
+                        message.img = "https://cdn.discordapp.com/attachments/437388704072466433/437389013637398533/Warframe10min_restant_du_jour0000.jpg"
+                        }
+                        if(expirationTimeMs <= 599999 && (expirationTimeMs >= 20)){
+                        message.img = "https://cdn.discordapp.com/attachments/437388704072466433/437388991638142987/Warframe1min_restant_du_jour_coucher_du_soleil0000.jpg" 
+                }//ça marche mais c'est pas tres opti... ques tu en pense ? (ça envois des images differantes selon le moment expire in )
+                }
+                writeMessage(message, discord_message);
+        });
+        /*
         let data; //=> JSON
         let date_expiry; //=> string
         let is_day; //=> boolean
@@ -134,7 +262,7 @@ function update(discord_message, channel) {
                 }//ça marche mais c'est pas tres opti... ques tu en pense ? (ça envois des images differantes selon le moment expire in )
                 }
                 writeMessage(message, discord_message);
-        });
+        });*/
 }
                           
 function writeMessage(_message, discord_message){

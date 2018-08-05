@@ -189,7 +189,7 @@ function update(discord_message, channel) {
                                 message.content += (nuit)
                         }
                         if(expirationTimeMs <= 600000 && (expirationTimeMs >= 585000)){
-                        bot.channels.get("336080127609929728").send('```<@444568556441698315> Les Eidolons arrivent dans quelques minutes! Préparez-vous!```');
+                        bot.channels.get("336080127609929728").send('```Les Eidolons arrivent dans quelques minutes! Préparez-vous!```');
                         }
                         if(expirationTimeMs <= 6000000 && (expirationTimeMs >= 5400000)){
                         message.img = "https://cdn.discordapp.com/attachments/437388704072466433/437388980380499979/Warframe1h33_restant_du_jour_0000.jpg"

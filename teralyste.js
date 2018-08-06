@@ -465,7 +465,7 @@ Eidelon.prototype.createNightMessage = function(info) {
             ++index;
     }
 
-    const expirationDateLocal = moment(info.expirationDate).add(-2, 'hours');
+    const expirationDateLocal = moment(info.expirationDate);
 
     return {
         content: `**\n \n Il fait nuit tenno! \n \n \n** **__Temps restant de cette nuit __**🕓 \n ${pad(info.timeLeft.h)}:${pad(info.timeLeft.m)}:${pad(info.timeLeft.s)} \n \n \n**__Debut du jour__ ** \n à ${expirationDateLocal.format('LT')}`,
@@ -505,7 +505,7 @@ Eidelon.prototype.createDayMessage = function(info) {
 
     const timeLeft = info.timeLeft.totalMs < 1200000;
 
-    const expirationDateLocal = moment(info.expirationDate).add(-2, 'hours');
+    const expirationDateLocal = moment(info.expirationDate);
 
     return {
         content: `**\n \n Il fait jour... \n \n \n** **__Temps restant avant la nuit__**🕓 \n ${pad(info.timeLeft.h)}:${pad(info.timeLeft.m)}:${pad(info.timeLeft.s)} \n \n \n**__Debut de la nuit__** \n à ${expirationDateLocal.format('LT')} ${timeLeft ? Eidelon.nearEndOfDayText : ''}`,

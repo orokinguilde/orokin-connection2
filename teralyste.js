@@ -25,7 +25,7 @@ Embed.createDiscordEmbed = function(options) {
         .setColor(15844367)
         .setThumbnail(options.img)
         .setFooter(`Actualisé à ${moment(new Date()).add(2, 'hour').format('LT')}`, 'https://cdn.discordapp.com/attachments/437388704072466433/458396183237361665/nouvelle_vue_sur_lembleme_final_1.png')
-        .setImage('https://media.discordapp.net/attachments/473609056163201024/475829958628081684/Teralyst_2.png?width=299&height=301')
+        .setImage('https://media.discordapp.net/attachments/437388704072466433/475991088813965312/Sans_titre-12.png?width=759&height=702')
         .setDescription(options.content);
 
     return embed;

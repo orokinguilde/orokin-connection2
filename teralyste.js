@@ -24,7 +24,7 @@ Embed.createDiscordEmbed = function(options) {
         .setTitle("[**__trio🌙 eidelon__ **]")
         .setColor(15844367)
         .setThumbnail(options.img)
-        .setFooter(`Actualisé à ${new Date().toLocaleTimeString().add(2, 'hour')}`, 'https://cdn.discordapp.com/attachments/437388704072466433/458396183237361665/nouvelle_vue_sur_lembleme_final_1.png')
+        .setFooter(`Actualisé à ${moment(new Date()).add(2, 'hour').format('LT')}`, 'https://cdn.discordapp.com/attachments/437388704072466433/458396183237361665/nouvelle_vue_sur_lembleme_final_1.png')
         .setImage('https://media.discordapp.net/attachments/473609056163201024/475829958628081684/Teralyst_2.png?width=299&height=301')
         .setDescription(options.content);
 
@@ -529,82 +529,89 @@ Eidelon.prototype.getInformation = function(callback) {
     request({
         url: 'https://whatever-origin.herokuapp.com/get?url=http://content.warframe.com/dynamic/worldState.php'
     }, (e, res, body) => {
-        const contents = JSON.parse(JSON.parse(body.toString()).contents);
+        try
+        {
+            const contents = JSON.parse(JSON.parse(body.toString()).contents);
 
-        const syndicate = contents.SyndicateMissions.find(el => el.Tag === 'CetusSyndicate');
+            const syndicate = contents.SyndicateMissions.find(el => el.Tag === 'CetusSyndicate');
 
-        if(!syndicate)
-            return callback(undefined);
+            if(!syndicate)
+                return callback(undefined);
 
-        const eido_timestamp = Math.floor(syndicate["Expiry"]["$date"]["$numberLong"] / 1000);
+            const eido_timestamp = Math.floor(syndicate["Expiry"]["$date"]["$numberLong"] / 1000);
 
-        const d = new Date();
-        const time = d.getTime() / 1000;
-        // This time is the end of night and start of day
-        const start_time = (eido_timestamp - 150 * 60)
-        const irltime_m = ((time - start_time)/60) % 150;  // 100m of day + 50m of night
-        
-        let eidotime_in_h = (irltime_m / 6.25) + 6;
-        if (eidotime_in_h < 0) eidotime_in_h += 24;
-        if (eidotime_in_h > 24) eidotime_in_h -= 24;
-        const eidotime_h = Math.floor(eidotime_in_h);
-        const eidotime_m = Math.floor((eidotime_in_h * 60) % 60);
-        const eidotime_s = Math.floor((eidotime_in_h * 60 * 60) % 60);
+            const d = new Date();
+            const time = d.getTime() / 1000;
+            // This time is the end of night and start of day
+            const start_time = (eido_timestamp - 150 * 60)
+            const irltime_m = ((time - start_time)/60) % 150;  // 100m of day + 50m of night
+            
+            let eidotime_in_h = (irltime_m / 6.25) + 6;
+            if (eidotime_in_h < 0) eidotime_in_h += 24;
+            if (eidotime_in_h > 24) eidotime_in_h -= 24;
+            const eidotime_h = Math.floor(eidotime_in_h);
+            const eidotime_m = Math.floor((eidotime_in_h * 60) % 60);
+            const eidotime_s = Math.floor((eidotime_in_h * 60 * 60) % 60);
 
-        let next_interval;
-        let isDay = false;
+            let next_interval;
+            let isDay = false;
 
-        // Night is from 9pm to 5am
-        // Day is from 5am to 9pm
-        if (150 - irltime_m > 50) {
-            isDay = true;
-            next_interval = 21;
-        } else {
-            isDay = false;
-            next_interval = 5;
-        }
-
-        let eido_until_h = next_interval - (eidotime_h % 24);
-        if(eido_until_h < 0)
-            eido_until_h += 24;
-        const eido_until_m = 60 - eidotime_m;
-        const eido_until_s = 60 - eidotime_s;
-
-        let irl_until_in_m = 150 - irltime_m;
-
-        if(irl_until_in_m > 50)
-            irl_until_in_m -= 50;
-
-        const irl_until_h = Math.floor(irl_until_in_m / 60);
-        const irl_until_m = Math.floor(irl_until_in_m % 60);
-        const irl_until_s = Math.floor((irl_until_in_m * 60) % 60);
-
-        const info = {
-            isDay: isDay,
-            timeLeft: {
-                h: irl_until_h,
-                m: irl_until_m,
-                s: irl_until_s,
-                totalMs: ((irl_until_h * 60 + irl_until_m) * 60 + irl_until_s) * 1000
-            },
-            eidotime: {
-                h: eidotime_h,
-                m: eidotime_m,
-                s: eidotime_s,
-                totalMs: ((eidotime_h * 60 + eidotime_m) * 60 + eidotime_s) * 1000
-            },
-            irl: {
-                h: eido_until_h,
-                m: eido_until_m,
-                s: eido_until_s,
-                totalMs: ((eido_until_h * 60 + eido_until_m) * 60 + eido_until_s) * 1000
+            // Night is from 9pm to 5am
+            // Day is from 5am to 9pm
+            if (150 - irltime_m > 50) {
+                isDay = true;
+                next_interval = 21;
+            } else {
+                isDay = false;
+                next_interval = 5;
             }
-        };
-        
-        const expirationDate = moment().add(info.timeLeft.h + 2, 'hours').add(info.timeLeft.m, 'minutes').add(info.timeLeft.s, 'seconds');
-        info.expirationDate = expirationDate.valueOf();
 
-        callback(info);
+            let eido_until_h = next_interval - (eidotime_h % 24);
+            if(eido_until_h < 0)
+                eido_until_h += 24;
+            const eido_until_m = 60 - eidotime_m;
+            const eido_until_s = 60 - eidotime_s;
+
+            let irl_until_in_m = 150 - irltime_m;
+
+            if(irl_until_in_m > 50)
+                irl_until_in_m -= 50;
+
+            const irl_until_h = Math.floor(irl_until_in_m / 60);
+            const irl_until_m = Math.floor(irl_until_in_m % 60);
+            const irl_until_s = Math.floor((irl_until_in_m * 60) % 60);
+
+            const info = {
+                isDay: isDay,
+                timeLeft: {
+                    h: irl_until_h,
+                    m: irl_until_m,
+                    s: irl_until_s,
+                    totalMs: ((irl_until_h * 60 + irl_until_m) * 60 + irl_until_s) * 1000
+                },
+                eidotime: {
+                    h: eidotime_h,
+                    m: eidotime_m,
+                    s: eidotime_s,
+                    totalMs: ((eidotime_h * 60 + eidotime_m) * 60 + eidotime_s) * 1000
+                },
+                irl: {
+                    h: eido_until_h,
+                    m: eido_until_m,
+                    s: eido_until_s,
+                    totalMs: ((eido_until_h * 60 + eido_until_m) * 60 + eido_until_s) * 1000
+                }
+            };
+            
+            const expirationDate = moment().add(info.timeLeft.h + 2, 'hours').add(info.timeLeft.m, 'minutes').add(info.timeLeft.s, 'seconds');
+            info.expirationDate = expirationDate.valueOf();
+
+            callback(info);
+        }
+        catch(ex)
+        {
+            callback();
+        }
     });
 }
 

@@ -608,9 +608,8 @@ Eidelon.prototype.getInformation = function(callback) {
     });
 }
 
-console.log('ATTENTION AU TOKEN');
 const bot = new Bot({
-    token: process.env.TOKEN || 'NDQxMzM0MzYzMzM0OTAxNzcx.DczzaQ.l0sOOiRw_xWrg7ijlYSZjiad_B8'
+    token: process.env.TOKEN
 });
 
 bot.start();

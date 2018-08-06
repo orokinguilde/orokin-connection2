@@ -24,7 +24,7 @@ Embed.createDiscordEmbed = function(options) {
         .setTitle("[**__trio🌙 eidelon__ **]")
         .setColor(15844367)
         .setThumbnail(options.img)
-        .setFooter(`Actualisé à ${new Date().toLocaleTimeString()}`, 'https://cdn.discordapp.com/attachments/437388704072466433/458396183237361665/nouvelle_vue_sur_lembleme_final_1.png')
+        .setFooter(`Actualisé à ${new Date().toLocaleTimeString().add(2, 'hour')}`, 'https://cdn.discordapp.com/attachments/437388704072466433/458396183237361665/nouvelle_vue_sur_lembleme_final_1.png')
         .setImage('https://media.discordapp.net/attachments/473609056163201024/475829958628081684/Teralyst_2.png?width=299&height=301')
         .setDescription(options.content);
 

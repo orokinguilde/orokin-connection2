@@ -24,7 +24,7 @@ Embed.createDiscordEmbed = function(options) {
         .setTitle("[**__trio🌙 eidelon__ **]")
         .setColor(15844367)
         .setThumbnail(options.img)
-        .setFooter(`Actualisé à ${new Date().toLocaleTimeString()}`, 'https://cdn.discordapp.com/attachments/430306848793690114/435516047395913738/embleme_alliance_.png')
+        .setFooter(`Actualisé à ${new Date().toLocaleTimeString()}`, 'https://cdn.discordapp.com/attachments/437388704072466433/458396183237361665/nouvelle_vue_sur_lembleme_final_1.png')
         .setImage('https://media.discordapp.net/attachments/473609056163201024/475829958628081684/Teralyst_2.png?width=299&height=301')
         .setDescription(options.content);
 
@@ -433,7 +433,12 @@ Server.prototype.updateEidelon = function(info) {
     }
     else
     {
-        this.eidelon.getInformation(info => this.updateEidelon(info));
+        this.eidelon.getInformation(info => {
+            if(!info)
+                return console.log('COULD NOT GET THE INFO OF EIDELON');
+            
+            this.updateEidelon(info);
+        });
     }
 }
 
@@ -441,11 +446,30 @@ function Eidelon()
 { }
 Eidelon.nearEndOfDayText = fs.readFileSync('./messagenuit.md');
 Eidelon.prototype.createNightMessage = function(info) {
+    const timesImg = [
+        [ 5 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388878899314698/Warframe_fin_de_la_nuit_0000.jpg' ],
+        [ 8 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388731402420224/1Warframe-5min0672.jpg' ],
+        [ 11 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388754366496778/1Warframe-8min0670.jpg' ],
+        [ 20 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388770506178570/1Warframe-11min0671.jpg' ],
+        [ 25 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388794015121429/1Warframe-20min0000.jpg' ],
+        [ 30 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388806266683404/1Warframe-25min0000.jpg' ],
+        [ 40 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388818274975745/1Warframe-30min0000.jpg' ],
+        [ 45 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388844707479571/1Warframe-40min0000.jpg' ],
+        [ Infinity, 'https://cdn.discordapp.com/attachments/437388704072466433/437388856036425738/1Warframe-45min0000.jpg' ],
+    ];
+
+    let index = 0;
+    for(const [ time ] of timesImg)
+    {
+        if(info.timeLeft.totalMs > time)
+            ++index;
+    }
+
     const expirationDateLocal = moment(info.expirationDate).add(-2, 'hours');
 
     return {
         content: `**\n \n Il fait nuit tenno! \n \n \n** **__Temps restant de cette nuit __**🕓 \n ${pad(info.timeLeft.h)}:${pad(info.timeLeft.m)}:${pad(info.timeLeft.s)} \n \n \n**__Debut du jour__ ** \n à ${expirationDateLocal.format('LT')}`,
-        img: 'https://vignette.wikia.nocookie.net/warframe/images/4/4c/Conclave_Moon.png/revision/latest?cb=20150327081658&path-prefix=fr'
+        img: timesImg[index][1] //'https://vignette.wikia.nocookie.net/warframe/images/4/4c/Conclave_Moon.png/revision/latest?cb=20150327081658&path-prefix=fr'
     };
 }
 Eidelon.prototype.createDayMessage = function(info) {
@@ -484,6 +508,9 @@ Eidelon.prototype.createMessageFromInformation = function(info) {
 Eidelon.prototype.createMessage = function(callback) {
 
     this.getInformation(info => {
+        if(!info)
+            return callback();
+        
         callback(this.createMessageFromInformation(info), info);
     });
 };
@@ -494,6 +521,9 @@ Eidelon.prototype.getInformation = function(callback) {
         const contents = JSON.parse(JSON.parse(body.toString()).contents);
 
         const syndicate = contents.SyndicateMissions.find(el => el.Tag === 'CetusSyndicate');
+
+        if(!syndicate)
+            return callback(undefined);
 
         const eido_timestamp = Math.floor(syndicate["Expiry"]["$date"]["$numberLong"] / 1000);
 

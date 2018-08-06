@@ -447,16 +447,16 @@ function Eidelon()
 Eidelon.nearEndOfDayText = fs.readFileSync('./messagenuit.md');
 Eidelon.prototype.createNightMessage = function(info) {
     const timesImg = [
-        [  5 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388878899314698/Warframe_fin_de_la_nuit_0000.jpg' ],
-        [  8 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388731402420224/1Warframe-5min0672.jpg' ],
-        [ 11 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388754366496778/1Warframe-8min0670.jpg' ],
-        [ 20 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388770506178570/1Warframe-11min0671.jpg' ],
-        [ 25 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388794015121429/1Warframe-20min0000.jpg' ],
-        [ 30 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388806266683404/1Warframe-25min0000.jpg' ],
-        [ 40 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388818274975745/1Warframe-30min0000.jpg' ],
-        [ 45 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388844707479571/1Warframe-40min0000.jpg' ],
         [       Infinity, 'https://cdn.discordapp.com/attachments/437388704072466433/437388856036425738/1Warframe-45min0000.jpg' ],
-    ];
+        [ 45 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388844707479571/1Warframe-40min0000.jpg' ],
+        [ 40 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388818274975745/1Warframe-30min0000.jpg' ],
+        [ 30 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388806266683404/1Warframe-25min0000.jpg' ],
+        [ 25 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388794015121429/1Warframe-20min0000.jpg' ],
+        [ 20 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388770506178570/1Warframe-11min0671.jpg' ],
+        [ 11 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388754366496778/1Warframe-8min0670.jpg' ],
+        [  8 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388731402420224/1Warframe-5min0672.jpg' ],
+        [  5 * 60 * 1000, 'https://cdn.discordapp.com/attachments/437388704072466433/437388878899314698/Warframe_fin_de_la_nuit_0000.jpg' ],
+    ].reverse();
 
     let index = 0;
     for(const [ time ] of timesImg)

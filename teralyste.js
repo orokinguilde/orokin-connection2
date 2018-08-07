@@ -295,13 +295,13 @@ Bot.prototype.helpCommand = function(message) {
 :small_blue_diamond: **!trio** | Affiche les informations sur le trio
 :small_blue_diamond: **!join trio** | Rejoindre le role @Trio Team
 :small_orange_diamond: **!leave trio** | Quitter le role @Trio Team
+:small_orange_diamond: **!oc nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
+:small_blue_diamond: **!oc notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons
 ====================[ Membres ]====================
 :small_orange_diamond: **!oc nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
 :small_blue_diamond: **!oc notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
 :small_orange_diamond: **!oc nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
 :small_blue_diamond: **!oc notif memberleave** | Active les notifications lorsqu'un membre quitte le clan
-:small_orange_diamond: **!oc nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
-:small_blue_diamond: **!oc notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons
 ================[ Twitch Disponible ]================
 :small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch
 `);

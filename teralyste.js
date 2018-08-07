@@ -562,7 +562,7 @@ Eidelon.prototype.createNightMessage = function(info) {
     const expirationDateLocal = moment(info.expirationDate);
 
     return {
-        content: `**\n \n Il fait nuit tenno! \n \n \n** **__Temps restant de cette nuit __**🕓 \n ${pad(info.timeLeft.h)}:${pad(info.timeLeft.m)}:${pad(info.timeLeft.s)} \n \n \n**__Debut du jour__ ** \n à ${expirationDateLocal.format('LT')}`,
+        content: `**\n\n** **__Temps restant de cette nuit __**🕓\n${pad(info.timeLeft.h)}:${pad(info.timeLeft.m)}:${pad(info.timeLeft.s)}\n\n\n**__Debut du jour__ **\nà ${expirationDateLocal.format('LT')}\n\n\nIl fait nuit tenno!`,
         img: timesImg[index][1] //'https://vignette.wikia.nocookie.net/warframe/images/4/4c/Conclave_Moon.png/revision/latest?cb=20150327081658&path-prefix=fr'
     };
 }
@@ -602,7 +602,7 @@ Eidelon.prototype.createDayMessage = function(info) {
     const expirationDateLocal = moment(info.expirationDate);
 
     return {
-        content: `**\n \n Il fait jour... \n \n \n** **__Temps restant avant la nuit__**🕓 \n ${pad(info.timeLeft.h)}:${pad(info.timeLeft.m)}:${pad(info.timeLeft.s)} \n \n \n**__Debut de la nuit__** \n à ${expirationDateLocal.format('LT')} ${timeLeft ? Eidelon.nearEndOfDayText : ''}`,
+        content: `**\n\n** **__Temps restant avant la nuit__**🕓 \n ${pad(info.timeLeft.h)}:${pad(info.timeLeft.m)}:${pad(info.timeLeft.s)}\n\n\n**__Debut de la nuit__** \n à ${expirationDateLocal.format('LT')} ${timeLeft ? Eidelon.nearEndOfDayText : ''}\n\n\nIl fait jour...`,
         img: timesImg[index][1]
     };
 }

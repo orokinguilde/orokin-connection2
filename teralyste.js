@@ -265,7 +265,7 @@ Bot.prototype.ocCommand = function(message) {
         .setThumbnail('https://media.discordapp.net/attachments/473609056163201024/475828867979018240/Capturecc2.PNG');
     
     this.client.channels.findAll('name', 'orokin-connection').map(channel => {
-        console.log('SENDING OC message to ', channel.guild.name);
+        console.log('SENDING message to ', channel.guild.name);
         
         channel.send(embed);
         channel.send(messageContent);
@@ -295,13 +295,13 @@ Bot.prototype.helpCommand = function(message) {
 :small_blue_diamond: **!trio** | Affiche les informations sur le trio
 :small_blue_diamond: **!join trio** | Rejoindre le role @Trio Team
 :small_orange_diamond: **!leave trio** | Quitter le role @Trio Team
-:small_orange_diamond: **!oc nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
-:small_blue_diamond: **!oc notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons
+:small_orange_diamond: **!nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
+:small_blue_diamond: **!notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons
 ====================[ Membres ]====================
-:small_orange_diamond: **!oc nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
-:small_blue_diamond: **!oc notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
-:small_orange_diamond: **!oc nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
-:small_blue_diamond: **!oc notif memberleave** | Active les notifications lorsqu'un membre quitte le clan
+:small_orange_diamond: **!nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
+:small_blue_diamond: **!notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
+:small_orange_diamond: **!nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
+:small_blue_diamond: **!notif memberleave** | Active les notifications lorsqu'un membre quitte le clan
 ================[ Twitch Disponible ]================
 :small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch
 `);
@@ -350,27 +350,27 @@ Bot.prototype.initialize = function() {
             this.application.addServerChannel(message.guild, message.channel);
             message.delete();
         }
-        else if(checkForCommand(/^\s*!oc\s+nonotif\s+memberadd\s*$/img))
+        else if(checkForCommand(/^\s*!nonotif\s+memberadd\s*$/img))
         {
             this.stops.memberAdd[message.guild.id] = true;
         }
-        else if(checkForCommand(/^\s*!oc\s+notif\s+memberadd\s*$/img))
+        else if(checkForCommand(/^\s*!notif\s+memberadd\s*$/img))
         {
             delete this.stops.memberAdd[message.guild.id];
         }
-        else if(checkForCommand(/^\s*!oc\s+nonotif\s+memberleave\s*$/img))
+        else if(checkForCommand(/^\s*!nonotif\s+memberleave\s*$/img))
         {
             this.stops.memberRemove[message.guild.id] = true;
         }
-        else if(checkForCommand(/^\s*!oc\s+notif\s+memberleave\s*$/img))
+        else if(checkForCommand(/^\s*!notif\s+memberleave\s*$/img))
         {
             delete this.stops.memberRemove[message.guild.id];
         }
-        else if(checkForCommand(/^\s*!oc\s+nonotif\s+eidolonswarning\s*$/img))
+        else if(checkForCommand(/^\s*!nonotif\s+eidolonswarning\s*$/img))
         {
             this.stops.eidolonsWarning[message.guild.id] = true;
         }
-        else if(checkForCommand(/^\s*!oc\s+notif\s+eidolonswarning\s*$/img))
+        else if(checkForCommand(/^\s*!notif\s+eidolonswarning\s*$/img))
         {
             delete this.stops.eidolonsWarning[message.guild.id];
         }

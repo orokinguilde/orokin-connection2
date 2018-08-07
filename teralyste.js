@@ -25,7 +25,7 @@ Embed.createDiscordEmbed = function(options) {
         .setColor(15844367)
         .setThumbnail(options.img)
         .setFooter(`Actualisé à ${moment(new Date()).add(2, 'hour').format('LT')}`, 'https://cdn.discordapp.com/attachments/437388704072466433/458396183237361665/nouvelle_vue_sur_lembleme_final_1.png')
-        .setImage('https://media.discordapp.net/attachments/473609056163201024/475829958628081684/Teralyst_2.png?width=299&height=301')
+        .setImage(options.isDay ? 'https://media.discordapp.net/attachments/473609056163201024/476216651281596420/sun_PNG13422.png' : 'https://media.discordapp.net/attachments/437388704072466433/475991088813965312/Sans_titre-12.png?width=759&height=702')
         .setDescription(options.content);
 
     return embed;
@@ -302,7 +302,7 @@ Bot.prototype.helpCommand = function(message) {
 :small_blue_diamond: **!notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
 :small_orange_diamond: **!nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
 :small_blue_diamond: **!notif memberleave** | Active les notifications lorsqu'un membre quitte le clan
-================[ Twitch Disponible ]================
+=================[ Twitch Disponible ]=================
 :small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch
 `);
 
@@ -336,6 +336,9 @@ Bot.findGeneralChannel = function(channels) {
         return undefined;
     }
 }
+Bot.isAdmin = function(member) {
+    return member.hasPermission('ADMINISTRATOR');
+}
 Bot.prototype.initialize = function() {
     const client = new Discord.Client();
     this.client = client;
@@ -352,27 +355,33 @@ Bot.prototype.initialize = function() {
         }
         else if(checkForCommand(/^\s*!nonotif\s+memberadd\s*$/img))
         {
-            this.stops.memberAdd[message.guild.id] = true;
+            if(Bot.isAdmin(message.member))
+                this.stops.memberAdd[message.guild.id] = true;
         }
         else if(checkForCommand(/^\s*!notif\s+memberadd\s*$/img))
         {
-            delete this.stops.memberAdd[message.guild.id];
+            if(Bot.isAdmin(message.member))
+                delete this.stops.memberAdd[message.guild.id];
         }
         else if(checkForCommand(/^\s*!nonotif\s+memberleave\s*$/img))
         {
-            this.stops.memberRemove[message.guild.id] = true;
+            if(Bot.isAdmin(message.member))
+                this.stops.memberRemove[message.guild.id] = true;
         }
         else if(checkForCommand(/^\s*!notif\s+memberleave\s*$/img))
         {
-            delete this.stops.memberRemove[message.guild.id];
+            if(Bot.isAdmin(message.member))
+                delete this.stops.memberRemove[message.guild.id];
         }
         else if(checkForCommand(/^\s*!nonotif\s+eidolonswarning\s*$/img))
         {
-            this.stops.eidolonsWarning[message.guild.id] = true;
+            if(Bot.isAdmin(message.member))
+                this.stops.eidolonsWarning[message.guild.id] = true;
         }
         else if(checkForCommand(/^\s*!notif\s+eidolonswarning\s*$/img))
         {
-            delete this.stops.eidolonsWarning[message.guild.id];
+            if(Bot.isAdmin(message.member))
+                delete this.stops.eidolonsWarning[message.guild.id];
         }
         else if(checkForCommand(/^\s*!helpme\s*$/img))
         {
@@ -506,6 +515,7 @@ Server.prototype.updateEidelon = function(info) {
 
         const embed = this.getEmbed(this.channel);
         embed.setContent({
+            isDay: info.isDay,
             img: message.img,
             content: message.content
         });

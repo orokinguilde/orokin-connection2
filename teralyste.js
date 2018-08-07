@@ -291,21 +291,22 @@ Bot.prototype.helpCommand = function(message) {
         .setAuthor('Help me!', 'https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50')
         .setThumbnail('https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50')
         .setDescription(`
-=======================[ Tridolon ]======================
+=====================[ Tridolon ]====================
 :small_blue_diamond: **!trio** | Affiche les informations sur le trio
 :small_blue_diamond: **!join trio** | Rejoindre le role @Trio Team
 :small_orange_diamond: **!leave trio** | Quitter le role @Trio Team
-=======================[ Membres ]=======================
+====================[ Membres ]====================
 :small_orange_diamond: **!oc nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
 :small_blue_diamond: **!oc notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
 :small_orange_diamond: **!oc nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
 :small_blue_diamond: **!oc notif memberleave** | Active les notifications lorsqu'un membre quitte le clan
 :small_orange_diamond: **!oc nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
 :small_blue_diamond: **!oc notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons
-==================[ Twitch Disponible ]==================
+================[ Twitch Disponible ]================
 :small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch
 `);
 
+    message.delete();
     message.channel.send(embed);
 }
 Bot.findGeneralChannel = function(channels) {

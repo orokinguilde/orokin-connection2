@@ -25,7 +25,7 @@ Embed.createDiscordEmbed = function(options) {
         .setColor(15844367)
         .setThumbnail(options.img)
         .setFooter(`Actualisé à ${moment(new Date()).add(2, 'hour').format('LT')}`, 'https://cdn.discordapp.com/attachments/437388704072466433/458396183237361665/nouvelle_vue_sur_lembleme_final_1.png')
-        .setImage('https://media.discordapp.net/attachments/437388704072466433/475991088813965312/Sans_titre-12.png?width=759&height=702')
+        .setImage('https://media.discordapp.net/attachments/473609056163201024/475829958628081684/Teralyst_2.png?width=299&height=301')
         .setDescription(options.content);
 
     return embed;
@@ -66,6 +66,37 @@ Embed.prototype.disable = function() {
         this.embedMessage.delete();
         this.embedMessage = undefined;
     }
+}
+
+function Twitch(streamer)
+{
+    this.streamer = streamer;
+}
+Twitch.getCurrentInformation = function(streamer, callback) {
+    request({
+        url: 'https://api.twitch.tv/kraken/streams/' + streamer,
+        headers: {
+            'Client-ID': '3zzmx0l2ph50anf78iefr6su9d8byj8',
+            'Accept': 'application/json'
+        }
+    }, (e, res, body) => {
+        const stream = JSON.parse(body.toString()).stream;
+        const result = {
+            isStreaming: !!stream
+        };
+
+        if(result.isStreaming)
+        {
+            result.startDate = stream.created_at;
+            result.title = stream.channel.status;
+            result.game = stream.game;
+        }
+
+        callback(result);
+    });
+}
+Twitch.prototype.getCurrentInformation = function(callback) {
+    return Twitch.getCurrentInformation(this.streamer, callback);
 }
 
 function Application(bot, options)
@@ -240,6 +271,19 @@ Bot.prototype.ocCommand = function(message) {
         channel.send(messageContent);
     })
 }
+Bot.findTrioTeamRole = function(guild) {
+    return guild.roles.find(role => role.name.replace(/\s+/, '').toLowerCase() === 'trioteam');
+}
+Bot.prototype.joinTrioCommand = function(message) {
+    const role = Bot.findTrioTeamRole(message.guild);
+    message.member.addRole(role);
+
+    message.channel.send('Vous avez quitté');
+}
+Bot.prototype.leaveTrioCommand = function(message) {
+    const role = Bot.findTrioTeamRole(message.guild);
+    message.member.removeRole(role);
+}
 Bot.prototype.helpCommand = function(message) {
 
     var embed = new Discord.RichEmbed()
@@ -247,12 +291,15 @@ Bot.prototype.helpCommand = function(message) {
         .setAuthor('Help me!', 'https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50')
         .setThumbnail('https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50')
         .setDescription(`
-* **!oc nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
-* **!oc notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
-* **!oc nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
-* **!oc notif memberleave** | Active les notifications lorsqu'un membre quitte le clan
-* **!oc nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
-* **!oc notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons
+:small_blue_diamond: **!trio** | Affiche les informations sur le trio
+:small_blue_diamond: **!join trio** | Rejoindre le role @Trio Team
+:small_orange_diamond: **!leave trio** | Quitter le role @Trio Team
+:small_orange_diamond: **!oc nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
+:small_blue_diamond: **!oc notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
+:small_orange_diamond: **!oc nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
+:small_blue_diamond: **!oc notif memberleave** | Active les notifications lorsqu'un membre quitte le clan
+:small_orange_diamond: **!oc nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
+:small_blue_diamond: **!oc notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons
 `);
 
     message.channel.send(embed);
@@ -266,6 +313,11 @@ Bot.findGeneralChannel = function(channels) {
     
     const matchingChannels = channels
         .filter(channel => channel.constructor.name === 'TextChannel')
+        .filter(channel => {
+            if(channel.name.indexOf('discussion') !== -1)
+            console.log(channel.name, /^[^a-zA-Z0-9]*discussion[^a-zA-Z0-9]*$/img.test(channel.name));
+            return true;
+        })
         .filter(channel => channelNames.some(regex => regex.test(channel.name)))
         .array();
                 
@@ -321,6 +373,31 @@ Bot.prototype.initialize = function() {
         {
             this.helpCommand(message);
         }
+        else if(checkForCommand(/^\s*!join trio\s*$/img))
+        {
+            this.joinTrioCommand(message);
+        }
+        else if(checkForCommand(/^\s*!leave trio\s*$/img))
+        {
+            this.leaveTrioCommand(message);
+        }
+        else if(checkForCommand(/^\s*!twitch\s*.+$/img))
+        {
+            //this.twitchCommand(message);
+            const msg = message.content.trim();
+            const streamer = msg.split(' ', 2)[1];
+            const twitch = new Twitch(streamer);
+            twitch.getCurrentInformation(info => {
+                if(info.isStreaming)
+                {
+                    message.channel.send(`:small_blue_diamond: ${streamer} est en live. https://www.twitch.tv/${stream}`);
+                }
+                else
+                {
+                    message.channel.send(`:small_orange_diamond: ${streamer} n'est pas en live. https://www.twitch.tv/${stream}`);
+                }
+            })
+        }
         else if(message.author.id !== this.client.user.id && message.channel.name === 'orokin-connection')
         {
             this.ocCommand(message);
@@ -360,6 +437,8 @@ Bot.prototype.initialize = function() {
             client.user.setAvatar('./embleme alliance.png');
         }, 5000);
         client.user.setActivity('connecter la guilde');
+        
+        Bot.findGeneralChannel(client.channels);
 
         this.application.start();
     })

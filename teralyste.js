@@ -14,63 +14,15 @@ function pad(value)
     return value;
 }
 
-function Embed(channel)
+function findById(collection, id)
 {
-    this.channel = channel;
-    this.poolSetContent = [];
-}
-Embed.createDiscordEmbed = function(options) {
-    const embed = new Discord.RichEmbed()
-        .setTitle("[**__trio🌙 eidelon__ **]")
-        .setColor(15844367)
-        .setThumbnail(options.img)
-        .setFooter(`Actualisé à ${moment(new Date()).add(2, 'hour').format('LT')}`, 'https://cdn.discordapp.com/attachments/437388704072466433/458396183237361665/nouvelle_vue_sur_lembleme_final_1.png')
-        .setImage(options.isDay ? 'https://media.discordapp.net/attachments/473609056163201024/476216651281596420/sun_PNG13422.png' : 'https://media.discordapp.net/attachments/437388704072466433/475991088813965312/Sans_titre-12.png?width=759&height=702')
-        .setDescription(options.content);
-
-    return embed;
-}
-Embed.prototype.setContent = function(options) {
-
-    this.poolSetContent.push(() => {
-        const embed = Embed.createDiscordEmbed(options);
-        console.log('TYING TO SEND EMBED', !!this.embedMessage);
-
-        let promise;
-        if(this.embedMessage)
-            promise = this.embedMessage.edit(embed);
-        else
-            promise = this.channel.send(embed);
-
-        promise.then(m => {
-            console.log('MESSAGE EMBED SET');
-            this.embedMessage = m;
-            this.poolSetContent.shift();
-
-            if(this.poolSetContent.length >= 1)
-            {
-                process.nextTick(() => {
-                    this.poolSetContent[0]();
-                });
-            }
-        });
-    });
-
-    if(this.poolSetContent.length === 1)
-        this.poolSetContent[0]();
-}
-Embed.prototype.disable = function() {
-    if(this.embedMessage)
-    {
-        console.log('DELETE');
-        this.embedMessage.delete();
-        this.embedMessage = undefined;
-    }
+    return collection.filter(item => item.id === id).first();
 }
 
-function Twitch(streamer)
+function Twitch(streamer, channel, originalMessage)
 {
     this.streamer = streamer;
+    this.message = new Message(channel, originalMessage);
 }
 Twitch.getCurrentInformation = function(streamer, callback) {
     request({
@@ -80,6 +32,7 @@ Twitch.getCurrentInformation = function(streamer, callback) {
             'Accept': 'application/json'
         }
     }, (e, res, body) => {
+        console.log(JSON.parse(body.toString()));
         const stream = JSON.parse(body.toString()).stream;
         const result = {
             isStreaming: !!stream
@@ -95,8 +48,63 @@ Twitch.getCurrentInformation = function(streamer, callback) {
         callback(result);
     });
 }
+Twitch.prototype.getURL = function() {
+    return `https://www.twitch.tv/${this.streamer}`;
+}
+Twitch.prototype.save = function() {
+    return {
+        streamer: this.streamer,
+        message: this.message.save()
+    };
+}
+Twitch.prototype.load = function(obj, ctx) {
+    this.streamer = obj.streamer;
+    this.message.load(obj.message, ctx);
+}
 Twitch.prototype.getCurrentInformation = function(callback) {
     return Twitch.getCurrentInformation(this.streamer, callback);
+}
+Twitch.prototype.notify = function(info) {
+    if(info)
+    {
+        const channel = this.message.channel;
+        if(channel)
+        {
+            if(info.isStreaming)
+                channel.send(`:small_blue_diamond: @everyone, ${this.streamer} est en live. ${this.getURL()}`);
+            else
+                channel.send(`:small_orange_diamond: ${this.streamer} n'est pas en live. ${this.getURL()}`);
+        }
+        else
+            console.log('Pas de channel défini pour Twitch');
+    }
+    else
+    {
+        this.getCurrentInformation(info => this.notify(info));
+    }
+}
+Twitch.prototype.update = function(callback) {
+    this.getCurrentInformation(info => {
+        if(info)
+        {
+            if(info.isStreaming && (!this.lastInformation || info.startDate !== this.lastInformation.startDate))
+            {
+                //this.notify(info);
+            }
+
+            let msg;
+            if(info.isStreaming)
+                msg = `:small_blue_diamond: ${this.streamer} est en live. ${this.getURL()}`;
+            else
+                msg = `:small_orange_diamond: ${this.streamer} n'est pas en live. ${this.getURL()}`;
+            this.message.update(msg);
+
+            this.lastInformation = info;
+        }
+
+        if(callback)
+            callback(this.lastInformation);
+    })
 }
 
 function Application(bot, options)
@@ -108,14 +116,41 @@ function Application(bot, options)
 
     this.options = options;
 
+    this.currentTwitchIndex = 0;
+    this.twitches = [];
     this.eidelon = new Eidelon();
     this.servers = [];
     this.bot = bot;
 }
-Application.prototype.addServerChannel = function(guild, channel) {
+Application.prototype.save = function() {
+    return {
+        servers: this.servers.map(server => server.save()),
+        twitches: this.twitches.map(server => server.save())
+    };
+}
+Application.prototype.load = function(obj, ctx) {
+    if(obj.servers)
+    {
+        this.servers = obj.servers.map(serverObj => {
+            const server = new Server(this, this.eidelon);
+            server.load(serverObj, ctx);
+            return server;
+        });
+    }
+
+    if(obj.twitches)
+    {
+        this.twitches = obj.twitches.map(twitchObj => {
+            const twitch = new Twitch();
+            twitch.load(twitchObj, ctx);
+            return twitch;
+        });
+    }
+}
+Application.prototype.addServerChannel = function(channel) {
     for(const server of this.servers)
     {
-        if(server.guild.id === guild.id)
+        if(server.getGuild().id === channel.guild.id)
         {
             server.setChannel(channel);
             server.update();
@@ -123,12 +158,12 @@ Application.prototype.addServerChannel = function(guild, channel) {
         }
     }
 
-    const newServer = new Server(this, guild, channel, this.eidelon);
+    const newServer = new Server(this, this.eidelon);
+    newServer.setChannel(channel);
     this.servers.push(newServer);
     newServer.update();
 }
-Application.prototype.update = function(callback) {
-
+Application.prototype.updateEidelon = function(callback) {
     if(this.servers.length === 0)
     {
         if(callback)
@@ -142,6 +177,45 @@ Application.prototype.update = function(callback) {
 
         if(callback)
             callback();
+    })
+}
+Application.prototype.updateTwitches = function(callback) {
+    console.log(this.twitches.length);
+    if(this.twitches.length > 0)
+    {
+        const twitch = this.twitches[this.currentTwitchIndex];
+        this.currentTwitchIndex = (this.currentTwitchIndex + 1) % this.twitches.length;
+
+        if(twitch)
+            twitch.update();
+    }
+
+    if(callback)
+        callback();
+}
+Application.twitchMatcher = function(streamer, channel) {
+    return twitch => twitch.streamer === streamer && twitch.channel.id === channel.id && twitch.channel.guild.id === channel.guild.id;
+}
+Application.prototype.addTwitch = function(streamer, channel, messageToReplace) {
+    const matchingTwitches = this.twitches.filter(Application.twitchMatcher(streamer, channel));
+
+    if(matchingTwitches.length === 0)
+    {
+        const twitch = new Twitch(streamer, channel, messageToReplace);
+        this.twitches.push(twitch);
+        return twitch;
+    }
+    else
+    {
+        return matchingTwitches[0];
+    }
+}
+Application.prototype.removeTwitch = function(streamer, channel) {
+    this.twitches = this.twitches.filter(twitch => !Application.twitchMatcher(streamer, channel)(twitch));
+}
+Application.prototype.update = function(callback) {
+    this.updateEidelon(() => {
+        this.updateTwitches(callback);
     })
 }
 Application.prototype.start = function(force) {
@@ -164,6 +238,38 @@ Application.prototype.stop = function() {
     }
 }
 
+function Saver(filePath, object)
+{
+    this.filePath = filePath;
+    this.object = object;
+    this.executionPool = new ExecutionPool();
+}
+Saver.prototype.save = function(callback) {
+    this.executionPool.add((done) => {
+        const obj = this.object.save();
+        const data = JSON.stringify(obj);
+        
+        fs.writeFile(this.filePath, data, () => {
+            done();
+            if(callback)
+                callback();
+        })
+    })
+}
+Saver.prototype.load = function(callback)
+{
+    fs.readFile(this.filePath, (e, content) => {
+        if(!e && content)
+        {
+            const data = JSON.parse(content.toString());
+            this.object.load(data);
+        }
+
+        if(callback)
+            callback();
+    })
+}
+
 function Bot(options)
 {
     if(!options)
@@ -182,6 +288,20 @@ function Bot(options)
 
     if(!this.noAutoInitialization)
         this.initialize();
+}
+Bot.prototype.save = function() {
+    return {
+        application: this.application.save(),
+        stops: this.stops
+    };
+}
+Bot.prototype.load = function(obj) {
+    const ctx = {
+        bot: this
+    };
+
+    this.application.load(obj.application, ctx);
+    this.stops = obj.stops;
 }
 Bot.prototype.start = function(token) {
     this.client.login(token || this.options.token);
@@ -203,27 +323,13 @@ Bot.getRandomColor = function() {
     return colors[Math.floor(Math.random() * colors.length)];
 }
 Bot.prototype.ocCommand = function(message) {
-    message
-        .delete(message.author)
-        .catch(ex => {
-            if(ex.code === 50013)
-            {
-                if(!this.errorCounters.permissionRequired)
-                {
-                    this.errorCounters.permissionRequired = 5;
-                    message.channel.send('Je n\'ai pas pu supprimer ton message. Met moi le rôle gérer `Gérer les messages` ou `Admin`.');
-                }
-                else
-                {
-                    --this.errorCounters.permissionRequired;
-                }
-            }
-        });
+
+    Message.deleteMessage(message);
 
     //let argson = message.content.split(" ").slice(1);
     //let vcsmsg = argson.join(" ")
     let messageContent = message.content;
-    if (!message.guild.channels.find('name', 'orokin-connection'))
+    if(!message.guild.channels.find('name', 'orokin-connection'))
         return message.reply('Erreur: le channel `orokin connection` est introuvable');
     if(message.channel.name !== 'orokin-connection')
         return message.reply('Commande a effectuer dans `orokin-connection`');
@@ -278,11 +384,13 @@ Bot.prototype.joinTrioCommand = function(message) {
     const role = Bot.findTrioTeamRole(message.guild);
     message.member.addRole(role);
 
-    message.channel.send('Vous avez quitté');
+    message.channel.send('Vous avez rejoint Trio Team ! :tada: ');
 }
 Bot.prototype.leaveTrioCommand = function(message) {
     const role = Bot.findTrioTeamRole(message.guild);
     message.member.removeRole(role);
+    
+    message.channel.send('Vous avez quitté Trio Team ! :cry: ');
 }
 Bot.prototype.helpCommand = function(message) {
 
@@ -303,8 +411,7 @@ Bot.prototype.helpCommand = function(message) {
 :small_orange_diamond: **!nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
 :small_blue_diamond: **!notif memberleave** | Active les notifications lorsqu'un membre quitte le clan
 =================[ Twitch Disponible ]=================
-:small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch
-`);
+:small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch`);
 
     message.delete();
     message.channel.send(embed);
@@ -318,11 +425,12 @@ Bot.findGeneralChannel = function(channels) {
     
     const matchingChannels = channels
         .filter(channel => channel.constructor.name === 'TextChannel')
+        /*
         .filter(channel => {
             if(channel.name.indexOf('discussion') !== -1)
-            console.log(channel.name, /^[^a-zA-Z0-9]*discussion[^a-zA-Z0-9]*$/img.test(channel.name));
+                console.log(channel.name, /^[^a-zA-Z0-9]*discussion[^a-zA-Z0-9]*$/img.test(channel.name));
             return true;
-        })
+        })*/
         .filter(channel => channelNames.some(regex => regex.test(channel.name)))
         .array();
                 
@@ -347,41 +455,74 @@ Bot.prototype.initialize = function() {
         const checkForCommand = (regexCmd) => {
             return regexCmd.test(message.content);
         };
+        
+        if(this.debug)
+        {
+            if(message.content[0] !== '@')
+                return;
+            
+            message.content = message.content.slice(1);
+        }
 
         if(checkForCommand(/^\s*!trio\s*$/img))
         {
-            this.application.addServerChannel(message.guild, message.channel);
+            this.application.addServerChannel(message.channel);
             message.delete();
+            saver.save();
         }
         else if(checkForCommand(/^\s*!nonotif\s+memberadd\s*$/img))
         {
             if(Bot.isAdmin(message.member))
+            {
                 this.stops.memberAdd[message.guild.id] = true;
+                message.reply(':small_orange_diamond: Désactivation des notifications lorsqu\'un membre rejoint le clan');
+                saver.save();
+            }
         }
         else if(checkForCommand(/^\s*!notif\s+memberadd\s*$/img))
         {
             if(Bot.isAdmin(message.member))
+            {
                 delete this.stops.memberAdd[message.guild.id];
+                message.reply(':small_blue_diamond: Activation des notifications lorsqu\'un membre rejoint le clan');
+                saver.save();
+            }
         }
         else if(checkForCommand(/^\s*!nonotif\s+memberleave\s*$/img))
         {
             if(Bot.isAdmin(message.member))
+            {
                 this.stops.memberRemove[message.guild.id] = true;
+                message.reply(':small_orange_diamond: Désactivation des notifications lorsqu\'un membre quitte le clan');
+                saver.save();
+            }
         }
         else if(checkForCommand(/^\s*!notif\s+memberleave\s*$/img))
         {
             if(Bot.isAdmin(message.member))
+            {
                 delete this.stops.memberRemove[message.guild.id];
+                message.reply(':small_blue_diamond: Activation des notifications lorsqu\'un membre quitte le clan');
+                saver.save();
+            }
         }
         else if(checkForCommand(/^\s*!nonotif\s+eidolonswarning\s*$/img))
         {
             if(Bot.isAdmin(message.member))
+            {
                 this.stops.eidolonsWarning[message.guild.id] = true;
+                message.reply(':small_orange_diamond: Désactivation des notifications pour les Eidolons');
+                saver.save();
+            }
         }
         else if(checkForCommand(/^\s*!notif\s+eidolonswarning\s*$/img))
         {
             if(Bot.isAdmin(message.member))
+            {
                 delete this.stops.eidolonsWarning[message.guild.id];
+                message.reply(':small_blue_diamond: Activation des notifications pour les Eidolons');
+                saver.save();
+            }
         }
         else if(checkForCommand(/^\s*!helpme\s*$/img))
         {
@@ -397,25 +538,20 @@ Bot.prototype.initialize = function() {
         }
         else if(checkForCommand(/^\s*!twitch\s*.+$/img))
         {
+            console.log('TWITCH');
             //this.twitchCommand(message);
             const msg = message.content.trim();
             const streamer = msg.split(' ', 2)[1];
-            const twitch = new Twitch(streamer);
-            twitch.getCurrentInformation(info => {
-                if(info.isStreaming)
-                {
-                    message.channel.send(`:small_blue_diamond: ${streamer} est en live. https://www.twitch.tv/${streamer}`);
-                }
-                else
-                {
-                    message.channel.send(`:small_orange_diamond: ${streamer} n'est pas en live. https://www.twitch.tv/${streamer}`);
-                }
-            })
+            
+            const twitch = this.application.addTwitch(streamer, message.channel, message);
+            twitch.update();
+            saver.save();
         }
         else if(message.author.id !== this.client.user.id && message.channel.name === 'orokin-connection')
         {
             this.ocCommand(message);
         }
+        console.log(message.content.trim());
     })
     
     client.on('guildMemberAdd', member => {
@@ -451,29 +587,190 @@ Bot.prototype.initialize = function() {
             client.user.setAvatar('./embleme alliance.png');
         }, 5000);
         client.user.setActivity('connecter la guilde');
-        
-        Bot.findGeneralChannel(client.channels);
 
         this.application.start();
+        if(this._onReady)
+            this._onReady();
     })
 }
+Bot.prototype.onReady = function(fn) {
+    this._onReady = fn;
+}
 
-function Server(application, guild, channel, eidelon)
+function ExecutionPool()
+{
+    this.poolSetContent = [];
+}
+ExecutionPool.prototype.add = function(fn) {
+    this.poolSetContent.push(() => {
+        fn(() => {
+            this.poolSetContent.shift();
+
+            if(this.poolSetContent.length >= 1)
+            {
+                process.nextTick(() => {
+                    this.poolSetContent[0]();
+                });
+            }
+        });
+    });
+
+    if(this.poolSetContent.length === 1)
+        this.poolSetContent[0]();
+}
+
+
+function Message(channel, messageToReplace, newMessage)
+{
+    this.channel = channel;
+    this.executionPool = new ExecutionPool();
+    
+    Message.deleteMessage(messageToReplace);
+
+    if(newMessage)
+        this.update(newMessage);
+}
+Message.displayPermissionRequired = function(channel) {
+    if(!Message.guilds)
+        Message.guilds = {};
+    if(!Message.guilds[channel.id])
+        Message.guilds[channel.id] = 0;
+    
+    const nb = Message.guilds[channel.id];
+
+    if(nb <= 0)
+    {
+        Message.guilds[channel.id] = 5;
+        channel.send('Je n\'ai pas pu supprimer ton message. Met moi le rôle `Gérer les messages` ou `Admin`.');
+    }
+    else
+    {
+        --Message.guilds[channel.id];
+    }
+}
+Message.deleteMessage = function(message) {
+    if(message)
+    {
+        message
+            .delete()
+            .catch(ex => {
+                if(ex.code === 50013)
+                {
+                    Message.displayPermissionRequired(message.channel);
+                }
+            });
+    }
+}
+Message.prototype.update = function(message) {
+    this.executionPool.add((done) => {
+        console.log('TRYING TO SEND EMBED', !!this.msg);
+
+        let promise;
+        if(this.msg)
+            promise = this.msg.edit(message);
+        else
+            promise = this.channel.send(message);
+
+        promise.then(m => {
+            console.log('MESSAGE EMBED SET');
+            this.msg = m;
+            saver.save();
+            
+            done();
+        });
+    });
+}
+Message.prototype.delete = function() {
+    Message.deleteMessage(this.msg);
+    this.msg = undefined;
+}
+Message.prototype.save = function() {
+    return {
+        channel: this.channel.id,
+        guild: this.channel.guild.id,
+        message: this.msg ? this.msg.id : undefined
+    };
+}
+Message.prototype.load = function(obj, ctx) {
+    if(obj.guild)
+    {
+        const guild = findById(ctx.bot.client.guilds, obj.guild);
+        const channel = findById(guild.channels, obj.channel);
+
+        this.channel = channel;
+
+        if(obj.message)
+        {
+            this.channel.fetchMessages().then((messages) => {
+                this.msg = findById(messages, obj.message);
+            })
+        }
+    }
+}
+Message.createUniqueServerWideMessage = function() {
+    const obj = {
+        getMessage: function(channel) {
+            if(channel && this.message && this.message.channel.id !== channel.id)
+            {
+                this.message.delete();
+                this.message = undefined;
+            }
+        
+            if(!this.message)
+            {
+                if(!channel)
+                    console.error('No channel provided, but it was required');
+                this.message = new Message(channel);
+            }
+            
+            return this.message;
+        },
+        save: function() {
+            return {
+                message: this.message.save()
+            }
+        },
+        load: function(obj, ctx) {
+            this.message = new Message();
+            this.message.load(obj.message, ctx);
+        },
+        getChannel: function() {
+            return this.message ? this.message.channel : undefined;
+        },
+        getGuild: function() {
+            const channel = this.getChannel();
+
+            return channel ? channel.guild : undefined;
+        }
+    };
+
+    return obj;
+}
+
+function Server(application, eidelon)
 {
     this.application = application;
-    this.guild = guild;
-    this.channel = channel;
     this.eidelon = eidelon;
+
+    this.messageManager = Message.createUniqueServerWideMessage();
+}
+Server.prototype.save = function() {
+    return {
+        messageManager: this.messageManager.save()
+    };
+}
+Server.prototype.load = function(obj, ctx) {
+    this.messageManager.load(obj.messageManager, ctx);
 }
 Server.prototype.warnForEidolons = function(info, force) {
-    if(!info.isDay || this.application.bot.stops.eidolonsWarning[this.guild.id])
+    if(!info.isDay || this.application.bot.stops.eidolonsWarning[this.messageManager.getGuild().id])
         return;
     
     if((force || Math.trunc(this.expirationDate / 10000) !== Math.trunc(info.expirationDate / 10000)) && info.timeLeft.totalMs <= 600000)
     {
         this.expirationDate = info.expirationDate;
 
-        const channelGeneral = Bot.findGeneralChannel(this.guild.channels);
+        const channelGeneral = Bot.findGeneralChannel(this.messageManager.getGuild().channels);
         
         if(channelGeneral)
         {
@@ -482,48 +779,43 @@ Server.prototype.warnForEidolons = function(info, force) {
         }
     }
 }
-Server.prototype.getEmbed = function(channel) {
-    if(this.embed && this.embed.channel.id !== channel.id)
-    {
-        this.embed.disable();
-        this.embed = undefined;
-    }
-
-    if(!this.embed)
-        this.embed = new Embed(channel);
-    
-    return this.embed;
+Server.prototype.getMessage = function(channel) {
+    return this.messageManager.getMessage(channel);
 }
 Server.prototype.setChannel = function(channel) {
-    if(this.channel && this.channel.id === channel.id && this.embed)
-    {
-        this.embed.disable();
-        this.embed = undefined;
-    }
-    
-    this.channel = channel;
+    this.messageManager.getMessage(channel);
+}
+Server.prototype.getChannel = function() {
+    return this.messageManager.getChannel();
+}
+Server.prototype.getGuild = function() {
+    return this.messageManager.getGuild();
 }
 Server.prototype.update = function(eidelonInfo) {
     this.updateEidelon(eidelonInfo);
 }
 Server.prototype.updateEidelon = function(info) {
 
-    const exec = () => {
+    if(info)
+    {
         this.warnForEidolons(info);
 
         const message = this.eidelon.createMessageFromInformation(info);
 
-        const embed = this.getEmbed(this.channel);
-        embed.setContent({
+        const embed = this.getMessage();
+        const options = {
             isDay: info.isDay,
             img: message.img,
             content: message.content
-        });
-    };
-
-    if(info)
-    {
-        exec();
+        }
+        const content = new Discord.RichEmbed()
+            .setTitle("[**__trio🌙 eidelon__ **]")
+            .setColor(15844367)
+            .setThumbnail(options.img)
+            .setFooter(`Actualisé à ${moment(new Date()).add(2, 'hour').format('LT')}`, 'https://cdn.discordapp.com/attachments/437388704072466433/458396183237361665/nouvelle_vue_sur_lembleme_final_1.png')
+            .setImage(options.isDay ? 'https://media.discordapp.net/attachments/473609056163201024/476216651281596420/sun_PNG13422.png' : 'https://media.discordapp.net/attachments/437388704072466433/475991088813965312/Sans_titre-12.png?width=759&height=702')
+            .setDescription(options.content);
+        embed.update(content);
     }
     else
     {
@@ -675,25 +967,27 @@ Eidelon.prototype.getInformation = function(callback) {
             const irl_until_m = Math.floor(irl_until_in_m % 60);
             const irl_until_s = Math.floor((irl_until_in_m * 60) % 60);
 
+            const toMS = (h, m, s) => ((h * 60 + m) * 60 + s) * 1000;
+
             const info = {
                 isDay: isDay,
                 timeLeft: {
                     h: irl_until_h,
                     m: irl_until_m,
                     s: irl_until_s,
-                    totalMs: ((irl_until_h * 60 + irl_until_m) * 60 + irl_until_s) * 1000
+                    totalMs: toMS(irl_until_h, irl_until_m, irl_until_s)
                 },
                 eidotime: {
                     h: eidotime_h,
                     m: eidotime_m,
                     s: eidotime_s,
-                    totalMs: ((eidotime_h * 60 + eidotime_m) * 60 + eidotime_s) * 1000
+                    totalMs: toMS(eidotime_h, eidotime_m, eidotime_s)
                 },
                 irl: {
                     h: eido_until_h,
                     m: eido_until_m,
                     s: eido_until_s,
-                    totalMs: ((eido_until_h * 60 + eido_until_m) * 60 + eido_until_s) * 1000
+                    totalMs: toMS(eido_until_h, eido_until_m, eido_until_s)
                 }
             };
             
@@ -704,6 +998,7 @@ Eidelon.prototype.getInformation = function(callback) {
         }
         catch(ex)
         {
+            console.error(ex);
             callback();
         }
     });
@@ -712,5 +1007,15 @@ Eidelon.prototype.getInformation = function(callback) {
 const bot = new Bot({
     token: process.env.TOKEN
 });
+bot.debug = true;
+
+const saver = new Saver('./state.json', bot);
+bot.saver = saver;
+bot.onReady(() => {
+    saver.load()
+})
+
+if(bot.debug)
+    console.log('ATTENTION AU MODE DEBUG');
 
 bot.start();

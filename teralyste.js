@@ -1007,7 +1007,6 @@ Eidelon.prototype.getInformation = function(callback) {
 const bot = new Bot({
     token: process.env.TOKEN
 });
-bot.debug = true;
 
 const saver = new Saver('./state.json', bot);
 bot.saver = saver;

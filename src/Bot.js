@@ -1,4 +1,5 @@
 const Application = require('./Application');
+const BigBrowser = require('./BigBrowser');
 const Discord = require('discord.js');
 const globals = require('./globals');
 
@@ -10,6 +11,7 @@ function Bot(options)
     this.options = options;
 
     this.application = new Application(this, this.options);
+    this.bigBrowser = new BigBrowser();
 
     this.errorCounters = {};
     this.stops = {
@@ -24,6 +26,7 @@ function Bot(options)
 Bot.prototype.save = function() {
     return {
         application: this.application.save(),
+        bigBrowser: this.bigBrowser.save(),
         stops: this.stops
     };
 }
@@ -34,6 +37,9 @@ Bot.prototype.load = function(obj) {
 
     this.application.load(obj.application, ctx);
     this.stops = obj.stops;
+
+    if(obj.bigBrowser)
+        this.bigBrowser.load(obj.bigBrowser, ctx);
 }
 Bot.prototype.start = function(token) {
     this.client.login(token || this.options.token);
@@ -131,22 +137,32 @@ Bot.prototype.helpCommand = function(message) {
     var embed = new Discord.RichEmbed()
         .setColor(Bot.getRandomColor())
         .setAuthor('Help me!', 'https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50')
-        .setThumbnail('https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50')
+        .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479491701853913095/Help.png')
         .setDescription(`
-=====================[ Tridolon ]====================
+**=====================[ Tridolon ]===================**
 :small_blue_diamond: **!trio** | Affiche les informations sur le trio
 :small_blue_diamond: **!join trio** | Rejoindre le role @Trio Team
 :small_orange_diamond: **!leave trio** | Quitter le role @Trio Team
 :small_orange_diamond: **!nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
 :small_blue_diamond: **!notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons
-====================[ Membres ]====================
+
+**====================[ Membres ]===================**
 :small_orange_diamond: **!nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
 :small_blue_diamond: **!notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
 :small_orange_diamond: **!nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
 :small_blue_diamond: **!notif memberleave** | Active les notifications lorsqu'un membre quitte le clan
-=================[ Twitch Disponible ]=================
+
+**=================[ Twitch Disponible ]================**
 :small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch
-:small_orange_diamond: **!twitch remove** <name> | Supprime un message Twitch précédement ajouté`);
+:small_orange_diamond: **!twitch remove** <name> | Supprime un message Twitch précédement ajouté
+
+**=================[ XP Vocal/Textuel ]================**
+:small_blue_diamond: **!server xp** | Affiche les statistiques du serveur
+:small_blue_diamond: **!server xp md** | Télécharge les stats du serveur au format [MD](https://www.commentcamarche.net/download/telecharger-34055333-notepad)
+:small_blue_diamond: **!server xp csv** | Télécharge les stats du serveur au format [CSV](https://www.commentcamarche.net/download/telecharger-209-excel-viewer)
+:small_blue_diamond: **!server xp txt** | Télécharge les stats du serveur au format TXT
+:small_blue_diamond: **!start xp** | Démarre le stockage de l'expérience
+:small_orange_diamond: **!stop xp** | Arrête le stockage de l'expérience`);
 
     message.delete();
     message.channel.send(embed);
@@ -201,6 +217,12 @@ Bot.prototype.initialize = function() {
             return regexCmd.test(message.content);
         };
         
+        if(!message.author.bot)
+        {
+            console.log(message.content);
+            this.bigBrowser.increaseTextActivity(message.guild, message.author, 1);
+        }
+        
         if(this.debug)
         {
             if(message.content[0] !== '@')
@@ -218,7 +240,19 @@ Bot.prototype.initialize = function() {
             });
         }
 
-        if(checkForCommand(/^\s*!trio\s*$/img))
+        if(checkForCommand(/^\s*!test\s*$/img))
+        {
+            var embed = new Discord.RichEmbed()
+                .setColor(Bot.getRandomColor())
+                .setDescription('description')
+                .setThumbnail('https://media.discordapp.net/attachments/473609056163201024/475828867979018240/Capturecc2.PNG');
+
+            message.reply('c\'est un test https://www.twitch.tv/warframe ', {
+                embed,
+                reply: message.channel.guild
+            });
+        }
+        else if(checkForCommand(/^\s*!trio\s*$/img))
         {
             this.application.addServerChannel(message.channel);
             message.delete();
@@ -270,13 +304,103 @@ Bot.prototype.initialize = function() {
         {
             this.helpCommand(message);
         }
-        else if(checkForCommand(/^\s*!join trio\s*$/img))
+        else if(checkForCommand(/^\s*!join\s+trio\s*$/img))
         {
             this.joinTrioCommand(message);
         }
-        else if(checkForCommand(/^\s*!leave trio\s*$/img))
+        else if(checkForCommand(/^\s*!leave\s+trio\s*$/img))
         {
             this.leaveTrioCommand(message);
+        }
+        else if(checkForCommand(/^\s*!server\s+xp\s*$/img))
+        {
+            console.log('SERVER STATS');
+
+            const result = this.bigBrowser.getTextSummaryByServer(message.guild);
+            
+            message.delete();
+            message.reply('\r\n' + result);
+        }
+        else if(checkForCommand(/^\s*!server\s+xp\s+csv\s*$/img))
+        {
+            console.log('SERVER STATS');
+
+            const result = this.bigBrowser.getTextSummaryByServerCSV(message.guild, true);
+
+            message.delete();
+            message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.csv'));
+        }
+        else if(checkForCommand(/^\s*!server\s+xp\s+md\s*$/img))
+        {
+            console.log('SERVER STATS');
+
+            const result = this.bigBrowser.getTextSummaryByServer(message.guild);
+
+            message.delete();
+            message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.md'));
+        }
+        else if(checkForCommand(/^\s*!server\s+xp\s+txt\s*$/img))
+        {
+            console.log('SERVER STATS');
+
+            const result = this.bigBrowser.getTextSummaryByServer(message.guild, false);
+
+            message.delete();
+            message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.txt'));
+        }
+        else if(checkForCommand(/^\s*!global\s+xp\s*$/img))
+        {
+            console.log('GLOBAL STATS');
+
+            const result = this.bigBrowser.getTextSummaryByServer();
+
+            message.delete();
+            message.reply('\r\n' + result);
+        }
+        else if(checkForCommand(/^\s*!global\s+xp\s+csv\s*$/img))
+        {
+            console.log('GLOBAL STATS DL');
+
+            const result = this.bigBrowser.getTextSummaryByServerCSV(undefined, true);
+
+            message.delete();
+            message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.csv'));
+        }
+        else if(checkForCommand(/^\s*!global\s+xp\s+md\s*$/img))
+        {
+            console.log('GLOBAL STATS DL');
+
+            const result = this.bigBrowser.getTextSummaryByServer();
+
+            message.delete();
+            message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.md'));
+        }
+        else if(checkForCommand(/^\s*!global\s+xp\s+txt\s*$/img))
+        {
+            console.log('GLOBAL STATS DL');
+
+            const result = this.bigBrowser.getTextSummaryByServer(undefined, false);
+
+            message.delete();
+            message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.txt'));
+        }
+        else if(checkForCommand(/^\s*!stop\s+xp\s*$/img))
+        {
+            console.log('STOP XP');
+
+            this.bigBrowser.setTracking(message.guild, message.author, false);
+
+            message.delete();
+            message.reply(':small_orange_diamond: arrêt du stockage de ton expérience.');
+        }
+        else if(checkForCommand(/^\s*!start\s+xp\s*$/img))
+        {
+            console.log('START XP');
+
+            this.bigBrowser.setTracking(message.guild, message.author, true);
+
+            message.delete();
+            message.reply(':small_blue_diamond: démarrage du stockage de ton expérience.');
         }
         else if(checkForCommand(/^\s*!twitch\s+remove\s*.+$/img))
         {
@@ -315,14 +439,14 @@ Bot.prototype.initialize = function() {
             }
 
             globals.saver.save();
-        }
+        }/*
         else if(checkForCommand(/^\s*![twitch]+\s*.+$/img))
         {
             const msg = message.content.trim();
             const streamer = msg.split(' ', 2)[1];
 
             message.reply('Tu voulais dire `!twitch ' + streamer + '`?');
-        }
+        }*/
         else if(message.author.id !== this.client.user.id && message.channel.name === 'orokin-connection')
         {
             this.ocCommand(message);
@@ -355,6 +479,13 @@ Bot.prototype.initialize = function() {
             })
         }
     })
+    
+    client.on('error', (value) => {
+        console.error(value);
+    });
+    client.on('warn', (value) => {
+        console.log(value);
+    });
 
     client.on('ready', () => {
         console.log('READY');
@@ -367,6 +498,32 @@ Bot.prototype.initialize = function() {
         this.application.start();
         if(this._onReady)
             this._onReady();
+        
+        setInterval(() => {
+            const voiceChannels = client.channels.filter(channel => channel.type === 'voice').array();
+            let needToSave = false;
+
+            for(const voiceChannel of voiceChannels)
+            {
+                for(const [ memberId, member ] of voiceChannel.members)
+                {
+                    if(!member.user.bot && !member.deaf)
+                    {
+                        this.bigBrowser.increaseVocalActivity(voiceChannel.guild, member.user, 1 / (30 * 60 * 2));
+
+                        if(member.user.presence && member.user.presence.game && member.user.presence.game.name)
+                        {
+                            this.bigBrowser.pingWarframeActivity(voiceChannel.guild, member.user, member.user.presence.game.name.toLowerCase() === 'warframe');
+                        }
+
+                        needToSave = true;
+                    }
+                }
+            }
+
+            if(needToSave)
+                globals.saver.save();
+        }, 500);
     })
 }
 Bot.prototype.onReady = function(fn) {

@@ -1,6 +1,7 @@
 const Application = require('./Application');
 const BigBrowser = require('./BigBrowser');
 const Discord = require('discord.js');
+const Message = require('./Message');
 const globals = require('./globals');
 
 function Bot(options)
@@ -300,7 +301,7 @@ Bot.prototype.initialize = function() {
                 message.reply(':small_blue_diamond: Activation des notifications pour les Eidolons')
             });
         }
-        else if(checkForCommand(/^\s*!helpme\s*$/img))
+        else if(checkForCommand(/^\s*!help\s*me(?:[^a-zA-Z0-9]|$)/img))
         {
             this.helpCommand(message);
         }

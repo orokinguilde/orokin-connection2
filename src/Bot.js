@@ -133,40 +133,132 @@ Bot.prototype.leaveTrioCommand = function(message) {
     message.delete();
     message.channel.send(`${message.author} a quitté Trio Team ! :cry: `);
 }
-Bot.prototype.helpCommand = function(message) {
+Bot.prototype.helpCommand = function(message, group) {
 
-    var embed = new Discord.RichEmbed()
+    const authorIcon = 'https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50';
+    
+    const embed = new Discord.RichEmbed()
         .setColor(Bot.getRandomColor())
-        .setAuthor('Help me!', 'https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50')
-        .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479491701853913095/Help.png')
-        .setDescription(`
-**=====================[ Tridolon ]===================**
+        .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479491701853913095/Help.png');
+
+    if(!group)
+    {
+        embed
+            .setAuthor('Help me!', authorIcon)
+            .addField('Tridolon', '`trio`, `join trio`, `leave trio`, `nonotif eidolonswarning`,\r\n`notif eidolonswarning`\r\n\r\n*Plus de détails :* `!helpme tridolon`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
+            .addField('Membres', '`nonotif memberadd`, `notif memberadd`, `nonotif memberleave`,\r\n`notif memberleave`\r\n\r\n*Plus de détails :* `!helpme membres`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
+            .addField('Twitch', '`twitch <name>`, `twitch remove <name>`\r\n\r\n*Plus de détails :* `!helpme twitch`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
+            .addField('XP Vocal/Textuel', '`server xp`, `server xp md`, `server xp csv`, `server xp txt`,\r\n`start server xp`, `stop server xp`, `start xp`, `stop xp`\r\n\r\n*Plus de détails :* `!helpme xp`\r\n¯¯¯¯¯¯¯¯¯¯¯')
+            .setDescription('**Utilisation** : `!<ma_commande>`');
+    }
+    else if(group.toLowerCase() === 'tridolon')
+    {
+        embed
+            .setAuthor('Tridolon\r\n¯¯¯¯¯¯¯¯', authorIcon)
+            .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479613651918127114/Teralyst_1.png')
+            .setDescription(`
 :small_blue_diamond: **!trio** | Affiche les informations sur le trio
 :small_blue_diamond: **!join trio** | Rejoindre le role @Trio Team
 :small_orange_diamond: **!leave trio** | Quitter le role @Trio Team
 :small_orange_diamond: **!nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
-:small_blue_diamond: **!notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons
-
-**====================[ Membres ]===================**
-:small_orange_diamond: **!nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
+:small_blue_diamond: **!notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons`.trim());
+    }
+    else if(group.toLowerCase() === 'membres')
+    {
+        embed
+            .setAuthor('Membres\r\n¯¯¯¯¯¯¯¯¯', authorIcon)
+            .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479619902161027072/unnamed3.png')
+            .setDescription(`
 :small_blue_diamond: **!notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
-:small_orange_diamond: **!nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
+:small_orange_diamond: **!nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
 :small_blue_diamond: **!notif memberleave** | Active les notifications lorsqu'un membre quitte le clan
-
-**=================[ Twitch Disponible ]================**
+:small_orange_diamond: **!nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan`.trim());
+    }
+    else if(group.toLowerCase() === 'twitch')
+    {
+        embed
+            .setAuthor('Twitch\r\n¯¯¯¯¯¯¯', authorIcon)
+            .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479614334805213185/1280px-Twitch_logo.png')
+            .setDescription(`
 :small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch
-:small_orange_diamond: **!twitch remove** <name> | Supprime un message Twitch précédement ajouté
-
-**=================[ XP Vocal/Textuel ]================**
+:small_orange_diamond: **!twitch remove** <name> | Supprime un message Twitch précédement ajouté`.trim());
+    }
+    else if(group.toLowerCase() === 'xp')
+    {
+        embed
+            .setAuthor('XP Vocal/Textuel\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯', authorIcon)
+            .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479614949220548610/xp-logo.png')
+            .setDescription(`
 :small_blue_diamond: **!server xp** | Affiche les statistiques du serveur
 :small_blue_diamond: **!server xp md** | Télécharge les stats du serveur au format [MD](https://www.commentcamarche.net/download/telecharger-34055333-notepad)
 :small_blue_diamond: **!server xp csv** | Télécharge les stats du serveur au format [CSV](https://www.commentcamarche.net/download/telecharger-209-excel-viewer)
 :small_blue_diamond: **!server xp txt** | Télécharge les stats du serveur au format TXT
+:small_blue_diamond: **!start server xp** | Démarre le stockage de l'exp du serveur
+:small_orange_diamond: **!stop server xp** | Arrête le stockage de l'exp du serveur
 :small_blue_diamond: **!start xp** | Démarre le stockage de l'expérience
-:small_orange_diamond: **!stop xp** | Arrête le stockage de l'expérience`);
+:small_orange_diamond: **!stop xp** | Arrête le stockage de l'expérience`.trim());
+    }
 
     message.delete();
     message.channel.send(embed);
+    /*
+    const texts = [ `
+=====================[ **Tridolon** ]===================
+:small_blue_diamond: **!trio** | Affiche les informations sur le trio
+:small_blue_diamond: **!join trio** | Rejoindre le role @Trio Team
+:small_orange_diamond: **!leave trio** | Quitter le role @Trio Team
+:small_orange_diamond: **!nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
+:small_blue_diamond: **!notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons`, `
+====================[ **Membres** ]===================
+:small_orange_diamond: **!nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
+:small_blue_diamond: **!notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
+:small_orange_diamond: **!nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
+:small_blue_diamond: **!notif memberleave** | Active les notifications lorsqu'un membre quitte le clan`, `
+=================[ **Twitch Disponible** ]================
+:small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch
+:small_orange_diamond: **!twitch remove** <name> | Supprime un message Twitch précédement ajouté`, `
+=================[ **XP Vocal/Textuel** ]================
+:small_blue_diamond: **!server xp** | Affiche les statistiques du serveur
+:small_blue_diamond: **!server xp md** | Télécharge les stats du serveur au format [MD](https://www.commentcamarche.net/download/telecharger-34055333-notepad)
+:small_blue_diamond: **!server xp csv** | Télécharge les stats du serveur au format [CSV](https://www.commentcamarche.net/download/telecharger-209-excel-viewer)
+:small_blue_diamond: **!server xp txt** | Télécharge les stats du serveur au format TXT
+:small_blue_diamond: **!start server xp** | Démarre le stockage de l'exp du serveur
+:small_orange_diamond: **!stop server xp** | Arrête le stockage de l'exp du serveur
+:small_blue_diamond: **!start xp** | Démarre le stockage de l'expérience
+:small_orange_diamond: **!stop xp** | Arrête le stockage de l'expérience`
+    ];
+    
+    const color = Bot.getRandomColor();
+
+    const embeds = [];
+
+    for(let i = 0; i < texts.length; ++i)
+    {
+        const text = texts[i];
+        let embed;
+
+        if(i === 0)
+        {
+            embed = new Discord.RichEmbed()
+                .setColor(color)
+                .setAuthor('Help me!', 'https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50')
+                .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479491701853913095/Help.png')
+                .setDescription(text);
+        }
+        else
+        {
+            embed = new Discord.RichEmbed()
+                .setColor(color)
+                .setDescription(text);
+        }
+
+        embeds.push(embed);
+    }
+
+    message.delete();
+
+    for(const embed of embeds)
+        message.channel.send(embed);*/
 }
 Bot.findGeneralChannel = function(channels) {
     const channelNames = [
@@ -219,10 +311,7 @@ Bot.prototype.initialize = function() {
         };
         
         if(!message.author.bot)
-        {
-            console.log(message.content);
-            this.bigBrowser.increaseTextActivity(message.guild, message.author, 1);
-        }
+            this.bigBrowser.increaseTextActivity(message.guild, message.author, 0.5);
         
         if(this.debug)
         {
@@ -241,19 +330,7 @@ Bot.prototype.initialize = function() {
             });
         }
 
-        if(checkForCommand(/^\s*!test\s*$/img))
-        {
-            var embed = new Discord.RichEmbed()
-                .setColor(Bot.getRandomColor())
-                .setDescription('description')
-                .setThumbnail('https://media.discordapp.net/attachments/473609056163201024/475828867979018240/Capturecc2.PNG');
-
-            message.reply('c\'est un test https://www.twitch.tv/warframe ', {
-                embed,
-                reply: message.channel.guild
-            });
-        }
-        else if(checkForCommand(/^\s*!trio\s*$/img))
+        if(checkForCommand(/^\s*!trio\s*$/img))
         {
             this.application.addServerChannel(message.channel);
             message.delete();
@@ -301,15 +378,17 @@ Bot.prototype.initialize = function() {
                 message.reply(':small_blue_diamond: Activation des notifications pour les Eidolons')
             });
         }
-        else if(checkForCommand(/^\s*!help\s*me(?:[^a-zA-Z0-9]|$)/img))
+        else if(checkForCommand(/^\s*!(?:help|aide)\s*(?:me|moi)\s*(.*)/img))
         {
-            this.helpCommand(message);
+            const match = /^\s*!(?:help|aide)\s*(?:me|moi)\s*(.*)/img.exec(message.content);
+
+            this.helpCommand(message, match[1]);
         }
-        else if(checkForCommand(/^\s*!join\s+trio\s*$/img))
+        else if(checkForCommand(/^\s*!(?:join|rejoindre)\s+trio\s*$/img))
         {
             this.joinTrioCommand(message);
         }
-        else if(checkForCommand(/^\s*!leave\s+trio\s*$/img))
+        else if(checkForCommand(/^\s*!(?:leave|quitter)\s+trio\s*$/img))
         {
             this.leaveTrioCommand(message);
         }
@@ -384,6 +463,24 @@ Bot.prototype.initialize = function() {
 
             message.delete();
             message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.txt'));
+        }
+        else if(checkForCommand(/^\s*!stop\s+server\s+xp\s*$/img))
+        {
+            console.log('STOP SERVER XP');
+
+            this.bigBrowser.setServerTracking(message.guild, false);
+
+            message.delete();
+            message.reply(':small_orange_diamond: arrêt du stockage de l\'expérience du serveur.');
+        }
+        else if(checkForCommand(/^\s*!start\s+server\s+xp\s*$/img))
+        {
+            console.log('START SERVER XP');
+
+            this.bigBrowser.setServerTracking(message.guild, true);
+
+            message.delete();
+            message.reply(':small_blue_diamond: démarrage du stockage de l\'expérience du serveur.');
         }
         else if(checkForCommand(/^\s*!stop\s+xp\s*$/img))
         {

@@ -4,7 +4,7 @@ function BigBrowser()
 {
     this.servers = {};
 }
-BigBrowser.prototype.getUserObject = function(server, user) {
+BigBrowser.prototype.getServerObject = function(server) {
     let serverObj = this.servers[server.id];
     if(!serverObj)
     {
@@ -14,6 +14,11 @@ BigBrowser.prototype.getUserObject = function(server, user) {
         };
         this.servers[server.id] = serverObj;
     }
+    
+    return serverObj;
+}
+BigBrowser.prototype.getUserObject = function(server, user) {
+    const serverObj = this.getServerObject(server);
     
     let userObj = serverObj[user.id];
     if(!userObj)
@@ -26,6 +31,12 @@ BigBrowser.prototype.getUserObject = function(server, user) {
     }
 
     return userObj;
+}
+BigBrowser.prototype.setServerValue = function(server, name, value) {
+    const obj = this.getServerObject(server);
+
+    obj[name] = value;
+    obj[name + '_date'] = Date.now();
 }
 BigBrowser.prototype.setUserValue = function(server, user, name, value) {
     const obj = this.getUserObject(server, user);
@@ -76,7 +87,11 @@ BigBrowser.prototype.increaseTextActivity = function(server, user, amount) {
 }
 BigBrowser.prototype.setTracking = function(server, user, value) {
     this.setUserValue(server, user, 'tracking', !!value);
-}/*
+}
+BigBrowser.prototype.setServerTracking = function(server, value) {
+    this.setServerValue(server, 'tracking', !!value);
+}
+/*
 BigBrowser.prototype.getTextSummaryOfUser = function(user) {
     const userServer = [];
 
@@ -114,6 +129,11 @@ BigBrowser.prototype.getTextSummaryByServer = function(server, markdown) {
         
         if(usersObj)
         {
+            if(usersObj.tracking === false)
+            {
+                return 'XP désactivé';
+            }
+
             const users = Object.keys(usersObj)
                 .filter(k => k[0] !== '_')
                 .map(k => usersObj[k])
@@ -207,9 +227,13 @@ BigBrowser.prototype.getTextSummaryByServer = function(server, markdown) {
         for(const key of Object.keys(this.servers))
         {
             const server = this.servers[key];
-            const serverText = this.getTextSummaryByServer(server, markdown);
+            
+            if(server.tracking !== false)
+            {
+                const serverText = this.getTextSummaryByServer(server, markdown);
 
-            text += `${md ? '**' : ''}[${server.__name__}]${md ? '**' : ''}\r\n${serverText}\r\n\r\n`;
+                text += `${md ? '**' : ''}[${server.__name__}]${md ? '**' : ''}\r\n${serverText}\r\n\r\n`;
+            }
         }
     }
 

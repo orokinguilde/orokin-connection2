@@ -1,9 +1,9 @@
 const ExecutionPool = require('./ExecutionPool');
-const fs = require('fs');
+const StorageFile = require('./StorageFile');
 
-function Saver(filePath, object)
+function Saver(fileId, object)
 {
-    this.filePath = filePath;
+    this.file = new StorageFile(fileId);
     this.object = object;
     this.executionPool = new ExecutionPool();
 }
@@ -12,7 +12,7 @@ Saver.prototype.save = function(callback) {
         const obj = this.object.save();
         const data = JSON.stringify(obj);
         
-        fs.writeFile(this.filePath, data, () => {
+        this.file.setContent(data, () => {
             done();
             if(callback)
                 callback();
@@ -21,11 +21,16 @@ Saver.prototype.save = function(callback) {
 }
 Saver.prototype.load = function(callback)
 {
-    fs.readFile(this.filePath, (e, content) => {
+    this.file.getContent((e, content) => {
         if(!e && content)
         {
-            const data = JSON.parse(content.toString());
-            this.object.load(data);
+            const content = content.toString().trim();
+
+            if(content)
+            {
+                const data = JSON.parse(content);
+                this.object.load(data);
+            }
         }
 
         if(callback)

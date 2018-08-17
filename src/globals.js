@@ -5,7 +5,7 @@ moment.locale('fr');
 
 module.exports = {
     initialize: function(bot) {
-        const saver = new Saver('./state.json', bot);
+        const saver = new Saver(process.env.STORAGE_FILE_ID, bot);
         bot.saver = saver;
         bot.onReady(() => {
             saver.load();

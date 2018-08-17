@@ -24,7 +24,7 @@ Saver.prototype.load = function(callback)
     this.file.getContent((e, content) => {
         if(!e && content)
         {
-            const content = content.toString().trim();
+            content = content.toString().trim();
 
             if(content)
             {

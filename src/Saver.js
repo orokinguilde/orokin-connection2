@@ -26,10 +26,12 @@ Saver.prototype.load = function(callback)
         {
             content = content.toString().trim();
 
-            if(content)
+            if(content && content.length > 0)
             {
                 const data = JSON.parse(content);
-                this.object.load(data);
+
+                if(data)
+                    this.object.load(data);
             }
         }
 

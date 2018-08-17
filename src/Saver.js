@@ -25,6 +25,7 @@ Saver.prototype.load = function(callback)
         if(!e && content)
         {
             content = content.toString().trim();
+            console.log(content);
 
             if(content && content.length > 0)
             {

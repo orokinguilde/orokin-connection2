@@ -83,9 +83,7 @@ Message.prototype.load = function(obj, ctx) {
 
         if(obj.message)
         {
-            this.channel.fetchMessages().then(() => {
-                this.msg = findById(this.channel.messages, obj.message);
-            })
+            this.channel.fetchMessage(obj.message).then((msg) => this.msg = msg)
         }
     }
 }

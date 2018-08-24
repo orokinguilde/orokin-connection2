@@ -28,13 +28,12 @@ Server.prototype.load = function(obj, ctx) {
         for(const channel of this.messageManager.channels)
         {
             pool.add((next) => {
-                channel.fetchMessages().then(() => {
-                    const found = findById(channel.messages, obj.warnForEidolonsMessage);
-                    if(found)
-                        this.warnForEidolonsMessage = found;
-                    else
+                channel.fetchMessage(obj.warnForEidolonsMessage).then((msg) => {
+                    if(!msg)
                         next();
-                })
+                    else
+                        this.warnForEidolonsMessage = msg;
+                }).catch(() => next());
             })
         }
     }

@@ -2,7 +2,6 @@ const ExecutionPool = require('./ExecutionPool');
 const Discord = require('discord.js');
 const Message = require('./Message');
 const moment = require('moment');
-const Bot = require('./Bot');
 
 function Server(application, eidelon)
 {
@@ -66,6 +65,7 @@ Server.prototype.warnForEidolons = function(info, force) {
     {
         this.expirationDate = info.expirationDate;
 
+        const Bot = require('./Bot');
         const channelGeneral = Bot.findGeneralChannel(this.messageManager.getGuild().channels);
         
         if(channelGeneral)

@@ -7,8 +7,8 @@ module.exports = {
     initialize: function(bot) {
         const saver = new Saver(process.env.STORAGE_FILE_ID, bot);
         bot.saver = saver;
-        bot.onReady(() => {
-            saver.load();
+        bot.onReady((callback) => {
+            saver.load(callback);
         });
         
         module.exports.bot = bot;

@@ -593,35 +593,42 @@ Bot.prototype.initialize = function() {
         }, 5000);
         client.user.setActivity('connecter la guilde');
 
-        this.application.start();
-        if(this._onReady)
-            this._onReady();
-        
-        setInterval(() => {
-            const voiceChannels = client.channels.filter(channel => channel.type === 'voice').array();
-            let needToSave = false;
+        const startRuntime = () => {
+            setInterval(() => {
+                const voiceChannels = client.channels.filter(channel => channel.type === 'voice').array();
+                let needToSave = false;
 
-            for(const voiceChannel of voiceChannels)
-            {
-                for(const [ memberId, member ] of voiceChannel.members)
+                for(const voiceChannel of voiceChannels)
                 {
-                    if(!member.user.bot && !member.deaf)
+                    if(!/([^a-zA-Z]|^)[aA][fF][kK]([^a-zA-Z]|$)/img.test(voiceChannel.name))
                     {
-                        this.bigBrowser.increaseVocalActivity(voiceChannel.guild, member.user, 1 / (30 * 60 * 2));
-
-                        if(member.user.presence && member.user.presence.game && member.user.presence.game.name)
+                        for(const [ memberId, member ] of voiceChannel.members)
                         {
-                            this.bigBrowser.pingWarframeActivity(voiceChannel.guild, member.user, member.user.presence.game.name.toLowerCase() === 'warframe');
-                        }
+                            if(!member.user.bot && !member.deaf)
+                            {
+                                this.bigBrowser.increaseVocalActivity(voiceChannel.guild, member.user, 1 / (30 * 60 * 2));
 
-                        needToSave = true;
+                                if(member.user.presence && member.user.presence.game && member.user.presence.game.name)
+                                {
+                                    this.bigBrowser.pingWarframeActivity(voiceChannel.guild, member.user, member.user.presence.game.name.toLowerCase() === 'warframe');
+                                }
+
+                                needToSave = true;
+                            }
+                        }
                     }
                 }
-            }
 
-            if(needToSave)
-                globals.saver.save();
-        }, 500);
+                if(needToSave)
+                    globals.saver.save();
+            }, 500);
+        }
+
+        this.application.start();
+        if(this._onReady)
+            this._onReady(startRuntime);
+        else
+            startRuntime();
     })
 }
 Bot.prototype.onReady = function(fn) {

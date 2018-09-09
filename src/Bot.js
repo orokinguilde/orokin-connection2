@@ -594,6 +594,8 @@ Bot.prototype.initialize = function() {
         client.user.setActivity('connecter la guilde');
 
         const startRuntime = () => {
+            this.application.start();
+            
             setInterval(() => {
                 const voiceChannels = client.channels.filter(channel => channel.type === 'voice').array();
                 let needToSave = false;
@@ -624,7 +626,6 @@ Bot.prototype.initialize = function() {
             }, 500);
         }
 
-        this.application.start();
         if(this._onReady)
             this._onReady(startRuntime);
         else

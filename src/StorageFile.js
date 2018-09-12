@@ -1,42 +1,44 @@
-const request = require('request');
+require('isomorphic-fetch');
+const Dropbox = require('dropbox').Dropbox;
+
+//const request = require('request');
 
 // https://developers.kloudless.com/docs/v1/storage#files-download-a-file
 
-function StorageFile(fileId, account)
+function StorageFile(fileId)
 {
-    this.account = account || process.env.STORAGE_ACCOUNT_ID;
     this.fileId = fileId.trim();
 
-    if(!this.account)
-        throw new Error('Invalid env variable STORAGE_ACCOUNT_ID');
     if(!StorageFile.apiKey)
         throw new Error('Invalid env variable STORAGE_API_KEY');
 }
 StorageFile.apiKey = process.env.STORAGE_API_KEY;
-StorageFile.prototype.request = function(options, callback) {
-    if(!StorageFile.apiKey)
-        throw new Error('Invalid env variable STORAGE_API_KEY');
-    
-    if(!options.headers)
-        options.headers = {};
-    options.headers.Authorization = 'APIKey ' + StorageFile.apiKey;
-    
-    return request(options, callback);
+StorageFile.dbx = function() {
+    if(!StorageFile._dbx)
+        StorageFile._dbx = new Dropbox({ accessToken: StorageFile.apiKey });
+    return StorageFile._dbx;
 }
 StorageFile.prototype.setContent = function(content, callback) {
-    const stream = this.request({
-        url: `https://api.kloudless.com/v1/accounts/${this.account}/storage/files/${this.fileId}`,
-        method: 'PUT'
-    }, callback);
-    
-    stream.end(content);
+    const dbx = StorageFile.dbx();
+    dbx.filesUpload({
+        path: this.fileId,
+        contents: content,
+        mode: {
+            '.tag': 'overwrite'
+        }
+    }).then(() => {
+        callback();
+    }).catch((e) => {
+        callback(e);
+    });
 }
 StorageFile.prototype.getContent = function(callback) {
-    return this.request({
-        url: `https://api.kloudless.com/v1/accounts/${this.account}/storage/files/${this.fileId}/contents`,
-        method: 'GET'
-    }, (e, res, body) => {
-        callback(e, body)
+    StorageFile.dbx().filesDownload({
+        path: this.fileId
+    }).then((r) => {
+        callback(undefined, r.fileBinary);
+    }).catch((e) => {
+        callback(e);
     });
 }
 

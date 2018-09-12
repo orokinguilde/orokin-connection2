@@ -1,4 +1,3 @@
-const ExecutionPool = require('./ExecutionPool');
 const Discord = require('discord.js');
 const Message = require('./Message');
 const moment = require('moment');
@@ -24,18 +23,14 @@ Server.prototype.load = function(obj, ctx) {
     {
         this.warnForEidolonsTimeout = obj.warnForEidolonsTimeout;
         
-        const pool = new ExecutionPool();
-        for(const channel of this.messageManager.channels)
-        {
-            pool.add((next) => {
-                channel.fetchMessage(obj.warnForEidolonsMessage).then((msg) => {
-                    if(!msg)
-                        next();
-                    else
-                        this.warnForEidolonsMessage = msg;
-                }).catch(() => next());
-            })
-        }
+        const Bot = require('./Bot');
+        const channelGeneral = Bot.findGeneralChannel(this.messageManager.getGuild().channels);
+        channelGeneral.fetchMessage(obj.warnForEidolonsMessage).then((msg) => {
+            if(msg)
+                this.warnForEidolonsMessage = msg;
+        }).catch(() => {
+            console.log('NOT FOUND');
+        });
     }
 }
 Server.warnForEidolonsTimeoutMs = 1000 * 60 * 15;

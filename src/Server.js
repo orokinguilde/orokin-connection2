@@ -66,9 +66,9 @@ Server.prototype.warnForEidolons = function(info, force) {
         if(channelGeneral)
         {
             var role = channelGeneral.guild.roles.filter(role => role.name === 'Trio Team').array()[0];
-            /*channelGeneral.send(`Les Eidolons arrivent dans quelques minutes! Préparez-vous! ${role ? role : '' }`).then(m => {
+            channelGeneral.send(`Les Eidolons arrivent dans quelques minutes! Préparez-vous! ${role ? role : '' }`).then(m => {
                 this.setWarnForEidolonsMessage(m);
-            });*/
+            });
         }
     }
 }

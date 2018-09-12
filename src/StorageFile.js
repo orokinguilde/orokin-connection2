@@ -29,6 +29,7 @@ StorageFile.prototype.setContent = function(content, callback) {
     }).then(() => {
         callback();
     }).catch((e) => {
+        console.error(e);
         callback(e);
     });
 }
@@ -36,8 +37,10 @@ StorageFile.prototype.getContent = function(callback) {
     StorageFile.dbx().filesDownload({
         path: this.fileId
     }).then((r) => {
+        console.log(r.fileBinary.toString());
         callback(undefined, r.fileBinary);
     }).catch((e) => {
+        console.error(e);
         callback(e);
     });
 }

@@ -143,7 +143,8 @@ BigBrowser.prototype.getTextSummaryByServer = function(server, markdown) {
 
             const formatTextAndDate = (text, date, time) => {
                 let dateString;
-                const dateObj = moment(date);
+                let dateObj = moment(date);
+                dateObj = dateObj.add(2, 'h');
 
                 if(time === false)
                     dateString = dateObj.format('DD/MM/YYYY');
@@ -262,7 +263,8 @@ BigBrowser.prototype.getTextSummaryByServerCSV = function(server, withBOM) {
 
             const formatTextAndDate = (text, date, time) => {
                 let dateString;
-                const dateObj = moment(date);
+                let dateObj = moment(date);
+                dateObj = dateObj.add(2, 'h');
 
                 if(time === false)
                     dateString = dateObj.format('DD/MM/YYYY');

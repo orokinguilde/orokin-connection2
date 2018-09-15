@@ -148,7 +148,7 @@ BigBrowser.prototype.getTextSummaryByServer = function(server, markdown) {
                 if(time === false)
                     dateString = dateObj.format('DD/MM/YYYY');
                 else
-                    dateString = dateObj.format('DD/MM/YYYY hh:mm');
+                    dateString = dateObj.format('DD/MM/YYYY HH:mm');
 
                 return `${text} (${dateString})`;
             }
@@ -267,7 +267,7 @@ BigBrowser.prototype.getTextSummaryByServerCSV = function(server, withBOM) {
                 if(time === false)
                     dateString = dateObj.format('DD/MM/YYYY');
                 else
-                    dateString = dateObj.format('DD/MM/YYYY hh:mm');
+                    dateString = dateObj.format('DD/MM/YYYY HH:mm');
 
                 return `${text} (${dateString})`;
             }

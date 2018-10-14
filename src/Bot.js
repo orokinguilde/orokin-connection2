@@ -112,8 +112,7 @@ Bot.prototype.ocCommand = function(message) {
     this.client.channels.findAll('name', 'orokin-connection').map(channel => {
         console.log('SENDING message to ', channel.guild.name);
         
-        channel.send(embed);
-        channel.send(messageContent);
+        channel.send(embed).then(() => channel.send(messageContent));
     })
 }
 Bot.findTrioTeamRole = function(guild) {
@@ -201,64 +200,6 @@ Bot.prototype.helpCommand = function(message, group) {
 
     message.delete();
     message.channel.send(embed);
-    /*
-    const texts = [ `
-=====================[ **Tridolon** ]===================
-:small_blue_diamond: **!trio** | Affiche les informations sur le trio
-:small_blue_diamond: **!join trio** | Rejoindre le role @Trio Team
-:small_orange_diamond: **!leave trio** | Quitter le role @Trio Team
-:small_orange_diamond: **!nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
-:small_blue_diamond: **!notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons`, `
-====================[ **Membres** ]===================
-:small_orange_diamond: **!nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
-:small_blue_diamond: **!notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
-:small_orange_diamond: **!nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan
-:small_blue_diamond: **!notif memberleave** | Active les notifications lorsqu'un membre quitte le clan`, `
-=================[ **Twitch Disponible** ]================
-:small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch
-:small_orange_diamond: **!twitch remove** <name> | Supprime un message Twitch précédement ajouté`, `
-=================[ **XP Vocal/Textuel** ]================
-:small_blue_diamond: **!server xp** | Affiche les statistiques du serveur
-:small_blue_diamond: **!server xp md** | Télécharge les stats du serveur au format [MD](https://www.commentcamarche.net/download/telecharger-34055333-notepad)
-:small_blue_diamond: **!server xp csv** | Télécharge les stats du serveur au format [CSV](https://www.commentcamarche.net/download/telecharger-209-excel-viewer)
-:small_blue_diamond: **!server xp txt** | Télécharge les stats du serveur au format TXT
-:small_blue_diamond: **!start server xp** | Démarre le stockage de l'exp du serveur
-:small_orange_diamond: **!stop server xp** | Arrête le stockage de l'exp du serveur
-:small_blue_diamond: **!start xp** | Démarre le stockage de l'expérience
-:small_orange_diamond: **!stop xp** | Arrête le stockage de l'expérience`
-    ];
-    
-    const color = Bot.getRandomColor();
-
-    const embeds = [];
-
-    for(let i = 0; i < texts.length; ++i)
-    {
-        const text = texts[i];
-        let embed;
-
-        if(i === 0)
-        {
-            embed = new Discord.RichEmbed()
-                .setColor(color)
-                .setAuthor('Help me!', 'https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50')
-                .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479491701853913095/Help.png')
-                .setDescription(text);
-        }
-        else
-        {
-            embed = new Discord.RichEmbed()
-                .setColor(color)
-                .setDescription(text);
-        }
-
-        embeds.push(embed);
-    }
-
-    message.delete();
-
-    for(const embed of embeds)
-        message.channel.send(embed);*/
 }
 Bot.findGeneralChannel = function(channels) {
     const channelNames = [
@@ -269,12 +210,6 @@ Bot.findGeneralChannel = function(channels) {
     
     const matchingChannels = channels
         .filter(channel => channel.constructor.name === 'TextChannel')
-        /*
-        .filter(channel => {
-            if(channel.name.indexOf('discussion') !== -1)
-                console.log(channel.name, /^[^a-zA-Z0-9]*discussion[^a-zA-Z0-9]*$/img.test(channel.name));
-            return true;
-        })*/
         .filter(channel => channelNames.some(regex => regex.test(channel.name)))
         .array();
                 

@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const Message = require('./Message');
+const globals = require('./globals');
 const moment = require('moment');
 
 function Server(application, eidelon)
@@ -66,7 +67,7 @@ Server.prototype.warnForEidolons = function(info, force) {
         if(channelGeneral)
         {
             var role = channelGeneral.guild.roles.filter(role => role.name === 'Trio Team').array()[0];
-            channelGeneral.send(`Les Eidolons arrivent dans quelques minutes ! Préparez-vous ! ${role ? role : '' } (${moment(this.expirationDate).format('LTS')})`).then(m => {
+            channelGeneral.send(`${globals.iconBefore()}Les Eidolons arrivent dans quelques minutes ! Préparez-vous ! ${role ? role : '' } (${moment(this.expirationDate).format('LTS')})${globals.iconAfter()}`).then(m => {
                 this.setWarnForEidolonsMessage(m);
             });
         }

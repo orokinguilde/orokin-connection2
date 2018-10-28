@@ -3,9 +3,6 @@ const Saver = require('./Saver');
 
 moment.locale('fr');
 
-console.log(moment(new Date()).tz('Europe/Paris').format('LT'));
-console.log(moment(new Date()).tz('Europe/Paris').format('H:mm'));
-
 var getPeriod = function() {
     var now = new Date(Date.now());
     var month = now.getMonth() + 1;

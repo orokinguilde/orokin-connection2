@@ -1,5 +1,5 @@
 const request = require('request');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const pad = require('./globals').pad;
 const fs = require('fs');
 
@@ -26,7 +26,7 @@ Eidelon.prototype.createNightMessage = function(info) {
             ++index;
     }
 
-    const expirationDateLocal = moment(info.expirationDate);
+    const expirationDateLocal = moment(info.expirationDate).tz('Europe/Paris');
 
     return {
         content: `**\n\n** **__Temps restant de cette nuit __**🕓\n${pad(info.timeLeft.h)}:${pad(info.timeLeft.m)}:${pad(info.timeLeft.s)}\n\n\n**__Debut du jour__ **\nà ${expirationDateLocal.format('LT')}\n\n\nIl fait nuit tenno!`,
@@ -66,7 +66,7 @@ Eidelon.prototype.createDayMessage = function(info) {
 
     const timeLeft = info.timeLeft.totalMs < 1200000;
 
-    const expirationDateLocal = moment(info.expirationDate);
+    const expirationDateLocal = moment(info.expirationDate).tz('Europe/Paris');
 
     return {
         content: `**\n\n** **__Temps restant avant la nuit__**🕓 \n ${pad(info.timeLeft.h)}:${pad(info.timeLeft.m)}:${pad(info.timeLeft.s)}\n\n\n**__Debut de la nuit__** \n à ${expirationDateLocal.format('LT')} ${timeLeft ? Eidelon.nearEndOfDayText : ''}\n\n\nIl fait jour...`,
@@ -166,7 +166,7 @@ Eidelon.prototype.getInformation = function(callback) {
                 }
             };
             
-            const expirationDate = moment().add(info.timeLeft.h + 2, 'hours').add(info.timeLeft.m, 'minutes').add(info.timeLeft.s, 'seconds');
+            const expirationDate = moment().add(info.timeLeft.h, 'hours').add(info.timeLeft.m, 'minutes').add(info.timeLeft.s, 'seconds');
             info.expirationDate = expirationDate.valueOf();
 
             callback(info);

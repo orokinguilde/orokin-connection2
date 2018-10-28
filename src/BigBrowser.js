@@ -1,4 +1,4 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 function BigBrowser()
 {
@@ -143,8 +143,7 @@ BigBrowser.prototype.getTextSummaryByServer = function(server, markdown) {
 
             const formatTextAndDate = (text, date, time) => {
                 let dateString;
-                let dateObj = moment(date);
-                dateObj = dateObj.add(2, 'h');
+                let dateObj = moment(date).tz('Europe/Paris');
 
                 if(time === false)
                     dateString = dateObj.format('DD/MM/YYYY');
@@ -263,8 +262,7 @@ BigBrowser.prototype.getTextSummaryByServerCSV = function(server, withBOM) {
 
             const formatTextAndDate = (text, date, time) => {
                 let dateString;
-                let dateObj = moment(date);
-                dateObj = dateObj.add(2, 'h');
+                let dateObj = moment(date).tz('Europe/Paris');
 
                 if(time === false)
                     dateString = dateObj.format('DD/MM/YYYY');

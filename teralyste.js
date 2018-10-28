@@ -1,11 +1,17 @@
-const { initialize } = require('./src/globals');
-const Bot = require('./src/Bot');
+const moment = require('moment-timezone');
 const fs = require('fs');
 
+moment.locale('fr')
+
+process.env = fs.existsSync('./env.json') ? JSON.parse(fs.readFileSync('./env.json')) : process.env;
+
+const { initialize } = require('./src/globals');
+const Bot = require('./src/Bot');
+
 const bot = new Bot({
-    token: process.env.TOKEN || fs.readFileSync('./token').toString().trim()
+    token: process.env.TOKEN
 });
-bot.debug = fs.existsSync('./token');
+bot.debug = fs.existsSync('./env.json');
 
 console.log('Debug mode:', bot.debug ? 'on' : 'off');
 

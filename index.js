@@ -1,7 +1,11 @@
 const moment = require('moment');
 const fs = require('fs');
 
-moment.locale('fr')
+moment.locale('fr');
+
+console.log(moment(new Date()).format('LT'));
+console.log(moment(new Date()).format('H:mm'));
+
 
 process.env = fs.existsSync('./env.json') ? JSON.parse(fs.readFileSync('./env.json')) : process.env;
 

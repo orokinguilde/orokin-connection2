@@ -116,7 +116,7 @@ Bot.prototype.ocCommand = function(message) {
     })
 }
 Bot.findTrioTeamRole = function(guild) {
-    return guild.roles.find(role => role.name.replace(/\s+/, '').toLowerCase() === 'trioteam');
+    return guild.roles.find(role => role.name.toLowerCase().indexOf('trio') > 0 && role.name.toLowerCase().indexOf('team') > 0);
 }
 Bot.prototype.joinTrioCommand = function(message) {
     const role = Bot.findTrioTeamRole(message.guild);

@@ -265,7 +265,14 @@ Bot.prototype.initialize = function() {
             });
         }
 
-        if(checkForCommand(/^\s*!trio\s*$/img))
+        if(checkForCommand(/^\s*!octest\s*$/img))
+        {
+            console.log('OCTEST');
+            const role = Bot.findTrioTeamRole(message.guild);
+            console.log(role);
+            message.reply(`role : ${role}`);
+        }
+        else if(checkForCommand(/^\s*!trio\s*$/img))
         {
             this.application.addServerChannel(message.channel);
             message.delete();

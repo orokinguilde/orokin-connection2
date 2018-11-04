@@ -48,6 +48,9 @@ Server.prototype.setWarnForEidolonsMessage = function(msg) {
         this.warnForEidolonsTimeout = Date.now() + Server.warnForEidolonsTimeoutMs;
     }
 }
+Server.findTrioTeamRole = function(guild) {
+    return guild.roles.find(role => role.name.toLowerCase().indexOf('trio') >= 0 && role.name.toLowerCase().indexOf('team') >= 0);
+}
 Server.prototype.warnForEidolons = function(info, force) {
     if(!info.isDay || this.application.bot.stops.eidolonsWarning[this.messageManager.getGuild().id])
         return;
@@ -66,7 +69,7 @@ Server.prototype.warnForEidolons = function(info, force) {
         
         if(channelGeneral)
         {
-            var role = channelGeneral.guild.roles.filter(role => role.name === 'Trio Team').array()[0];
+            const role = Server.findTrioTeamRole(channelGeneral.guild);
             channelGeneral.send(`${globals.iconBefore()}Les Eidolons arrivent dans quelques minutes ! Préparez-vous ! ${role ? role : '' } (${moment(this.expirationDate).tz('Europe/Paris').format('LTS')})${globals.iconAfter()}`).then(m => {
                 this.setWarnForEidolonsMessage(m);
             });

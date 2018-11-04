@@ -1,4 +1,4 @@
-require('isomorphic-fetch');
+const fetch = require('isomorphic-fetch');
 const Dropbox = require('dropbox').Dropbox;
 
 //const request = require('request');
@@ -15,7 +15,7 @@ function StorageFile(fileId)
 StorageFile.apiKey = process.env.STORAGE_API_KEY;
 StorageFile.dbx = function() {
     if(!StorageFile._dbx)
-        StorageFile._dbx = new Dropbox({ accessToken: StorageFile.apiKey });
+        StorageFile._dbx = new Dropbox({ accessToken: StorageFile.apiKey, fetch: fetch });
     return StorageFile._dbx;
 }
 StorageFile.prototype.setContent = function(content, callback) {

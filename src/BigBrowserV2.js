@@ -611,13 +611,23 @@ BigBrowserV2.prototype.getServerCSV = function(server, withBOM) {
 
 BigBrowserV2.prototype.getServerMarkDown = function(server) {
 
+    let nbCols = undefined;
+
     const formatter = {
         headerEnd: function() {
-            return '---------------\r\n';
+            let text = '';
+
+            for(let i = 0; i < nbCols; ++i)
+                text += '|-';
+
+            return `${text}|\r\n`;
         },
         row: function(/* arguments... */) {
-            const args = [];
+            if(nbCols === undefined)
+                nbCols = arguments.length;
             
+            const args = [];
+
             for(const arg of arguments)
             {
                 if(arg === undefined || arg === null)
@@ -626,7 +636,7 @@ BigBrowserV2.prototype.getServerMarkDown = function(server) {
                     args.push(arg.toString());
             }
             
-            return `${args.join(' | ')}\r\n`;
+            return `| ${args.join(' | ')} |\r\n`;
         },
         noRow: function(/* arguments... */) {
             const args = [];
@@ -639,7 +649,7 @@ BigBrowserV2.prototype.getServerMarkDown = function(server) {
                     args.push(arg.toString());
             }
             
-            return `${args.join(' ')}\r\n`;
+            return `| ${args.join(' ')} |\r\n`;
         }
     };
 

@@ -14,7 +14,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-prebuild": "apt-get install -y --force-yes chromium chromium-l10n",
+    "heroku-prebuild": "apt-get install -y --force-yes chrome",
     "start": "node teralyst.js"
   },
   "author": "",

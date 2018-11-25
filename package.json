@@ -14,8 +14,9 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "heroku-prebuild": "apt-get install chromium-browser",
     "start": "node teralyst.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "Unlicense"
 }

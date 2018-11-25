@@ -616,6 +616,8 @@ BigBrowserV2.prototype.getServerMarkDown = function(server) {
             return '---------------\r\n';
         },
         row: function(/* arguments... */) {
+            const args = [];
+            
             for(const arg of arguments)
             {
                 if(arg === undefined || arg === null)

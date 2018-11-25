@@ -78,79 +78,79 @@ BigBrowserV2.prototype.getUserRank = function(user, exp)
 
     const ranks = {
         0: {
-            name: 'chair a canon'
+            name: 'Chair à canon'
         },
         50: {
-            name: 'divine call'
+            name: 'Galinette cendrée'
         },
         100: {
-            name: 'rejeté'
+            name: 'Rejeté'
         },
         150: {
-            name: 'bouclier humain'
+            name: 'Bouclier humain'
         },
         200: {
-            name: 'noob'
+            name: 'Noob'
         },
         250: {
-            name: 'mauvais herbe'
+            name: 'Mauvaise herbe'
         },
         300: {
-            name: 'jeune pousse écrasé'
+            name: 'Jeune pousse écrasée'
         },
         350: {
-            name: 'poussin kfc'
+            name: 'Poussin KFC'
         },
         400: {
-            name: 'pion du neant'
+            name: 'Pion du neant'
         },
         450: {
-            name: 'vagabon'
+            name: 'Vagabon'
         },
         500: {
-            name: 'tenno'
+            name: 'Tenno'
         },
         550: {
-            name: 'portier de lua'
+            name: 'Portier de Lua'
         },
         600: {
-            name: 'apprenti samurai'
+            name: 'Apprenti samurai'
         },
         650: {
-            name: 'samurai'
+            name: 'Samurai'
         },
         700: {
             name: 'Rōnin'
         },
         750: {
-            name: 'acharner'
+            name: 'Acharné'
         },
         800: {
-            name: 'fanatique'
+            name: 'Fanatique'
         },
         850: {
-            name: 'dur à cuire'
+            name: 'Dur à cuire'
         },
         900: {
-            name: 'orokin apprenti'
+            name: 'Orokin apprenti'
         },
         950: {
-            name: 'orokin'
+            name: 'Orokin'
         },
         1000: {
-            name: 'orokin officier'
+            name: 'Orokin officier'
         },
         1050: {
-            name: 'orokin general'
+            name: 'Orokin general'
         },
         1100: {
-            name: 'orokin etat major'
+            name: 'Orokin etat major'
         },
         1150: {
-            name: 'orokin marechal'
+            name: 'Orokin marechal'
         },
         1200: {
-            name: 'vaulted'
+            name: 'Vaulted'
         }
     };
 

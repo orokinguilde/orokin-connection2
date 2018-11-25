@@ -52,7 +52,7 @@ Server.findTrioTeamRole = function(guild) {
     return guild.roles.find(role => role.name.toLowerCase().indexOf('trio') >= 0 && role.name.toLowerCase().indexOf('team') >= 0);
 }
 Server.prototype.warnForEidolons = function(info, force) {
-    if(!info.isDay || this.application.bot.stops.eidolonsWarning[this.messageManager.getGuild().id])
+    if(!info.isDay || this.application.bot.stops.eidolonsWarning[this.messageManager.getGuild().id] || this.application.bot.debug)
         return;
 
     if(this.warnForEidolonsTimeout && this.warnForEidolonsTimeout < Date.now())

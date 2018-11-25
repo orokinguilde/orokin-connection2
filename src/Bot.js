@@ -1,8 +1,10 @@
+const BigBrowserV2 = require('./BigBrowserV2');
 const Application = require('./Application');
 const BigBrowser = require('./BigBrowser');
 const Discord = require('discord.js');
 const Message = require('./Message');
 const globals = require('./globals');
+const Banner = require('./Banner');
 
 function Bot(options)
 {
@@ -13,6 +15,7 @@ function Bot(options)
 
     this.application = new Application(this, this.options);
     this.bigBrowser = new BigBrowser();
+    this.bigBrowserV2 = new BigBrowserV2();
 
     this.errorCounters = {};
     this.stops = {
@@ -28,6 +31,7 @@ Bot.prototype.save = function() {
     return {
         application: this.application.save(),
         bigBrowser: this.bigBrowser.save(),
+        bigBrowserV2: this.bigBrowserV2.save(),
         stops: this.stops
     };
 }
@@ -41,6 +45,8 @@ Bot.prototype.load = function(obj) {
 
     if(obj.bigBrowser)
         this.bigBrowser.load(obj.bigBrowser, ctx);
+    if(obj.bigBrowserV2)
+        this.bigBrowserV2.load(obj.bigBrowserV2, ctx);
 }
 Bot.prototype.start = function(token) {
     this.client.login(token || this.options.token);
@@ -247,6 +253,68 @@ Bot.prototype.initialize = function() {
         
         if(!message.author.bot)
             this.bigBrowser.increaseTextActivity(message.guild, message.author, 0.5);
+
+        this.bigBrowserV2.updateUserText(message);
+/*
+        if(checkForCommand(/^\s*@!server\s+xp\s+txt\s*$/img))
+        {
+            console.log('SERVER STATS');
+
+            const result = this.bigBrowserV2.getServerText(message.guild, true);
+
+            message.delete();
+            message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.txt'));
+        }
+        else if(checkForCommand(/^\s*@!global\s+xp\s+txt\s*$/img))
+        {
+            console.log('GLOBAL STATS');
+
+            const result = this.bigBrowserV2.getServersText(client.guilds.map((guild) => guild), true);
+
+            message.delete();
+            message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.txt'));
+        }
+        else if(checkForCommand(/^\s*@!rank\s*$/img))
+        {
+            const user = this.bigBrowserV2.getUser(message.member);
+            const exp = this.bigBrowserV2.getUserExp(user);
+            const voiceExp = this.bigBrowserV2.getUserVoiceExp(user);
+            const textExp = this.bigBrowserV2.getUserTextExp(user);
+            const ranking = this.bigBrowserV2.getUserRank(user, exp);
+            const rank = this.bigBrowserV2.getUserRanking(user, message.guild);
+            
+            const banner = new Banner({
+                avatarUrl: message.member.user.avatarURL.replace('?size=2048', '?size=128'),
+                nickname: message.member.displayName,
+                rankIndex: rank.index,
+                rankTotal: rank.total,
+                level: ranking.currentRank.index,
+                exp: ranking.expInCurrentRank,
+                expText: textExp,
+                expVocal: voiceExp,
+                maxExp: ranking.expFromCurrentToNextRank
+            });
+
+            message.react('🐰');
+
+            banner.createStream((e, stream) => {
+                if(e)
+                {
+                    console.log(e);
+                    message.channel.send(`Désolé, une erreur s'est produite lors de la génération de l'image.`);
+                }
+                else
+                {
+                    message.delete();
+                    message.channel.send({
+                        files: [{
+                            attachment: stream,
+                            name: 'ranking.png'
+                        }]
+                    });
+                }
+            });
+        }*/
         
         if(this.debug)
         {
@@ -270,6 +338,47 @@ Bot.prototype.initialize = function() {
             this.application.addServerChannel(message.channel);
             message.delete();
             globals.saver.save();
+        }
+        else if(checkForCommand(/^\s*!rank\s*$/img))
+        {
+            const user = this.bigBrowserV2.getUser(message.member);
+            const exp = this.bigBrowserV2.getUserExp(user);
+            const voiceExp = this.bigBrowserV2.getUserVoiceExp(user);
+            const textExp = this.bigBrowserV2.getUserTextExp(user);
+            const ranking = this.bigBrowserV2.getUserRank(user, exp);
+            const rank = this.bigBrowserV2.getUserRanking(user, message.guild);
+            
+            const banner = new Banner({
+                avatarUrl: message.member.user.avatarURL.replace('?size=2048', '?size=128'),
+                nickname: message.member.displayName,
+                rankIndex: rank.index,
+                rankTotal: rank.total,
+                level: ranking.currentRank.index,
+                exp: ranking.expInCurrentRank,
+                expText: textExp,
+                expVocal: voiceExp,
+                maxExp: ranking.expFromCurrentToNextRank
+            });
+
+            message.react('🐰');
+
+            banner.createStream((e, stream) => {
+                if(e)
+                {
+                    console.log(e);
+                    message.channel.send(`Désolé, une erreur s'est produite lors de la génération de l'image.`);
+                }
+                else
+                {
+                    message.delete();
+                    message.channel.send({
+                        files: [{
+                            attachment: stream,
+                            name: 'ranking.png'
+                        }]
+                    });
+                }
+            });
         }
         else if(checkForCommand(/^\s*!nonotif\s+memberadd\s*$/img))
         {
@@ -331,7 +440,8 @@ Bot.prototype.initialize = function() {
         {
             console.log('SERVER STATS');
 
-            const result = this.bigBrowser.getTextSummaryByServer(message.guild);
+            //const result = this.bigBrowser.getTextSummaryByServer(message.guild);
+            const result = this.bigBrowserV2.getServerText(message.guild);
             
             message.delete();
             message.reply('\r\n' + result);
@@ -340,7 +450,8 @@ Bot.prototype.initialize = function() {
         {
             console.log('SERVER STATS');
 
-            const result = this.bigBrowser.getTextSummaryByServerCSV(message.guild, true);
+            //const result = this.bigBrowser.getTextSummaryByServerCSV(message.guild, true);
+            const result = this.bigBrowserV2.getServerCSV(message.guild, true);
 
             message.delete();
             message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.csv'));
@@ -349,7 +460,8 @@ Bot.prototype.initialize = function() {
         {
             console.log('SERVER STATS');
 
-            const result = this.bigBrowser.getTextSummaryByServer(message.guild);
+            //const result = this.bigBrowser.getTextSummaryByServer(message.guild);
+            const result = this.bigBrowserV2.getServerMarkDown(message.guild);
 
             message.delete();
             message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.md'));
@@ -358,7 +470,8 @@ Bot.prototype.initialize = function() {
         {
             console.log('SERVER STATS');
 
-            const result = this.bigBrowser.getTextSummaryByServer(message.guild, false);
+            //const result = this.bigBrowser.getTextSummaryByServer(message.guild, false);
+            const result = this.bigBrowserV2.getServerText(message.guild);
 
             message.delete();
             message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.txt'));
@@ -367,7 +480,8 @@ Bot.prototype.initialize = function() {
         {
             console.log('GLOBAL STATS');
 
-            const result = this.bigBrowser.getTextSummaryByServer();
+            //const result = this.bigBrowser.getTextSummaryByServer();
+            const result = this.bigBrowserV2.getServersText(client.guilds.map((guild) => guild));
 
             message.delete();
             message.reply('\r\n' + result);
@@ -376,7 +490,8 @@ Bot.prototype.initialize = function() {
         {
             console.log('GLOBAL STATS DL');
 
-            const result = this.bigBrowser.getTextSummaryByServerCSV(undefined, true);
+            //const result = this.bigBrowser.getTextSummaryByServerCSV(undefined, true);
+            const result = this.bigBrowserV2.getServersCSV(client.guilds.map((guild) => guild), true);
 
             message.delete();
             message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.csv'));
@@ -385,7 +500,8 @@ Bot.prototype.initialize = function() {
         {
             console.log('GLOBAL STATS DL');
 
-            const result = this.bigBrowser.getTextSummaryByServer();
+            //const result = this.bigBrowser.getTextSummaryByServer();
+            const result = this.bigBrowserV2.getServersMarkDown(client.guilds.map((guild) => guild));
 
             message.delete();
             message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.md'));
@@ -394,7 +510,8 @@ Bot.prototype.initialize = function() {
         {
             console.log('GLOBAL STATS DL');
 
-            const result = this.bigBrowser.getTextSummaryByServer(undefined, false);
+            //const result = this.bigBrowser.getTextSummaryByServer(undefined, false);
+            const result = this.bigBrowserV2.getServersText(client.guilds.map((guild) => guild));
 
             message.delete();
             message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.txt'));
@@ -403,6 +520,7 @@ Bot.prototype.initialize = function() {
         {
             console.log('STOP SERVER XP');
 
+            this.bigBrowserV2.setTrackingServer(message.guild, false);
             this.bigBrowser.setServerTracking(message.guild, false);
 
             message.delete();
@@ -412,6 +530,7 @@ Bot.prototype.initialize = function() {
         {
             console.log('START SERVER XP');
 
+            this.bigBrowserV2.setTrackingServer(message.guild, true);
             this.bigBrowser.setServerTracking(message.guild, true);
 
             message.delete();
@@ -421,6 +540,7 @@ Bot.prototype.initialize = function() {
         {
             console.log('STOP XP');
 
+            this.bigBrowserV2.setTrackingUser(message.member, false);
             this.bigBrowser.setTracking(message.guild, message.author, false);
 
             message.delete();
@@ -430,6 +550,7 @@ Bot.prototype.initialize = function() {
         {
             console.log('START XP');
 
+            this.bigBrowserV2.setTrackingUser(message.member, true);
             this.bigBrowser.setTracking(message.guild, message.author, true);
 
             message.delete();
@@ -559,6 +680,16 @@ Bot.prototype.initialize = function() {
                 if(needToSave)
                     globals.saver.save();
             }, 500);
+
+            if(this.bigBrowser.servers && Object.keys(this.bigBrowser.servers).length > 0)
+                this.bigBrowserV2.initWithV1Data(this.bigBrowser.servers);
+            
+            setInterval(() => {
+                this.client.guilds.forEach((guild) => {
+                    //if(guild.name === 'Orokin Guilde Académie')
+                    this.bigBrowserV2.updateServer(guild);
+                })
+            }, 1000)
         }
 
         if(this._onReady)

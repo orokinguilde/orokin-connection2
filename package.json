@@ -14,7 +14,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-prebuild": "apt-get update && apt-get install -y chromium-browser",
+    "heroku-prebuild": "curl http://ftp.mozilla.org/pub/firefox/releases/64.0b9/linux-x86_64/en-GB/firefox-64.0b9.tar.bz2 > x.tar.bz2 && tar -xvf x.tar.bz2 && ls",
     "start": "node teralyst.js"
   },
   "author": "",

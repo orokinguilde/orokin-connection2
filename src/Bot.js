@@ -154,7 +154,7 @@ Bot.prototype.helpCommand = function(message, group) {
             .addField('Tridolon', '`trio`, `join trio`, `leave trio`, `nonotif eidolonswarning`,\r\n`notif eidolonswarning`\r\n\r\n*Plus de détails :* `!helpme tridolon`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
             .addField('Membres', '`nonotif memberadd`, `notif memberadd`, `nonotif memberleave`,\r\n`notif memberleave`\r\n\r\n*Plus de détails :* `!helpme membres`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
             .addField('Twitch', '`twitch <name>`, `twitch remove <name>`\r\n\r\n*Plus de détails :* `!helpme twitch`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
-            .addField('XP Vocal/Textuel', '`rank`, `rank templates`, `rank template ...`, `server xp`, `server xp md`, `server xp csv`, `server xp txt`,\r\n`start server xp`, `stop server xp`, `start xp`, `stop xp`\r\n\r\n*Plus de détails :* `!helpme xp`\r\n¯¯¯¯¯¯¯¯¯¯¯')
+            .addField('XP Vocal/Textuel', '`rank`, `rank templates`, `rank template <name>`, `server xp`, `server xp md`, `server xp csv`, `server xp txt`,\r\n`start server xp`, `stop server xp`, `start xp`, `stop xp`\r\n\r\n*Plus de détails :* `!helpme xp`\r\n¯¯¯¯¯¯¯¯¯¯¯')
             .setDescription('**Utilisation** : `!<ma_commande>`');
     }
     else if(group.toLowerCase() === 'tridolon')
@@ -197,7 +197,7 @@ Bot.prototype.helpCommand = function(message, group) {
             .setDescription(`
 :small_blue_diamond: **!rank** | Affiche l'expérience de l'utilisateur
 :small_blue_diamond: **!rank templates** | Affiche la liste des templates
-:small_blue_diamond: **!rank template ...** | Sélectionne un template
+:small_blue_diamond: **!rank template <name>** | Sélectionne un template
 :small_blue_diamond: **!server xp** | Affiche les statistiques du serveur
 :small_blue_diamond: **!server xp md** | Télécharge les stats du serveur au format [MD](https://www.commentcamarche.net/download/telecharger-34055333-notepad)
 :small_blue_diamond: **!server xp csv** | Télécharge les stats du serveur au format [CSV](https://www.commentcamarche.net/download/telecharger-209-excel-viewer)

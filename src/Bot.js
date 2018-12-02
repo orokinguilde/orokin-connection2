@@ -292,7 +292,7 @@ Bot.prototype.initialize = function() {
 
             const msg = 'Liste des rangs disponibles :\r\n' + Object.keys(this.bigBrowserV2.ranks)
                 .map((key) => this.bigBrowserV2.ranks[key])
-                .map((rank) => `${rank === userRank.currentRank ? `\r\n` : ''}\`[${globals.padN(rank.start, 4)}, ${globals.padN(rank.end || '∞', 4)}[ ${rank.name}\`${rank === userRank.currentRank ? ` ⇦ **${message.member.displayName}**, tu es ici avec **${Math.floor(exp)} exp** !\r\n` : ''}`)
+                .map((rank) => `\`[${globals.padN(rank.start, 4)}, ${globals.padN(rank.end || '∞', 4)}[ ${rank.name}\`${rank === userRank.currentRank ? ` ⇦ **${message.member.displayName}**, tu es ici avec **${Math.floor(exp)} exp** !` : ''}`)
                 .join('\r\n');
 
             message.delete();

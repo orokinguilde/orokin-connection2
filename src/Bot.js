@@ -290,10 +290,10 @@ Bot.prototype.initialize = function() {
             const exp = this.bigBrowserV2.getUserExp(user);
             const userRank = this.bigBrowserV2.getUserRank(user, exp);
 
-            const msg = 'Liste des rangs disponibles :\r\n\`' + Object.keys(this.bigBrowserV2.ranks)
+            const msg = 'Liste des rangs disponibles :\r\n' + Object.keys(this.bigBrowserV2.ranks)
                 .map((key) => this.bigBrowserV2.ranks[key])
-                .map((rank) => `[${globals.padN(rank.start, 4)}, ${globals.padN(rank.end || '∞', 4)}[ ${rank.name}${rank === userRank.currentRank ? ' <= Vous êtes ici !' : ''}`)
-                .join('\r\n') + '\`';
+                .map((rank) => `${rank === userRank.currentRank ? `\r\n` : ''}\`[${globals.padN(rank.start, 4)}, ${globals.padN(rank.end || '∞', 4)}[ ${rank.name}\`${rank === userRank.currentRank ? ` ⇦ **${message.member.displayName}**, tu es ici avec **${Math.floor(exp)} exp** !\r\n` : ''}`)
+                .join('\r\n');
 
             message.delete();
             message.channel.send(msg);

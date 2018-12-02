@@ -71,96 +71,104 @@ BigBrowserV2.prototype.getUserRanking = function(user, server)
     }
 }
 
+BigBrowserV2.prototype.ranks = {
+    0: {
+        name: 'Chair à canon'
+    },
+    50: {
+        name: 'Galinette cendrée'
+    },
+    100: {
+        name: 'Rejeté'
+    },
+    150: {
+        name: 'Bouclier humain'
+    },
+    200: {
+        name: 'Noob'
+    },
+    250: {
+        name: 'Mauvaise herbe'
+    },
+    300: {
+        name: 'Jeune pousse écrasée'
+    },
+    350: {
+        name: 'Poussin KFC'
+    },
+    400: {
+        name: 'Pion du neant'
+    },
+    450: {
+        name: 'Vagabon'
+    },
+    500: {
+        name: 'Tenno'
+    },
+    550: {
+        name: 'Portier de Lua'
+    },
+    600: {
+        name: 'Apprenti samurai'
+    },
+    650: {
+        name: 'Samurai'
+    },
+    700: {
+        name: 'Rōnin'
+    },
+    750: {
+        name: 'Acharné'
+    },
+    800: {
+        name: 'Fanatique'
+    },
+    850: {
+        name: 'Dur à cuire'
+    },
+    900: {
+        name: 'Orokin apprenti'
+    },
+    950: {
+        name: 'Orokin'
+    },
+    1000: {
+        name: 'Orokin officier'
+    },
+    1050: {
+        name: 'Orokin general'
+    },
+    1100: {
+        name: 'Orokin etat major'
+    },
+    1150: {
+        name: 'Orokin marechal'
+    },
+    1200: {
+        name: 'Vaulted'
+    }
+};
+
+let index = -1;
+let lastRank = undefined;
+for(const rankStart in BigBrowserV2.prototype.ranks)
+{
+    const rank = BigBrowserV2.prototype.ranks[rankStart];
+    rank.start = rankStart;
+    rank.index = ++index;
+
+    if(lastRank)
+        lastRank.end = rank.start;
+
+    lastRank = rank;
+}
+
 BigBrowserV2.prototype.getUserRank = function(user, exp)
 {
     if(exp === undefined)
         exp = this.getUserExp(user);
 
-    const ranks = {
-        0: {
-            name: 'Chair à canon'
-        },
-        50: {
-            name: 'Galinette cendrée'
-        },
-        100: {
-            name: 'Rejeté'
-        },
-        150: {
-            name: 'Bouclier humain'
-        },
-        200: {
-            name: 'Noob'
-        },
-        250: {
-            name: 'Mauvaise herbe'
-        },
-        300: {
-            name: 'Jeune pousse écrasée'
-        },
-        350: {
-            name: 'Poussin KFC'
-        },
-        400: {
-            name: 'Pion du neant'
-        },
-        450: {
-            name: 'Vagabon'
-        },
-        500: {
-            name: 'Tenno'
-        },
-        550: {
-            name: 'Portier de Lua'
-        },
-        600: {
-            name: 'Apprenti samurai'
-        },
-        650: {
-            name: 'Samurai'
-        },
-        700: {
-            name: 'Rōnin'
-        },
-        750: {
-            name: 'Acharné'
-        },
-        800: {
-            name: 'Fanatique'
-        },
-        850: {
-            name: 'Dur à cuire'
-        },
-        900: {
-            name: 'Orokin apprenti'
-        },
-        950: {
-            name: 'Orokin'
-        },
-        1000: {
-            name: 'Orokin officier'
-        },
-        1050: {
-            name: 'Orokin general'
-        },
-        1100: {
-            name: 'Orokin etat major'
-        },
-        1150: {
-            name: 'Orokin marechal'
-        },
-        1200: {
-            name: 'Vaulted'
-        }
-    };
-
-    let index = -1;
-    for(const rankStart in ranks)
-    {
-        const rank = ranks[rankStart];
-        rank.start = rankStart;
-        rank.index = ++index;
-    }
+    const ranks = this.ranks;
 
     let lastMatchingRank = ranks[0];
     let nextRank = undefined;

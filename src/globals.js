@@ -33,6 +33,18 @@ module.exports = {
             value = '0' + value;
         return value;
     },
+    padN: (value, nb, char) => {
+        value = value === undefined || value === null ? '' : value.toString();
+        nb = nb || 0;
+        
+        if(char === undefined)
+            char = ' ';
+
+        while(value.length < nb)
+            value = `${char}${value}`;
+
+        return value;
+    },
     findById: function(collection, id)
     {
         return collection.filter(item => item.id === id).first();

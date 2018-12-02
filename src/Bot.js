@@ -290,7 +290,7 @@ Bot.prototype.initialize = function() {
             const exp = this.bigBrowserV2.getUserExp(user);
             const userRank = this.bigBrowserV2.getUserRank(user, exp);
 
-            const msg = 'Liste des rangs disponibles :\r\n' + Object.keys(this.bigBrowserV2.ranks)
+            const msg = `${message.member}, voici la liste des rangs disponibles :\r\n` + Object.keys(this.bigBrowserV2.ranks)
                 .map((key) => this.bigBrowserV2.ranks[key])
                 .map((rank) => `\`[${globals.padN(rank.start, 4)}, ${globals.padN(rank.end || '∞', 4)}[ ${rank.name}\`${rank === userRank.currentRank ? ` ⇦ **${message.member.displayName}**, tu es ici avec **${Math.floor(exp)} exp** !` : ''}`)
                 .join('\r\n');
@@ -300,7 +300,7 @@ Bot.prototype.initialize = function() {
         }
         else if(checkForCommand(/^\s*!rank templates$/img))
         {
-            const msg = 'Liste des templates disponibles (`!rank template ...`) :\r\n' + bannerTemplates.list.map((bannerTemplate) => {
+            const msg = `${message.member}, voici la liste des templates disponibles (\`!rank template ...\`) :\r\n` + bannerTemplates.list.map((bannerTemplate) => {
                 return `**${bannerTemplate.key}.** ${bannerTemplate.name}`
             }).join('\r\n');
 
@@ -349,13 +349,13 @@ Bot.prototype.initialize = function() {
 
             if(!template)
             {
-                message.channel.send(`Template "${name}" non trouvé 😢`);
+                message.channel.send(`${message.member}, le template "${name}" n'a pas été trouvé 😢`);
             }
             else
             {
                 user.bannerTemplateKey = template.key;
+                message.channel.send(`${message.member}, le template "${name}" t'a été assigné 👍`);
                 message.delete();
-                message.channel.send(`Template "${name}" t'a été assigné 👍`);
                 globals.saver.save();
             }
         }

@@ -265,7 +265,6 @@ Banner.prototype.createCanvas = function(template) {
 
     function drawRank(x, y, rank)
     {
-        rank *= 10;
         drawText(x, y, 'RANK', 15, rankColor);
         drawText(x + 38 / 2 - dix(rank) * 10 - 20, y + 20, '#' + Math.trunc(rank), 30, rankColor);
         drawText(x + 38 / 2 + dix(rank) * 10 + 15, y + 25, '/' + Math.trunc(rankTotal), 15, rankColor);

@@ -57,9 +57,10 @@ BigBrowserV2.prototype.getUserExp = function(user)
 BigBrowserV2.prototype.getUserRanking = function(user, server)
 {
     const users = this.getSortedUsers(server).reverse();
+    const len = users.length;
 
     let index;
-    for(index = 0; index < users.length; ++index)
+    for(index = 0; index < len; ++index)
     {
         if(users[index].id == user.id)
             break;
@@ -67,7 +68,7 @@ BigBrowserV2.prototype.getUserRanking = function(user, server)
     
     return {
         index: index,
-        total: users.length
+        total: len
     }
 }
 

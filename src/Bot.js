@@ -1,3 +1,4 @@
+const bannerTemplates = require('./BannerTemplate');
 const BigBrowserV2 = require('./BigBrowserV2');
 const Application = require('./Application');
 const BigBrowser = require('./BigBrowser');
@@ -194,6 +195,9 @@ Bot.prototype.helpCommand = function(message, group) {
             .setAuthor('XP Vocal/Textuel\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯', authorIcon)
             .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479614949220548610/xp-logo.png')
             .setDescription(`
+:small_blue_diamond: **!rank** | Affiche l'expérience de l'utilisateur
+:small_blue_diamond: **!rank templates** | Affiche la liste des templates
+:small_blue_diamond: **!rank template ...** | Sélectionne un template
 :small_blue_diamond: **!server xp** | Affiche les statistiques du serveur
 :small_blue_diamond: **!server xp md** | Télécharge les stats du serveur au format [MD](https://www.commentcamarche.net/download/telecharger-34055333-notepad)
 :small_blue_diamond: **!server xp csv** | Télécharge les stats du serveur au format [CSV](https://www.commentcamarche.net/download/telecharger-209-excel-viewer)
@@ -255,66 +259,6 @@ Bot.prototype.initialize = function() {
             this.bigBrowser.increaseTextActivity(message.guild, message.author, 0.5);
 
         this.bigBrowserV2.updateUserText(message);
-/*
-        if(checkForCommand(/^\s*@!server\s+xp\s+txt\s*$/img))
-        {
-            console.log('SERVER STATS');
-
-            const result = this.bigBrowserV2.getServerText(message.guild, true);
-
-            message.delete();
-            message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.txt'));
-        }
-        else if(checkForCommand(/^\s*@!global\s+xp\s+txt\s*$/img))
-        {
-            console.log('GLOBAL STATS');
-
-            const result = this.bigBrowserV2.getServersText(client.guilds.map((guild) => guild), true);
-
-            message.delete();
-            message.channel.send(new Discord.Attachment(new Buffer(result), 'stats.txt'));
-        }
-        else if(checkForCommand(/^\s*@!rank\s*$/img))
-        {
-            const user = this.bigBrowserV2.getUser(message.member);
-            const exp = this.bigBrowserV2.getUserExp(user);
-            const voiceExp = this.bigBrowserV2.getUserVoiceExp(user);
-            const textExp = this.bigBrowserV2.getUserTextExp(user);
-            const ranking = this.bigBrowserV2.getUserRank(user, exp);
-            const rank = this.bigBrowserV2.getUserRanking(user, message.guild);
-            
-            const banner = new Banner({
-                avatarUrl: message.member.user.avatarURL.replace('?size=2048', '?size=128'),
-                nickname: message.member.displayName,
-                rankIndex: rank.index,
-                rankTotal: rank.total,
-                level: ranking.currentRank.index,
-                exp: ranking.expInCurrentRank,
-                expText: textExp,
-                expVocal: voiceExp,
-                maxExp: ranking.expFromCurrentToNextRank
-            });
-
-            message.react('🐰');
-
-            banner.createStream((e, stream) => {
-                if(e)
-                {
-                    console.log(e);
-                    message.channel.send(`Désolé, une erreur s'est produite lors de la génération de l'image.`);
-                }
-                else
-                {
-                    message.delete();
-                    message.channel.send({
-                        files: [{
-                            attachment: stream,
-                            name: 'ranking.png'
-                        }]
-                    });
-                }
-            });
-        }*/
         
         if(this.debug)
         {
@@ -339,6 +283,67 @@ Bot.prototype.initialize = function() {
             message.delete();
             globals.saver.save();
         }
+        else if(checkForCommand(/^\s*!rank templates$/img))
+        {
+            const msg = 'Liste des templates disponibles (`!rank template ...`) :\r\n' + bannerTemplates.list.map((bannerTemplate) => {
+                return `**${bannerTemplate.key}.** ${bannerTemplate.name}`
+            }).join('\r\n');
+
+            message.delete();
+            message.channel.send(msg);
+        }
+        else if(checkForCommand(/^\s*!rank template (.+)$/img))
+        {
+            const name = /^\s*!rank template (.+)$/img.exec(message.content)[1].trim().toLowerCase();
+
+            const user = this.bigBrowserV2.getUser(message.member);
+            let template = undefined;
+
+            for(const templateItem of bannerTemplates.list)
+            {
+                if(templateItem.key.toString().toLowerCase() == name)
+                {
+                    template = templateItem;
+                    break;
+                }
+            }
+
+            if(!template)
+            {
+                for(const templateItem of bannerTemplates.list)
+                {
+                    if(templateItem.name.toString().toLowerCase().indexOf(name) > -1)
+                    {
+                        template = templateItem;
+                        break;
+                    }
+                }
+            }
+
+            if(!template)
+            {
+                for(const templateItem of bannerTemplates.list)
+                {
+                    if(`${templateItem.key}. ${templateItem.name}`.toLowerCase().indexOf(name) > -1)
+                    {
+                        template = templateItem;
+                        break;
+                    }
+                }
+            }
+
+            if(!template)
+            {
+                message.channel.send(`Template "${name}" non trouvé 😢`);
+            }
+            else
+            {
+                user.bannerTemplateKey = template.key;
+                message.delete();
+                message.channel.send(`Template "${name}" t'a été assigné 👍`);
+                globals.saver.save();
+            }
+        }
         else if(checkForCommand(/^\s*!rank\s*$/img))
         {
             const user = this.bigBrowserV2.getUser(message.member);
@@ -354,15 +359,23 @@ Bot.prototype.initialize = function() {
                 rankIndex: rank.index,
                 rankTotal: rank.total,
                 level: ranking.currentRank.index,
+                levelName: ranking.currentRank ? ranking.currentRank.name : '?',
                 exp: ranking.expInCurrentRank,
                 expText: textExp,
                 expVocal: voiceExp,
                 maxExp: ranking.expFromCurrentToNextRank
             });
 
-            message.react('🐰');
+            let template = undefined;
+            
+            if(user.bannerTemplateKey)
+                template = bannerTemplates.indexed[user.bannerTemplateKey];
+            if(!template)
+                template = bannerTemplates.default;
 
-            banner.createStream((e, stream) => {
+            message.react('🐰');
+            
+            banner.createStream(template, (e, stream) => {
                 if(e)
                 {
                     console.log(e);

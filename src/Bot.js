@@ -2,6 +2,7 @@ const bannerTemplates = require('./BannerTemplate');
 const BigBrowserV2 = require('./BigBrowserV2');
 const Application = require('./Application');
 const BigBrowser = require('./BigBrowser');
+const Mentoring = require('./Mentoring');
 const Discord = require('discord.js');
 const Message = require('./Message');
 const globals = require('./globals');
@@ -17,6 +18,7 @@ function Bot(options)
     this.application = new Application(this, this.options);
     this.bigBrowser = new BigBrowser();
     this.bigBrowserV2 = new BigBrowserV2();
+    this.mentoring = new Mentoring();
 
     this.errorCounters = {};
     this.stops = {
@@ -33,6 +35,7 @@ Bot.prototype.save = function() {
         application: this.application.save(),
         bigBrowser: this.bigBrowser.save(),
         bigBrowserV2: this.bigBrowserV2.save(),
+        mentoring: this.mentoring.save(),
         stops: this.stops
     };
 }
@@ -48,6 +51,8 @@ Bot.prototype.load = function(obj) {
         this.bigBrowser.load(obj.bigBrowser, ctx);
     if(obj.bigBrowserV2)
         this.bigBrowserV2.load(obj.bigBrowserV2, ctx);
+    if(obj.mentoring)
+        this.mentoring.load(obj.mentoring, ctx);
 }
 Bot.prototype.start = function(token) {
     this.client.login(token || this.options.token);
@@ -283,6 +288,119 @@ Bot.prototype.initialize = function() {
             this.application.addServerChannel(message.channel);
             message.delete();
             globals.saver.save();
+        }
+        else if(checkForCommand(/^\s*!mentor .+$/img))
+        {
+            console.log('MENTOR');
+            const mentions = message.mentions.members.array();
+
+            if(mentions.length === 1)
+            {
+                const disciple = mentions[0];
+
+                if(this.mentoring.setMentor(message.member, disciple))
+                {
+                    message.reply(`recrutement enregistré !`);
+                    globals.saver.save();
+                }
+                else
+                {
+                    message.reply(`recrutement refusé !`);
+                }
+            }/*
+            else if(mentions.length === 2)
+            {
+                const mentor = mentions[0];
+                const disciple = mentions[1];
+
+                if(this.mentoring.setMentor(mentor, disciple))
+                {
+                    message.reply(`recrutement enregistré !`);
+                    globals.saver.save();
+                }
+                else
+                {
+                    message.reply(`recrutement refusé !`);
+                }
+            }*/
+            else
+            {
+                message.reply(`tu dois mentionner le/la disciple !`);
+            }
+        }
+        else if(checkForCommand(/^\s*!mentors\s*$/img))
+        {
+            console.log('MENTORS');
+            
+            const server = this.mentoring.getServer(message.guild);
+
+            let str = '';
+            for(const id in server.users)
+            {
+                const user = server.users[id];
+
+                str += `${user.displayName} | ${Object.keys(user.disciples).length} ${Object.keys(user.disciples).map((id) => server.users[id].displayName).join(' - ')} | ${Object.keys(user.mentors).length} ${Object.keys(user.mentors).map((id) => server.users[id].displayName).join(' - ')} | ${user.mentoringSuccess ? 'V' : '-'}\r\n`;
+            }
+
+            message.channel.send(str);
+        }
+        else if(checkForCommand(/^\s*!mentors pending\s*$/img))
+        {
+            console.log('MENTORS PENDING');
+            
+            const server = this.mentoring.getServer(message.guild);
+
+            let str = '';
+            for(const id in server.users)
+            {
+                const user = server.users[id];
+
+                if(!user.mentoringSuccess)
+                {
+                    str += `${user.displayName} | ${Object.keys(user.disciples).length} ${Object.keys(user.disciples).map((id) => server.users[id].displayName).join(' - ')} | ${Object.keys(user.mentors).length} ${Object.keys(user.mentors).map((id) => server.users[id].displayName).join(' - ')}\r\n`;
+                }
+            }
+
+            message.channel.send(str);
+        }
+        else if(checkForCommand(/^\s*!mentors success\s*$/img))
+        {
+            console.log('MENTORS PENDING');
+            
+            const server = this.mentoring.getServer(message.guild);
+
+            let str = '';
+            for(const id in server.users)
+            {
+                const user = server.users[id];
+
+                if(user.mentoringSuccess)
+                {
+                    str += `${user.displayName} | ${Object.keys(user.disciples).length} ${Object.keys(user.disciples).map((id) => server.users[id].displayName).join(' - ')} | ${Object.keys(user.mentors).length} ${Object.keys(user.mentors).map((id) => server.users[id].displayName).join(' - ')}\r\n`;
+                }
+            }
+
+            message.channel.send(str);
+        }
+        else if(checkForCommand(/^\s*!mentoring\s*$/img))
+        {
+            console.log('MENTORING');
+            
+            const server = this.mentoring.getServer(message.guild);
+
+            let success = 0;
+            let unsuccess = 0;
+            for(const id in server.users)
+            {
+                const user = server.users[id];
+
+                if(user.mentoringSuccess)
+                    ++success;
+                else
+                    ++unsuccess;
+            }
+
+            message.channel.send(`**${success}** chaine(s) de recrutement réussie(s) / **${unsuccess + success}** chaine(s) au total (**${unsuccess}** en attente)\r\n**${Math.round(success / (unsuccess + success) * 10000) / 100}%** de réussite`);
         }
         else if(checkForCommand(/^\s*!ranks$/img))
         {

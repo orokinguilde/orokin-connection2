@@ -270,6 +270,9 @@ BigBrowserV2.prototype.getUser = function(member)
         };
     }
 
+    if(!user.joinedTimestamp)
+        user.joinedTimestamp = guild.joinedTimestamp;
+
     const zero = (name) => {
         if(user.stats[name] === undefined)
             user.stats[name] = 0;
@@ -349,6 +352,34 @@ BigBrowserV2.prototype.updateServer = function(guild)
 {
     const now = Date.now();
 
+    const server = this.getServer(guild);
+
+    let nbUsers = server.users.length + 1;
+    const onDone = () => {
+        --nbUsers;
+
+        if(nbUsers === 0)
+        {
+            this.save();
+        }
+    }
+
+    for(const userId in server.users)
+    {
+        const user = server.users[userId];
+
+        if(!user.removedDate)
+        {
+            guild.fetchMember(userId).then(() => {
+                onDone();
+            }).catch(() => {
+                user.removedDate = Date.now();
+
+                onDone();
+            })
+        }
+    }
+
     guild.members.forEach((member) => {
 
         /*
@@ -427,6 +458,8 @@ BigBrowserV2.prototype.updateServer = function(guild)
             user.stats.wasVoicingLastTick = false;
         }
     })
+
+    onDone();
 }
 
 BigBrowserV2.prototype.updateUserText = function(message)
@@ -758,6 +791,7 @@ BigBrowserV2.prototype.getSortedUsers = function(server) {
 
     const users = Object.keys(server.users)
         .map(id => server.users[id])
+        .filter(user => !user.removedDate)
         .filter(user => user.tracking !== false)
         .sort((u1, u2) => {
             const u1exp = this.getUserExp(u1);
@@ -855,7 +889,9 @@ BigBrowserV2.prototype.getServerFormatted = function(server, formatter) {
             formatter.asString('Dernier jeu autre que Warframe'),
 
             formatter.asString('Temps total sur aucune application (ms)'),
-            formatter.asString('Dernière connection à aucune application')
+            formatter.asString('Dernière connection à aucune application'),
+
+            formatter.asString('Date de join')
         );
 
         if(formatter.headerEnd)
@@ -904,7 +940,9 @@ BigBrowserV2.prototype.getServerFormatted = function(server, formatter) {
                 formatter.asDate(user.stats.lastWarframeDiscordDateNot),
 
                 formatter.asInteger(user.stats.totalWarframeDiscordTimeMsUndefined),
-                formatter.asDate(user.stats.lastWarframeDiscordDateUndefined)
+                formatter.asDate(user.stats.lastWarframeDiscordDateUndefined),
+
+                formatter.asDate(user.joinedTimestamp)
             );
         }
 

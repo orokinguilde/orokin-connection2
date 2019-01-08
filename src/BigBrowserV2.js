@@ -271,7 +271,7 @@ BigBrowserV2.prototype.getUser = function(member)
     }
 
     if(!user.joinedTimestamp)
-        user.joinedTimestamp = guild.joinedTimestamp;
+        user.joinedTimestamp = member.joinedTimestamp;
 
     const zero = (name) => {
         if(user.stats[name] === undefined)

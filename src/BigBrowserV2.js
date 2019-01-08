@@ -273,6 +273,9 @@ BigBrowserV2.prototype.getUser = function(member)
     if(!user.joinedTimestamp)
         user.joinedTimestamp = member.joinedTimestamp;
 
+    if(member.roles)
+        user.roles = member.roles.array().map((role) => role.name);
+
     const zero = (name) => {
         if(user.stats[name] === undefined)
             user.stats[name] = 0;
@@ -891,7 +894,8 @@ BigBrowserV2.prototype.getServerFormatted = function(server, formatter) {
             formatter.asString('Temps total sur aucune application (ms)'),
             formatter.asString('Dernière connection à aucune application'),
 
-            formatter.asString('Date de join')
+            formatter.asString('Date de join'),
+            formatter.asString('Roles')
         );
 
         if(formatter.headerEnd)
@@ -942,7 +946,8 @@ BigBrowserV2.prototype.getServerFormatted = function(server, formatter) {
                 formatter.asInteger(user.stats.totalWarframeDiscordTimeMsUndefined),
                 formatter.asDate(user.stats.lastWarframeDiscordDateUndefined),
 
-                formatter.asDate(user.joinedTimestamp)
+                formatter.asDate(user.joinedTimestamp),
+                formatter.asString((user.roles || []).join(' / '))
             );
         }
 

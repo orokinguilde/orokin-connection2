@@ -276,6 +276,9 @@ BigBrowserV2.prototype.getUser = function(member)
     if(member.roles)
         user.roles = member.roles.array().map((role) => role.name);
 
+    if(member.roles)
+        user.isWeird = member.roles.array().some((role) => role.name === 'EN phase de test' || role.name === 'Tenno') && !user.stats.totalVoiceTimeMs;
+
     const zero = (name) => {
         if(user.stats[name] === undefined)
             user.stats[name] = 0;
@@ -895,7 +898,9 @@ BigBrowserV2.prototype.getServerFormatted = function(server, formatter) {
             formatter.asString('Dernière connection à aucune application'),
 
             formatter.asString('Date de join'),
-            formatter.asString('Roles')
+            formatter.asString('Roles'),
+
+            formatter.asString('Inactif ?')
         );
 
         if(formatter.headerEnd)
@@ -947,7 +952,9 @@ BigBrowserV2.prototype.getServerFormatted = function(server, formatter) {
                 formatter.asDate(user.stats.lastWarframeDiscordDateUndefined),
 
                 formatter.asDate(user.joinedTimestamp),
-                formatter.asString((user.roles || []).join(' / '))
+                formatter.asString((user.roles || []).join(' / ')),
+
+                formatter.asBool(user.isWeird || false)
             );
         }
 

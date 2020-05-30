@@ -554,6 +554,20 @@ Bot.prototype.initialize = function() {
 
             message.react('🐰');
             
+            banner.createBuffer(template, (e, buffer) => {
+                if(e)
+                {
+                    console.log(e);
+                    message.channel.send(`Désolé, une erreur s'est produite lors de la génération de l'image.`);
+                }
+                else
+                {
+                    const attachment = new Discord.Attachment(buffer, 'banner.png');
+                    message.delete();
+                    message.channel.send('', attachment);
+                }
+            })
+            /*
             banner.createStream(template, (e, stream) => {
                 if(e)
                 {
@@ -570,7 +584,7 @@ Bot.prototype.initialize = function() {
                         }]
                     });
                 }
-            });
+            });*/
         }
         else if(checkForCommand(/^\s*!nonotif\s+memberadd\s*$/img))
         {

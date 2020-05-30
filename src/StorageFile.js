@@ -37,7 +37,8 @@ StorageFile.prototype.getContent = function(callback) {
     StorageFile.dbx().filesDownload({
         path: this.fileId
     }).then((r) => {
-        console.log(r.fileBinary.toString());
+       //console.log(r.fileBinary.toString());
+        console.log('StorageFile has been read with ' + r.fileBinary.toString().length + ' chars');
         callback(undefined, r.fileBinary);
     }).catch((e) => {
         console.error(e);

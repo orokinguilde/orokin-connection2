@@ -5,7 +5,7 @@ const fs = require('fs');
 
 function Eidelon()
 { }
-Eidelon.nearEndOfDayText = fs.readFileSync('./messagenuit.md');
+Eidelon.nearEndOfDayText = fs.readFileSync('./messages/messagenuit.md');
 Eidelon.prototype.createNightMessage = function(info) {
     const timesImg = [
         [       Infinity, 'https://cdn.discordapp.com/attachments/437388704072466433/437388856036425738/1Warframe-45min0000.jpg' ],

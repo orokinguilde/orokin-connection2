@@ -658,15 +658,15 @@ Bot.prototype.initialize = function() {
             const result = this.bigBrowserV2.getRosterRanks(message.guild, nbRoster);
 
             const createStrLine = (entries) => entries
-                .map((u, i) => `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} ${u.stats.voiceXp} :: ${u.user.userData.displayName}`)
+                .map((u, i) => u.stats.voiceXp <= 0 ? `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} -` : `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} ${Math.round(u.stats.voiceXp * 100) / 100} :: ${u.user.userData.displayName}`)
                 .reduce((p, c) => !p ? c : `${p}\n${c}`, '');
             
             message.delete();
             message.reply('\r\n' + `\`\`\`::: Jour :::
- ${createStrLine(result.day)}
+${createStrLine(result.day)}
 
 ::: Semaine :::
- ${createStrLine(result.week)}\`\`\``);
+${createStrLine(result.week)}\`\`\``);
         }
         else if(checkForCommand(/^\s*!server\s+xp\s*$/img))
         {

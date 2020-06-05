@@ -156,16 +156,12 @@ var BigBrowserV2UserStatsTimed = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(BigBrowserV2UserStatsTimed.prototype, "obsoleteDate", {
-        get: function () {
-            return Math.floor(Date.now() / this.timeDivider);
-        },
-        enumerable: false,
-        configurable: true
-    });
+    BigBrowserV2UserStatsTimed.prototype.getDateIndicator = function (date) {
+        return this.timeDivider(new Date(date));
+    };
     Object.defineProperty(BigBrowserV2UserStatsTimed.prototype, "isObsolete", {
         get: function () {
-            return this.obsoleteDate !== this.date;
+            return this.getDateIndicator(Date.now()) !== this.getDateIndicator(this.date);
         },
         enumerable: false,
         configurable: true
@@ -193,14 +189,18 @@ var BigBrowserV2User = /** @class */ (function () {
     });
     Object.defineProperty(BigBrowserV2User.prototype, "dayStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimed(this.userData.dayStats, 1000 * 60 * 60 * 24);
+            return new BigBrowserV2UserStatsTimed(this.userData.dayStats, function (date) { return date.getDay(); });
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2User.prototype, "weekStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimed(this.userData.weekStats, 1000 * 60 * 60 * 24 * 7);
+            return new BigBrowserV2UserStatsTimed(this.userData.weekStats, function (date) {
+                var onejan = new Date(date.getFullYear(), 0, 1);
+                var millisecsInDay = 86400000;
+                return Math.ceil((((date.getTime() - onejan.getTime()) / millisecsInDay) + onejan.getDay() + 1) / 7);
+            });
         },
         enumerable: false,
         configurable: true
@@ -290,8 +290,8 @@ var BigBrowserV2 = /** @class */ (function () {
         this._xpMultiplier = 1;
         var index = -1;
         var lastRank = undefined;
-        for (var rankStart in BigBrowserV2.prototype.ranks) {
-            var rank = BigBrowserV2.prototype.ranks[rankStart];
+        for (var rankStart in this.ranks) {
+            var rank = this.ranks[rankStart];
             rank.start = rankStart;
             rank.index = ++index;
             if (lastRank)
@@ -530,7 +530,6 @@ var BigBrowserV2 = /** @class */ (function () {
         var onDone = function () {
             --nbUsers;
             if (nbUsers === 0) {
-                console.log('EXIT');
                 _this.save();
             }
         };
@@ -610,11 +609,11 @@ var BigBrowserV2 = /** @class */ (function () {
             };
             if (user.dayStats.isObsolete) {
                 user.dayStats.injectInto(user.weekStats);
-                user.dayStats.date = user.dayStats.obsoleteDate;
+                user.dayStats.date = now;
                 user.dayStats.clear();
             }
             if (user.weekStats.isObsolete) {
-                user.weekStats.date = user.weekStats.obsoleteDate;
+                user.weekStats.date = now;
                 user.weekStats.clear();
             }
             updateStats(userData.stats);

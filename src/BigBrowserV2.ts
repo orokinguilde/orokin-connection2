@@ -194,7 +194,7 @@ export class BigBrowserV2UserStats {
     }
 }
 export class BigBrowserV2UserStatsTimed extends BigBrowserV2UserStats {
-    public constructor(stats: IBigBrowserV2UserStatsTimed, timeDivider: number) {
+    public constructor(stats: IBigBrowserV2UserStatsTimed, timeDivider: (date: Date) => number) {
         super(stats.data);
 
         this._statsTimed = stats;
@@ -213,17 +213,17 @@ export class BigBrowserV2UserStatsTimed extends BigBrowserV2UserStats {
         this.statsTimed.date = value;
     }
 
-    private _timeDivider: number;
+    private _timeDivider: (date: Date) => number;
     public get timeDivider() {
         return this._timeDivider;
     }
 
-    public get obsoleteDate() {
-        return Math.floor(Date.now() / this.timeDivider);
+    public getDateIndicator(date: number) {
+        return this.timeDivider(new Date(date));
     }
 
     public get isObsolete() {
-        return this.obsoleteDate !== this.date;
+        return this.getDateIndicator(Date.now()) !== this.getDateIndicator(this.date);
     }
 }
 
@@ -241,10 +241,14 @@ export class BigBrowserV2User {
         return new BigBrowserV2UserStats(this.userData.stats);
     }
     public get dayStats() {
-        return new BigBrowserV2UserStatsTimed(this.userData.dayStats, 1000 * 60 * 60 * 24);
+        return new BigBrowserV2UserStatsTimed(this.userData.dayStats, date => date.getDay());
     }
     public get weekStats() {
-        return new BigBrowserV2UserStatsTimed(this.userData.weekStats, 1000 * 60 * 60 * 24 * 7);
+        return new BigBrowserV2UserStatsTimed(this.userData.weekStats, date => {
+            const onejan = new Date(date.getFullYear(), 0, 1);
+            const millisecsInDay = 86400000;
+            return Math.ceil((((date.getTime() - onejan.getTime()) / millisecsInDay) + onejan.getDay() + 1) / 7);
+        });
     }
 }
 
@@ -252,9 +256,9 @@ export class BigBrowserV2 {
     constructor() {
         let index = -1;
         let lastRank = undefined;
-        for(const rankStart in BigBrowserV2.prototype.ranks)
+        for(const rankStart in this.ranks)
         {
-            const rank = BigBrowserV2.prototype.ranks[rankStart];
+            const rank = this.ranks[rankStart];
             rank.start = rankStart as any as number;
             rank.index = ++index;
     
@@ -650,7 +654,6 @@ export class BigBrowserV2 {
 
             if(nbUsers === 0)
             {
-                console.log('EXIT');
                 this.save();
             }
         }
@@ -755,11 +758,11 @@ export class BigBrowserV2 {
 
             if(user.dayStats.isObsolete) {
                 user.dayStats.injectInto(user.weekStats);
-                user.dayStats.date = user.dayStats.obsoleteDate;
+                user.dayStats.date = now;
                 user.dayStats.clear();
             }
             if(user.weekStats.isObsolete) {
-                user.weekStats.date = user.weekStats.obsoleteDate;
+                user.weekStats.date = now;
                 user.weekStats.clear();
             }
 

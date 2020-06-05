@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "removeComments": false,
+        "preserveConstEnums": true,
+        "declaration": false,
+        "moduleResolution": "node",
+        "outDir": "./src",
+        "typeRoots": [
+          "./node_modules/@types"
+        ],
+        "target": "ES5",
+        "jsx": "react"
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": []
+}

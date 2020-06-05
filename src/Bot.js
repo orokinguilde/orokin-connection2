@@ -1,5 +1,5 @@
 const bannerTemplates = require('./BannerTemplate');
-const BigBrowserV2 = require('./BigBrowserV2');
+const { BigBrowserV2 } = require('./BigBrowserV2.js');
 const Application = require('./Application');
 const BigBrowser = require('./BigBrowser');
 const Mentoring = require('./Mentoring');
@@ -641,6 +641,32 @@ Bot.prototype.initialize = function() {
         else if(checkForCommand(/^\s*!(?:leave|quitter)\s+trio\s*$/img))
         {
             this.leaveTrioCommand(message);
+        }
+        else if(checkForCommand(/^\s*!server\s+rank(\s|$)/img))
+        {
+            console.log('SERVER RANK');
+
+            let nbRoster = undefined;
+            
+            const params = /server\s+rank\s+(\d+)/img.exec(message.content);
+            if(params) {
+                const [ , nbRosterStr ] = params;
+
+                nbRoster = nbRosterStr && parseInt(nbRosterStr);
+            }
+
+            const result = this.bigBrowserV2.getRosterRanks(message.guild, nbRoster);
+
+            const createStrLine = (entries) => entries
+                .map((u, i) => `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} ${u.stats.voiceXp} :: ${u.user.userData.displayName}`)
+                .reduce((p, c) => !p ? c : `${p}\n${c}`, '');
+            
+            message.delete();
+            message.reply('\r\n' + `\`\`\`::: Jour :::
+ ${createStrLine(result.day)}
+
+::: Semaine :::
+ ${createStrLine(result.week)}\`\`\``);
         }
         else if(checkForCommand(/^\s*!server\s+xp\s*$/img))
         {

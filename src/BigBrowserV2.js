@@ -905,14 +905,14 @@ var BigBrowserV2 = /** @class */ (function () {
                     }
                 };
                 clean(user.stats);
-                clean(user.dayStats.data);
-                clean(user.weekStats.data);
-                clean(user.rangedDayStats.data);
-                clean(user.rangedWeekStats.data);
-                clean(user.dayStats.last);
-                clean(user.weekStats.last);
-                clean(user.rangedDayStats.last);
-                clean(user.rangedWeekStats.last);
+                clean(user.dayStats && user.dayStats.data);
+                clean(user.weekStats && user.weekStats.data);
+                clean(user.rangedDayStats && user.rangedDayStats.data);
+                clean(user.rangedWeekStats && user.rangedWeekStats.data);
+                clean(user.dayStats && user.dayStats.last);
+                clean(user.weekStats && user.weekStats.last);
+                clean(user.rangedDayStats && user.rangedDayStats.last);
+                clean(user.rangedWeekStats && user.rangedWeekStats.last);
             }
         }
     };

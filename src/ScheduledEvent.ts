@@ -66,7 +66,8 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
             xpBonusOnReact: this.xpBonusOnReact,
             xpBonusOnPopUp: this.xpBonusOnPopUp,
             periodMsMax: this.periodMsMax,
-            periodMsMin: this.periodMsMin
+            periodMsMin: this.periodMsMin,
+            messageTimeoutSec: this.messageTimeoutSec
         }
     }
 
@@ -77,6 +78,7 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
         this._periodMsMax = obj.periodMsMax;
         this._xpBonusOnPopUp = obj.xpBonusOnPopUp;
         this._xpBonusOnReact = obj.xpBonusOnReact;
+        this._messageTimeoutSec = obj.messageTimeoutSec;
     }
 
     public active = false;
@@ -119,8 +121,14 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
     public set xpBonusOnReact(value) {
         this._xpBonusOnReact = value;
     }
-    
-    public messageTimeoutSec = 10;
+
+    private _messageTimeoutSec: number
+    public get messageTimeoutSec() {
+        return this._messageTimeoutSec ?? 10;
+    }
+    public set messageTimeoutSec(value) {
+        this._messageTimeoutSec = value;
+    }
 
     public get messageTimeoutMs() {
         return this.messageTimeoutSec * 1000;

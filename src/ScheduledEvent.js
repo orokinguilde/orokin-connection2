@@ -109,7 +109,6 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
         _this.guild = guild;
         _this.bigBrowser = bigBrowser;
         _this.active = false;
-        _this.messageTimeoutSec = 10;
         _this.channelIds = {};
         if (serialized) {
             _this.load(serialized);
@@ -124,7 +123,8 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
             xpBonusOnReact: this.xpBonusOnReact,
             xpBonusOnPopUp: this.xpBonusOnPopUp,
             periodMsMax: this.periodMsMax,
-            periodMsMin: this.periodMsMin
+            periodMsMin: this.periodMsMin,
+            messageTimeoutSec: this.messageTimeoutSec
         };
     };
     XPBonusScheduledEvent.prototype.load = function (obj) {
@@ -135,6 +135,7 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
         this._periodMsMax = obj.periodMsMax;
         this._xpBonusOnPopUp = obj.xpBonusOnPopUp;
         this._xpBonusOnReact = obj.xpBonusOnReact;
+        this._messageTimeoutSec = obj.messageTimeoutSec;
     };
     Object.defineProperty(XPBonusScheduledEvent.prototype, "enabled", {
         get: function () {
@@ -185,6 +186,17 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
         },
         set: function (value) {
             this._xpBonusOnReact = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(XPBonusScheduledEvent.prototype, "messageTimeoutSec", {
+        get: function () {
+            var _a;
+            return (_a = this._messageTimeoutSec) !== null && _a !== void 0 ? _a : 10;
+        },
+        set: function (value) {
+            this._messageTimeoutSec = value;
         },
         enumerable: false,
         configurable: true

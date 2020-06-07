@@ -149,14 +149,14 @@ var Bot = /** @class */ (function () {
                 .addField('Twitch', '`twitch <name>`, `twitch remove <name>`\r\n\r\n*Plus de détails :* `!helpme twitch`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
                 .addField('XP Vocal/Textuel', '`rank`, `rank templates`, `rank template <name>`, `ranks`, `server xp`, `server xp md`, `server xp csv`, `server xp txt`,\r\n`start server xp`, `stop server xp`, `start xp`, `stop xp`\r\n\r\n*Plus de détails :* `!helpme xp`\r\n¯¯¯¯¯¯¯¯¯¯¯')
                 .addField('Leaderboard', '`server rank <nb>`, `server last rank <nb>`, `server rank reset`, `server rank ranges`, `server rank range <name> <start> <end>`\r\n\r\n*Plus de détails :* `!helpme leaderboard`\r\n¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('XP Bonus', '`xpbonus <enable|disable>`, `xpbonus config <periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>`, `xpbonus config`, `xpbonus channel <add|remove|list>`\r\n\r\n*Plus de détails :* `!helpme xpbonus`\r\n¯¯¯¯¯¯¯¯¯¯¯')
+                .addField('XP Bonus', '`xpbonus <enable|disable>`, `xpbonus pop`, `xpbonus config <messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>`, `xpbonus config`, `xpbonus channel <add|remove|list>`\r\n\r\n*Plus de détails :* `!helpme xpbonus`\r\n¯¯¯¯¯¯¯¯¯¯¯')
                 .setDescription('**Utilisation** : `!<ma_commande>`');
         }
         else if (group.toLowerCase() === 'xpbonus') {
             embed
                 .setAuthor('XP Bonus\r\n¯¯¯¯¯¯¯¯', authorIcon)
                 .setThumbnail('https://media.discordapp.net/attachments/514178068835860498/718771841476460604/XP-bonus_1.gif')
-                .setDescription("\n    :small_orange_diamond: **!xpbonus <enable|disable>** | Active ou d\u00E9sactive l'XP Bonus\n    :small_orange_diamond: **!xpbonus config <periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>** | Modifie la configuration\n    :small_blue_diamond: **!xpbonus config** | Affiche la configuration\n    :small_orange_diamond: **!xpbonus channel <add|remove|list>** | Ajoute/supprime/liste les salons".trim());
+                .setDescription("\n    :small_orange_diamond: **!xpbonus <enable|disable>** | Active ou d\u00E9sactive l'XP Bonus\n    :small_orange_diamond: **!xpbonus config <messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>** | Modifie la configuration\n    :small_blue_diamond: **!xpbonus config** | Affiche la configuration\n    :small_orange_diamond: **!xpbonus channel <add|remove|list>** | Ajoute/supprime/liste les salons\n    :small_orange_diamond: **!xpbonus pop** | Fait apparaitre manuellement le bonus dans un salon de la liste".trim());
         }
         else if (group.toLowerCase() === 'leaderboard') {
             embed
@@ -667,6 +667,7 @@ var Bot = /** @class */ (function () {
                         xpBonusScheduledEvent.runtime({
                             periodMs: 0
                         });
+                        message.reply("Pop !");
                     }
                 });
             }
@@ -687,13 +688,13 @@ var Bot = /** @class */ (function () {
                 });
             }
             else if (checkForCommand(/^\s*!xpbonus\s+config\s*$/img)) {
-                var propNames = ['periodMsMin', 'periodMsMax', 'xpBonusOnPopUp', 'xpBonusOnReact'];
+                var propNames = ['messageTimeoutSec', 'periodMsMin', 'periodMsMax', 'xpBonusOnPopUp', 'xpBonusOnReact'];
                 var xpBonusScheduledEvent_1 = _this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
                 if (xpBonusScheduledEvent_1) {
                     message.reply("```active = " + (xpBonusScheduledEvent_1.active ? 'oui' : 'non') + "\n" + propNames.map(function (propName) { return propName + " = " + xpBonusScheduledEvent_1[propName]; }).reduce(function (p, c) { return p + '\n' + c; }).trim() + "```");
                 }
             }
-            else if (checkForCommand(/^\s*!xpbonus\s+config\s+(periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact)\s+(\d+(?:\.\d+)?)\s*$/img)) {
+            else if (checkForCommand(/^\s*!xpbonus\s+config\s+(messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact)\s+(\d+(?:\.\d+)?)\s*$/img)) {
                 Bot.adminOnly(message, function () {
                     var propName = params[1], valueStr = params[2];
                     var xpBonusScheduledEvent = _this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });

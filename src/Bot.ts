@@ -186,7 +186,7 @@ export class Bot {
                 .addField('Twitch', '`twitch <name>`, `twitch remove <name>`\r\n\r\n*Plus de détails :* `!helpme twitch`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
                 .addField('XP Vocal/Textuel', '`rank`, `rank templates`, `rank template <name>`, `ranks`, `server xp`, `server xp md`, `server xp csv`, `server xp txt`,\r\n`start server xp`, `stop server xp`, `start xp`, `stop xp`\r\n\r\n*Plus de détails :* `!helpme xp`\r\n¯¯¯¯¯¯¯¯¯¯¯')
                 .addField('Leaderboard', '`server rank <nb>`, `server last rank <nb>`, `server rank reset`, `server rank ranges`, `server rank range <name> <start> <end>`\r\n\r\n*Plus de détails :* `!helpme leaderboard`\r\n¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('XP Bonus', '`xpbonus <enable|disable>`, `xpbonus config <periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>`, `xpbonus config`, `xpbonus channel <add|remove|list>`\r\n\r\n*Plus de détails :* `!helpme xpbonus`\r\n¯¯¯¯¯¯¯¯¯¯¯')
+                .addField('XP Bonus', '`xpbonus <enable|disable>`, `xpbonus pop`, `xpbonus config <messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>`, `xpbonus config`, `xpbonus channel <add|remove|list>`\r\n\r\n*Plus de détails :* `!helpme xpbonus`\r\n¯¯¯¯¯¯¯¯¯¯¯')
                 .setDescription('**Utilisation** : `!<ma_commande>`');
         }
         else if(group.toLowerCase() === 'xpbonus')
@@ -196,9 +196,10 @@ export class Bot {
                 .setThumbnail('https://media.discordapp.net/attachments/514178068835860498/718771841476460604/XP-bonus_1.gif')
                 .setDescription(`
     :small_orange_diamond: **!xpbonus <enable|disable>** | Active ou désactive l'XP Bonus
-    :small_orange_diamond: **!xpbonus config <periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>** | Modifie la configuration
+    :small_orange_diamond: **!xpbonus config <messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>** | Modifie la configuration
     :small_blue_diamond: **!xpbonus config** | Affiche la configuration
-    :small_orange_diamond: **!xpbonus channel <add|remove|list>** | Ajoute/supprime/liste les salons`.trim());
+    :small_orange_diamond: **!xpbonus channel <add|remove|list>** | Ajoute/supprime/liste les salons
+    :small_orange_diamond: **!xpbonus pop** | Fait apparaitre manuellement le bonus dans un salon de la liste`.trim());
         }
         else if(group.toLowerCase() === 'leaderboard')
         {
@@ -861,6 +862,7 @@ ${createStrLine(result.week)}\`\`\``);
                         xpBonusScheduledEvent.runtime({
                             periodMs: 0
                         });
+                        message.reply(`Pop !`);
                     }
                 })
 
@@ -883,14 +885,14 @@ ${createStrLine(result.week)}\`\`\``);
 
             } else if(checkForCommand(/^\s*!xpbonus\s+config\s*$/img)) {
 
-                const propNames = [ 'periodMsMin', 'periodMsMax', 'xpBonusOnPopUp', 'xpBonusOnReact' ]
+                const propNames = [ 'messageTimeoutSec', 'periodMsMin', 'periodMsMax', 'xpBonusOnPopUp', 'xpBonusOnReact' ]
                 const xpBonusScheduledEvent = this.xpBonusScheduledEvents.find(item => item.guild.id === message.guild.id);
 
                 if(xpBonusScheduledEvent) {
                     message.reply(`\`\`\`active = ${xpBonusScheduledEvent.active ? 'oui' : 'non'}\n${propNames.map(propName => `${propName} = ${xpBonusScheduledEvent[propName]}`).reduce((p, c) => p + '\n' + c).trim()}\`\`\``)
                 }
 
-            } else if(checkForCommand(/^\s*!xpbonus\s+config\s+(periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact)\s+(\d+(?:\.\d+)?)\s*$/img)) {
+            } else if(checkForCommand(/^\s*!xpbonus\s+config\s+(messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact)\s+(\d+(?:\.\d+)?)\s*$/img)) {
 
                 Bot.adminOnly(message, () => {
                     const [, propName, valueStr ] = params;

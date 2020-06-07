@@ -160,7 +160,20 @@ Bot.prototype.helpCommand = function(message, group) {
             .addField('Membres', '`nonotif memberadd`, `notif memberadd`, `nonotif memberleave`,\r\n`notif memberleave`\r\n\r\n*Plus de détails :* `!helpme membres`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
             .addField('Twitch', '`twitch <name>`, `twitch remove <name>`\r\n\r\n*Plus de détails :* `!helpme twitch`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
             .addField('XP Vocal/Textuel', '`rank`, `rank templates`, `rank template <name>`, `ranks`, `server xp`, `server xp md`, `server xp csv`, `server xp txt`,\r\n`start server xp`, `stop server xp`, `start xp`, `stop xp`\r\n\r\n*Plus de détails :* `!helpme xp`\r\n¯¯¯¯¯¯¯¯¯¯¯')
+            .addField('Leaderboard', '`server rank <nb>`, `server last rank <nb>`, `server rank reset`, `server rank ranges`, `server rank range <name> <start> <end>`\r\n\r\n*Plus de détails :* `!helpme leaderboard`\r\n¯¯¯¯¯¯¯¯¯¯¯')
             .setDescription('**Utilisation** : `!<ma_commande>`');
+    }
+    else if(group.toLowerCase() === 'leaderboard')
+    {
+        embed
+            .setAuthor('Leaderboard\r\n¯¯¯¯¯¯¯¯', authorIcon)
+            .setThumbnail('https://media.discordapp.net/attachments/514178068835860498/718771841476460604/XP-bonus_1.gif')
+            .setDescription(`
+:small_blue_diamond: **!server rank <nb>** | Affiche le leaderboard
+:small_blue_diamond: **!server last rank <nb>** | Affiche le leaderboard de la dernière fois (jour dernier et semaine dernière)
+:small_orange_diamond: **!server rank reset** | Réinitialise le leaderboard
+:small_blue_diamond: **!server rank ranges** | Affiche les plages horaires pour recevoir de l'exp
+:small_orange_diamond: **!server rank range <name> <start> <end>** | Modifie une plage horaire`.trim());
     }
     else if(group.toLowerCase() === 'tridolon')
     {
@@ -638,24 +651,57 @@ Bot.prototype.initialize = function() {
         {
             this.joinTrioCommand(message);
         }
-        else if(checkForCommand(/^\s*!(?:leave|quitter)\s+trio\s*$/img))
-        {
+        else if(checkForCommand(/^\s*!(?:leave|quitter)\s+trio\s*$/img)) {
+            
             this.leaveTrioCommand(message);
-        }
-        else if(checkForCommand(/^\s*!server\s+rank(\s|$)/img))
-        {
+
+        } else if(checkForCommand(/^\s*!server\s+rank\s+reset\s*$/img)) {
+            
+            Bot.adminOnly(message, () => {
+                this.bigBrowserV2.resetDayWeekStats(message.guild);
+                
+                message.reply(`Les stats viennent d'être réinitialisées.`);
+            })
+
+        } else if(checkForCommand(/^\s*!server\s+rank\s+ranges\s*$/img)) {
+
+            message.reply(`\`\`\`${this.bigBrowserV2.dayRange.map(range => `::: ${range.name} :::
+Jours : ${range.days.map(j => j + 1)}
+Début : ${range.start} h
+Fin : ${range.end} h`).reduce((p, c) => `${p}\n\n${c}`, '').trim()}\`\`\``);
+
+        } else if(checkForCommand(/^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s+(\d+)\s*$/img)) {
+
+            Bot.adminOnly(message, () => {
+                const regex = /^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s+(\d+)\s*$/img;
+                const [, name, startStr, endStr ] = regex.exec(message.content);
+                const start = parseInt(startStr);
+                const end = parseInt(endStr);
+                
+                if(isNaN(start) || isNaN(end)) {
+                    message.reply('Paramètres invalides. Exemple : !server rank range Semaine 9 23');
+                } else {
+                    const range = this.bigBrowserV2.dayRange.find(range => range.name.toLowerCase().includes(name.toLowerCase().trim()));
+
+                    if(!range) {
+                        message.reply(`Impossible de trouver la plage "${name.trim()}"`);
+                    } else {
+                        range.start = start;
+                        range.end = end;
+                        globals.saver.save();
+                        message.reply(`Plage changée : [${start} h, ${end} h]`);
+                    }
+                }
+            })
+
+        } else if(checkForCommand(/^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img)) {
+
             console.log('SERVER RANK');
 
-            let nbRoster = undefined;
-            
-            const params = /server\s+rank\s+(\d+)/img.exec(message.content);
-            if(params) {
-                const [ , nbRosterStr ] = params;
+            const [, getLast, nbRosterStr ] = /^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img.exec(message.content);
+            const nbRoster = nbRosterStr && parseInt(nbRosterStr);
 
-                nbRoster = nbRosterStr && parseInt(nbRosterStr);
-            }
-
-            const result = this.bigBrowserV2.getRosterRanks(message.guild, nbRoster);
+            const result = this.bigBrowserV2.getRosterRanks(message.guild, nbRoster, !!getLast);
 
             const createStrLine = (entries) => entries
                 .map((u, i) => u.stats.voiceXp <= 0 ? `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} -` : `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} ${Math.round(u.stats.voiceXp * 100) / 100} :: ${u.user.userData.displayName}`)
@@ -913,8 +959,8 @@ ${createStrLine(result.week)}\`\`\``);
                     globals.saver.save();
             }, 500);
 
-            if(this.bigBrowser.servers && Object.keys(this.bigBrowser.servers).length > 0)
-                this.bigBrowserV2.initWithV1Data(this.bigBrowser.servers);
+            /*if(this.bigBrowser.servers && Object.keys(this.bigBrowser.servers).length > 0)
+                this.bigBrowserV2.initWithV1Data(this.bigBrowser.servers);*/
             
             setInterval(() => {
                 this.client.guilds.forEach((guild) => {

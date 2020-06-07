@@ -13,7 +13,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BigBrowserV2 = exports.BigBrowserV2User = exports.BigBrowserV2UserStatsTimed = exports.BigBrowserV2UserStats = void 0;
+exports.BigBrowserV2 = exports.BigBrowserV2User = exports.BigBrowserV2UserStatsTimedWeek = exports.BigBrowserV2UserStatsTimedDay = exports.BigBrowserV2UserStatsTimed = exports.BigBrowserV2UserStats = void 0;
 var moment = require("moment-timezone");
 var BigBrowserV2UserStats = /** @class */ (function () {
     function BigBrowserV2UserStats(stats) {
@@ -45,6 +45,14 @@ var BigBrowserV2UserStats = /** @class */ (function () {
     Object.defineProperty(BigBrowserV2UserStats.prototype, "stats", {
         get: function () {
             return this._stats;
+        },
+        set: function (value) {
+            for (var propName in value) {
+                delete this.stats[propName];
+            }
+            for (var propName in value) {
+                this.stats[propName] = value[propName];
+            }
         },
         enumerable: false,
         configurable: true
@@ -149,6 +157,25 @@ var BigBrowserV2UserStatsTimed = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(BigBrowserV2UserStatsTimed.prototype, "last", {
+        get: function () {
+            if (!this.statsTimed.last) {
+                return undefined;
+            }
+            else {
+                return new BigBrowserV2UserStats(this.statsTimed.last);
+            }
+        },
+        enumerable: false,
+        configurable: true
+    });
+    BigBrowserV2UserStatsTimed.prototype.finalize = function () {
+        if (this.isObsolete) {
+            this.statsTimed.last = JSON.parse(JSON.stringify(this.stats));
+            this.date = Date.now();
+            this.clear();
+        }
+    };
     Object.defineProperty(BigBrowserV2UserStatsTimed.prototype, "timeDivider", {
         get: function () {
             return this._timeDivider;
@@ -157,7 +184,7 @@ var BigBrowserV2UserStatsTimed = /** @class */ (function (_super) {
         configurable: true
     });
     BigBrowserV2UserStatsTimed.prototype.getDateIndicator = function (date) {
-        return this.timeDivider(new Date(date));
+        return this.timeDivider(moment(date));
     };
     Object.defineProperty(BigBrowserV2UserStatsTimed.prototype, "isObsolete", {
         get: function () {
@@ -169,6 +196,22 @@ var BigBrowserV2UserStatsTimed = /** @class */ (function (_super) {
     return BigBrowserV2UserStatsTimed;
 }(BigBrowserV2UserStats));
 exports.BigBrowserV2UserStatsTimed = BigBrowserV2UserStatsTimed;
+var BigBrowserV2UserStatsTimedDay = /** @class */ (function (_super) {
+    __extends(BigBrowserV2UserStatsTimedDay, _super);
+    function BigBrowserV2UserStatsTimedDay(stats) {
+        return _super.call(this, stats, function (date) { return date.day(); }) || this;
+    }
+    return BigBrowserV2UserStatsTimedDay;
+}(BigBrowserV2UserStatsTimed));
+exports.BigBrowserV2UserStatsTimedDay = BigBrowserV2UserStatsTimedDay;
+var BigBrowserV2UserStatsTimedWeek = /** @class */ (function (_super) {
+    __extends(BigBrowserV2UserStatsTimedWeek, _super);
+    function BigBrowserV2UserStatsTimedWeek(stats) {
+        return _super.call(this, stats, function (date) { return date.week(); }) || this;
+    }
+    return BigBrowserV2UserStatsTimedWeek;
+}(BigBrowserV2UserStatsTimed));
+exports.BigBrowserV2UserStatsTimedWeek = BigBrowserV2UserStatsTimedWeek;
 var BigBrowserV2User = /** @class */ (function () {
     function BigBrowserV2User(userData) {
         this._userData = userData;
@@ -189,22 +232,50 @@ var BigBrowserV2User = /** @class */ (function () {
     });
     Object.defineProperty(BigBrowserV2User.prototype, "dayStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimed(this.userData.dayStats, function (date) { return date.getDay(); });
+            return new BigBrowserV2UserStatsTimedDay(this.userData.dayStats);
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2User.prototype, "weekStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimed(this.userData.weekStats, function (date) {
-                var onejan = new Date(date.getFullYear(), 0, 1);
-                var millisecsInDay = 86400000;
-                return Math.ceil((((date.getTime() - onejan.getTime()) / millisecsInDay) + onejan.getDay() + 1) / 7);
-            });
+            return new BigBrowserV2UserStatsTimedWeek(this.userData.weekStats);
         },
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(BigBrowserV2User.prototype, "rangedDayStats", {
+        get: function () {
+            return new BigBrowserV2UserStatsTimedDay(this.userData.rangedDayStats);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "rangedWeekStats", {
+        get: function () {
+            return new BigBrowserV2UserStatsTimedWeek(this.userData.rangedWeekStats);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    BigBrowserV2User.prototype.resetDayWeekStats = function () {
+        this.userData.dayStats = {
+            date: 0,
+            data: BigBrowserV2UserStats.create().stats
+        };
+        this.userData.weekStats = {
+            date: 0,
+            data: BigBrowserV2UserStats.create().stats
+        };
+        this.userData.rangedDayStats = {
+            date: 0,
+            data: BigBrowserV2UserStats.create().stats
+        };
+        this.userData.rangedWeekStats = {
+            date: 0,
+            data: BigBrowserV2UserStats.create().stats
+        };
+    };
     return BigBrowserV2User;
 }());
 exports.BigBrowserV2User = BigBrowserV2User;
@@ -288,6 +359,18 @@ var BigBrowserV2 = /** @class */ (function () {
             }
         };
         this._xpMultiplier = 1;
+        this.dayRangeDefault = [{
+                name: 'Semaine',
+                days: [0, 1, 2, 3, 4],
+                start: 18,
+                end: 23
+            }, {
+                name: 'Weekend',
+                days: [5, 6],
+                start: 10,
+                end: 23
+            }];
+        this._dayRange = this.dayRangeDefault;
         var index = -1;
         var lastRank = undefined;
         for (var rankStart in this.ranks) {
@@ -299,8 +382,9 @@ var BigBrowserV2 = /** @class */ (function () {
             lastRank = rank;
         }
     }
-    BigBrowserV2.prototype.getRosterRanks = function (guild, nbRoster) {
+    BigBrowserV2.prototype.getRosterRanks = function (guild, nbRoster, getLast) {
         if (nbRoster === void 0) { nbRoster = 10; }
+        if (getLast === void 0) { getLast = false; }
         var users = this.getFilteredUsers(guild)
             .filter(function (user) { return !user.userData.isBot; });
         var extract = function (statsMapper) { return users
@@ -308,12 +392,15 @@ var BigBrowserV2 = /** @class */ (function () {
             user: user,
             stats: statsMapper(user)
         }); })
+            .filter(function (obj) { return obj.stats; })
             .sort(function (a, b) { return b.stats.stats.lastVocalDate - a.stats.stats.lastVocalDate; })
             .sort(function (a, b) { return b.stats.voiceXp - a.stats.voiceXp; })
             .slice(0, nbRoster); };
+        var day = getLast ? function (user) { return user.rangedDayStats.last; } : function (user) { return user.rangedDayStats; };
+        var week = getLast ? function (user) { return user.rangedWeekStats.last; } : function (user) { return user.rangedWeekStats; };
         return {
-            day: extract(function (user) { return user.dayStats; }),
-            week: extract(function (user) { return user.weekStats.merge(user.dayStats); }),
+            day: extract(day),
+            week: extract(function (user) { return week(user).merge(day(user)); }),
             global: extract(function (user) { return user.stats; })
         };
     };
@@ -327,6 +414,34 @@ var BigBrowserV2 = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(BigBrowserV2.prototype, "dayRange", {
+        get: function () {
+            return this._dayRange;
+        },
+        set: function (value) {
+            this._dayRange = value !== null && value !== void 0 ? value : this.dayRangeDefault;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    BigBrowserV2.prototype.isInDayRange = function (dateTime) {
+        if (dateTime === void 0) { dateTime = Date.now(); }
+        var m = moment(dateTime);
+        var day = (m.day() - 1 + 7) % 7;
+        var hour = m.hour();
+        for (var _i = 0, _a = this.dayRange; _i < _a.length; _i++) {
+            var range = _a[_i];
+            if (range.days.includes(day)) {
+                if (range.start <= range.end) {
+                    return range.start <= hour && hour <= range.end;
+                }
+                else {
+                    return range.start <= hour || hour <= range.end;
+                }
+            }
+        }
+        return false;
+    };
     BigBrowserV2.prototype.getServers = function () {
         if (!this.servers)
             this.servers = {};
@@ -453,6 +568,18 @@ var BigBrowserV2 = /** @class */ (function () {
                 data: BigBrowserV2UserStats.create().stats
             };
         }
+        if (!user.rangedDayStats) {
+            user.rangedDayStats = {
+                date: 0,
+                data: BigBrowserV2UserStats.create().stats
+            };
+        }
+        if (!user.rangedWeekStats) {
+            user.rangedWeekStats = {
+                date: 0,
+                data: BigBrowserV2UserStats.create().stats
+            };
+        }
         if (!user.joinedTimestamp)
             user.joinedTimestamp = member.joinedTimestamp;
         if (member.roles)
@@ -471,12 +598,14 @@ var BigBrowserV2 = /** @class */ (function () {
     BigBrowserV2.prototype.save = function () {
         return {
             servers: this.getServers(),
-            xpMultiplier: this.xpMultiplier
+            xpMultiplier: this.xpMultiplier,
+            dayRange: this.dayRange
         };
     };
     BigBrowserV2.prototype.load = function (obj, ctx) {
         this.servers = obj.servers;
         this.xpMultiplier = obj.xpMultiplier;
+        this.dayRange = obj.dayRange;
     };
     BigBrowserV2.prototype.initWithV1Data = function (servers) {
         var now = Date.now();
@@ -535,17 +664,11 @@ var BigBrowserV2 = /** @class */ (function () {
         };
         var _loop_1 = function (userId) {
             var user = server.users[userId];
-            if (!user.removedDate) {
-                guild.fetchMember(userId).then(function () {
-                    onDone();
-                }).catch(function () {
-                    user.removedDate = Date.now();
-                    onDone();
-                });
-            }
-            else {
-                onDone();
-            }
+            guild.fetchMember(userId).then(function () {
+                delete user.removedDate;
+            }).catch(function () {
+                user.removedDate = Date.now();
+            }).finally(function () { return onDone(); });
         };
         for (var userId in server.users) {
             _loop_1(userId);
@@ -557,16 +680,20 @@ var BigBrowserV2 = /** @class */ (function () {
             var userData = _this.getUser(member);
             var user = new BigBrowserV2User(userData);
             var isInWarframe = undefined;
-            if (member.user.presence && member.user.presence.game && member.user.presence.game.name)
+            if (member.user.presence && member.user.presence.game && member.user.presence.game.name) {
                 isInWarframe = member.user.presence.game.name.toLowerCase() === 'warframe';
-            var updateStats = function (stats) {
+            }
+            var updateStats = function (stats, updateData) {
+                if (updateData === void 0) { updateData = true; }
                 if (isInWarframe !== undefined) {
                     if (isInWarframe) {
                         if (!stats.wasWarframeDiscordLastTick) {
                             stats.wasWarframeDiscordLastTick = true;
                         }
                         else {
-                            stats.totalWarframeDiscordTimeMs += now - stats.lastWarframeDiscordDate;
+                            if (updateData) {
+                                stats.totalWarframeDiscordTimeMs += now - stats.lastWarframeDiscordDate;
+                            }
                         }
                         stats.lastWarframeDiscordDate = now;
                         stats.wasWarframeDiscordLastTickNot = false;
@@ -576,7 +703,9 @@ var BigBrowserV2 = /** @class */ (function () {
                             stats.wasWarframeDiscordLastTickNot = true;
                         }
                         else {
-                            stats.totalWarframeDiscordTimeMsNot += now - stats.lastWarframeDiscordDateNot;
+                            if (updateData) {
+                                stats.totalWarframeDiscordTimeMsNot += now - stats.lastWarframeDiscordDateNot;
+                            }
                         }
                         stats.lastWarframeDiscordDateNot = now;
                         stats.wasWarframeDiscordLastTick = false;
@@ -588,7 +717,9 @@ var BigBrowserV2 = /** @class */ (function () {
                         stats.wasWarframeDiscordLastTickUndefined = true;
                     }
                     else {
-                        stats.totalWarframeDiscordTimeMsUndefined += now - stats.lastWarframeDiscordDateUndefined;
+                        if (updateData) {
+                            stats.totalWarframeDiscordTimeMsUndefined += now - stats.lastWarframeDiscordDateUndefined;
+                        }
                     }
                     stats.lastWarframeDiscordDateUndefined = now;
                     stats.wasWarframeDiscordLastTickNot = false;
@@ -599,7 +730,9 @@ var BigBrowserV2 = /** @class */ (function () {
                         stats.wasVoicingLastTick = true;
                     }
                     else {
-                        stats.totalVoiceTimeMs += now - stats.lastVocalDate;
+                        if (updateData) {
+                            stats.totalVoiceTimeMs += now - stats.lastVocalDate;
+                        }
                     }
                     stats.lastVocalDate = now;
                 }
@@ -607,19 +740,33 @@ var BigBrowserV2 = /** @class */ (function () {
                     stats.wasVoicingLastTick = false;
                 }
             };
-            if (user.dayStats.isObsolete) {
-                user.dayStats.injectInto(user.weekStats);
-                user.dayStats.date = now;
-                user.dayStats.clear();
-            }
-            if (user.weekStats.isObsolete) {
-                user.weekStats.date = now;
-                user.weekStats.clear();
-            }
+            /*
+                        if(user.dayStats.isObsolete) {
+                            user.dayStats.injectInto(user.weekStats);
+                            user.dayStats.finalize();
+                        }
+                        if(user.weekStats.isObsolete) {
+                            user.weekStats.finalize();
+                        }
+                        if(user.rangedDayStats.isObsolete) {
+                            user.rangedDayStats.injectInto(user.rangedWeekStats);
+                            user.rangedDayStats.finalize();
+                        }
+                        if(user.rangedWeekStats.isObsolete) {
+                            user.rangedWeekStats.finalize();
+                        }*/
             updateStats(userData.stats);
             updateStats(userData.dayStats.data);
+            updateStats(userData.rangedDayStats.data, _this.isInDayRange(now));
         });
         onDone();
+    };
+    BigBrowserV2.prototype.resetDayWeekStats = function (guild) {
+        var server = this.getServer(guild);
+        for (var userId in server.users) {
+            var user = new BigBrowserV2User(server.users[userId]);
+            user.resetDayWeekStats();
+        }
     };
     BigBrowserV2.prototype.updateUserText = function (message) {
         var content = message.content;
@@ -628,17 +775,27 @@ var BigBrowserV2 = /** @class */ (function () {
             /*
             if(member.displayName !== 'Akamelia ♡')
                 return;*/
-            var user = this.getUser(member);
-            var now = Date.now();
-            if (user.stats.lastTextContent !== content) {
-                ++user.stats.nbTextMessages;
-                user.stats.totalTextSize += message.content.length;
-                user.stats.lastNotDuplicateTextDate = now;
-            }
-            user.stats.lastTextContent = content;
-            ++user.stats.nbTextMessagesWithDuplicates;
-            user.stats.totalTextSizeWithDuplicates += message.content.length;
-            user.stats.lastTextDate = now;
+            var user_1 = this.getUser(member);
+            var now_1 = Date.now();
+            var updateData = function (stats, updateData) {
+                if (updateData === void 0) { updateData = true; }
+                if (user_1.stats.lastTextContent !== content) {
+                    if (updateData) {
+                        ++user_1.stats.nbTextMessages;
+                        user_1.stats.totalTextSize += message.content.length;
+                    }
+                    user_1.stats.lastNotDuplicateTextDate = now_1;
+                }
+                if (updateData) {
+                    user_1.stats.lastTextContent = content;
+                    ++user_1.stats.nbTextMessagesWithDuplicates;
+                    user_1.stats.totalTextSizeWithDuplicates += message.content.length;
+                }
+                user_1.stats.lastTextDate = now_1;
+            };
+            updateData(user_1.stats);
+            updateData(user_1.dayStats.data);
+            updateData(user_1.rangedDayStats.data, this.isInDayRange(now_1));
         }
     };
     BigBrowserV2.prototype.setTrackingUser = function (member, isTracking) {

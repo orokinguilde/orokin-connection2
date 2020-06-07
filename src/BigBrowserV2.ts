@@ -65,10 +65,14 @@ export interface IBigBrowserV2User {
 
     dayStats?: IBigBrowserV2UserStatsTimed
     weekStats?: IBigBrowserV2UserStatsTimed
+
+    rangedDayStats?: IBigBrowserV2UserStatsTimed
+    rangedWeekStats?: IBigBrowserV2UserStatsTimed
 }
 export interface IBigBrowserV2UserStatsTimed {
     date: number
     data: IBigBrowserV2UserStats
+    last?: IBigBrowserV2UserStats
 }
 export interface IBigBrowserV2UserStats {
     lastVocalDate: number
@@ -126,6 +130,14 @@ export class BigBrowserV2UserStats {
     private _stats: IBigBrowserV2UserStats;
     public get stats() {
         return this._stats;
+    }
+    public set stats(value) {
+        for(const propName in value) {
+            delete this.stats[propName];
+        }
+        for(const propName in value) {
+            this.stats[propName] = value[propName];
+        }
     }
 
     public get voiceXp() {
@@ -193,8 +205,9 @@ export class BigBrowserV2UserStats {
         return new BigBrowserV2UserStats(JSON.parse(JSON.stringify(this.stats)));
     }
 }
+
 export class BigBrowserV2UserStatsTimed extends BigBrowserV2UserStats {
-    public constructor(stats: IBigBrowserV2UserStatsTimed, timeDivider: (date: Date) => number) {
+    public constructor(stats: IBigBrowserV2UserStatsTimed, timeDivider: (date: moment.Moment) => number) {
         super(stats.data);
 
         this._statsTimed = stats;
@@ -213,17 +226,43 @@ export class BigBrowserV2UserStatsTimed extends BigBrowserV2UserStats {
         this.statsTimed.date = value;
     }
 
-    private _timeDivider: (date: Date) => number;
+    public get last() {
+        if(!this.statsTimed.last) {
+            return undefined;
+        } else {
+            return new BigBrowserV2UserStats(this.statsTimed.last);
+        }
+    }
+
+    public finalize() {
+        if(this.isObsolete) {
+            this.statsTimed.last = JSON.parse(JSON.stringify(this.stats));
+            this.date = Date.now();
+            this.clear();
+        }
+    }
+
+    private _timeDivider: (date: moment.Moment) => number;
     public get timeDivider() {
         return this._timeDivider;
     }
 
     public getDateIndicator(date: number) {
-        return this.timeDivider(new Date(date));
+        return this.timeDivider(moment(date));
     }
 
     public get isObsolete() {
         return this.getDateIndicator(Date.now()) !== this.getDateIndicator(this.date);
+    }
+}
+export class BigBrowserV2UserStatsTimedDay extends BigBrowserV2UserStatsTimed {
+    public constructor(stats: IBigBrowserV2UserStatsTimed) {
+        super(stats, date => date.day());
+    }
+}
+export class BigBrowserV2UserStatsTimedWeek extends BigBrowserV2UserStatsTimed {
+    public constructor(stats: IBigBrowserV2UserStatsTimed) {
+        super(stats, date => date.week());
     }
 }
 
@@ -241,14 +280,36 @@ export class BigBrowserV2User {
         return new BigBrowserV2UserStats(this.userData.stats);
     }
     public get dayStats() {
-        return new BigBrowserV2UserStatsTimed(this.userData.dayStats, date => date.getDay());
+        return new BigBrowserV2UserStatsTimedDay(this.userData.dayStats);
     }
     public get weekStats() {
-        return new BigBrowserV2UserStatsTimed(this.userData.weekStats, date => {
-            const onejan = new Date(date.getFullYear(), 0, 1);
-            const millisecsInDay = 86400000;
-            return Math.ceil((((date.getTime() - onejan.getTime()) / millisecsInDay) + onejan.getDay() + 1) / 7);
-        });
+        return new BigBrowserV2UserStatsTimedWeek(this.userData.weekStats);
+    }
+
+    public get rangedDayStats() {
+        return new BigBrowserV2UserStatsTimedDay(this.userData.rangedDayStats);
+    }
+    public get rangedWeekStats() {
+        return new BigBrowserV2UserStatsTimedWeek(this.userData.rangedWeekStats);
+    }
+
+    public resetDayWeekStats() {
+        this.userData.dayStats = {
+            date: 0,
+            data: BigBrowserV2UserStats.create().stats
+        }
+        this.userData.weekStats = {
+            date: 0,
+            data: BigBrowserV2UserStats.create().stats
+        }
+        this.userData.rangedDayStats = {
+            date: 0,
+            data: BigBrowserV2UserStats.create().stats
+        }
+        this.userData.rangedWeekStats = {
+            date: 0,
+            data: BigBrowserV2UserStats.create().stats
+        }
     }
 }
 
@@ -269,7 +330,7 @@ export class BigBrowserV2 {
         }
     }
 
-    public getRosterRanks(guild: Guild, nbRoster = 10) {
+    public getRosterRanks(guild: Guild, nbRoster = 10, getLast = false) {
         const users = this.getFilteredUsers(guild)
             .filter(user => !user.userData.isBot);
 
@@ -278,13 +339,17 @@ export class BigBrowserV2 {
                 user: user,
                 stats: statsMapper(user)
             }))
+            .filter(obj => obj.stats)
             .sort((a, b) => b.stats.stats.lastVocalDate - a.stats.stats.lastVocalDate)
             .sort((a, b) => b.stats.voiceXp - a.stats.voiceXp)
             .slice(0, nbRoster);
+
+        const day = getLast ? (user: BigBrowserV2User) => user.rangedDayStats.last : (user: BigBrowserV2User) => user.rangedDayStats;
+        const week = getLast ? (user: BigBrowserV2User) => user.rangedWeekStats.last : (user: BigBrowserV2User) => user.rangedWeekStats;
         
         return {
-            day: extract(user => user.dayStats),
-            week: extract(user => user.weekStats.merge(user.dayStats)),
+            day: extract(day),
+            week: extract(user => week(user).merge(day(user))),
             global: extract(user => user.stats)
         }
     }
@@ -375,6 +440,44 @@ export class BigBrowserV2 {
     }
     public set xpMultiplier(value) {
         this._xpMultiplier = value ?? 1;
+    }
+    
+    private dayRangeDefault = [{
+        name: 'Semaine',
+        days: [ 0, 1, 2, 3, 4 ],
+        start: 18,
+        end: 23
+    }, {
+        name: 'Weekend',
+        days: [ 5, 6 ],
+        start: 10,
+        end: 23
+    }];
+
+    private _dayRange = this.dayRangeDefault;
+    public get dayRange() {
+        return this._dayRange;
+    }
+    public set dayRange(value) {
+        this._dayRange = value ?? this.dayRangeDefault;
+    }
+
+    public isInDayRange(dateTime: number = Date.now()) {
+        const m = moment(dateTime);
+        const day = (m.day() - 1 + 7) % 7;
+        const hour = m.hour();
+
+        for(const range of this.dayRange) {
+            if(range.days.includes(day)) {
+                if(range.start <= range.end) {
+                    return range.start <= hour && hour <= range.end;
+                } else {
+                    return range.start <= hour || hour <= range.end;
+                }
+            }
+        }
+        
+        return false;
     }
 
     getServers()
@@ -536,8 +639,7 @@ export class BigBrowserV2 {
         if(member.user && member.user.bot !== undefined)
             user.isBot = member.user.bot;
         
-        if(!user.stats)
-        {
+        if(!user.stats) {
             user.stats = BigBrowserV2UserStats.create().stats;
         }
 
@@ -549,6 +651,19 @@ export class BigBrowserV2 {
         }
         if(!user.weekStats) {
             user.weekStats = {
+                date: 0,
+                data: BigBrowserV2UserStats.create().stats
+            }
+        }
+        
+        if(!user.rangedDayStats) {
+            user.rangedDayStats = {
+                date: 0,
+                data: BigBrowserV2UserStats.create().stats
+            }
+        }
+        if(!user.rangedWeekStats) {
+            user.rangedWeekStats = {
                 date: 0,
                 data: BigBrowserV2UserStats.create().stats
             }
@@ -579,12 +694,14 @@ export class BigBrowserV2 {
     {
         return {
             servers: this.getServers(),
-            xpMultiplier: this.xpMultiplier
+            xpMultiplier: this.xpMultiplier,
+            dayRange: this.dayRange
         };
     }
     load(obj: any, ctx) {
         this.servers = obj.servers;
         this.xpMultiplier = obj.xpMultiplier;
+        this.dayRange = obj.dayRange;
     }
 
     initWithV1Data(servers: any)
@@ -642,8 +759,7 @@ export class BigBrowserV2 {
         }
     }
 
-    updateServer(guild: Guild)
-    {
+    updateServer(guild: Guild) {
         const now = Date.now();
 
         const server = this.getServer(guild);
@@ -652,27 +768,19 @@ export class BigBrowserV2 {
         const onDone = () => {
             --nbUsers;
 
-            if(nbUsers === 0)
-            {
+            if(nbUsers === 0) {
                 this.save();
             }
         }
 
-        for(const userId in server.users)
-        {
+        for(const userId in server.users) {
             const user = server.users[userId];
 
-            if(!user.removedDate) {
-                guild.fetchMember(userId).then(() => {
-                    onDone();
-                }).catch(() => {
-                    user.removedDate = Date.now();
-
-                    onDone();
-                })
-            } else {
-                onDone();
-            }
+            guild.fetchMember(userId).then(() => {
+                delete user.removedDate;
+            }).catch(() => {
+                user.removedDate = Date.now();
+            }).finally(() => onDone())
         }
 
         guild.members.array().forEach((member) => {
@@ -684,10 +792,11 @@ export class BigBrowserV2 {
             const user = new BigBrowserV2User(userData);
 
             let isInWarframe = undefined;
-            if(member.user.presence && member.user.presence.game && member.user.presence.game.name)
+            if(member.user.presence && member.user.presence.game && member.user.presence.game.name) {
                 isInWarframe = member.user.presence.game.name.toLowerCase() === 'warframe';
+            }
 
-            const updateStats = (stats: IBigBrowserV2UserStats) => {
+            const updateStats = (stats: IBigBrowserV2UserStats, updateData = true) => {
                 if(isInWarframe !== undefined)
                 {
                     if(isInWarframe)
@@ -698,7 +807,9 @@ export class BigBrowserV2 {
                         }
                         else
                         {
-                            stats.totalWarframeDiscordTimeMs += now - stats.lastWarframeDiscordDate;
+                            if(updateData) {
+                                stats.totalWarframeDiscordTimeMs += now - stats.lastWarframeDiscordDate;
+                            }
                         }
                         
                         stats.lastWarframeDiscordDate = now;
@@ -712,7 +823,9 @@ export class BigBrowserV2 {
                         }
                         else
                         {
-                            stats.totalWarframeDiscordTimeMsNot += now - stats.lastWarframeDiscordDateNot;
+                            if(updateData) {
+                                stats.totalWarframeDiscordTimeMsNot += now - stats.lastWarframeDiscordDateNot;
+                            }
                         }
                         
                         stats.lastWarframeDiscordDateNot = now;
@@ -729,7 +842,9 @@ export class BigBrowserV2 {
                     }
                     else
                     {
-                        stats.totalWarframeDiscordTimeMsUndefined += now - stats.lastWarframeDiscordDateUndefined;
+                        if(updateData) {
+                            stats.totalWarframeDiscordTimeMsUndefined += now - stats.lastWarframeDiscordDateUndefined;
+                        }
                     }
                     
                     stats.lastWarframeDiscordDateUndefined = now;
@@ -745,7 +860,9 @@ export class BigBrowserV2 {
                     }
                     else
                     {
-                        stats.totalVoiceTimeMs += now - stats.lastVocalDate;
+                        if(updateData) {
+                            stats.totalVoiceTimeMs += now - stats.lastVocalDate;
+                        }
                     }
                     
                     stats.lastVocalDate = now;
@@ -755,22 +872,38 @@ export class BigBrowserV2 {
                     stats.wasVoicingLastTick = false;
                 }
             }
-
+/*
             if(user.dayStats.isObsolete) {
                 user.dayStats.injectInto(user.weekStats);
-                user.dayStats.date = now;
-                user.dayStats.clear();
+                user.dayStats.finalize();
             }
             if(user.weekStats.isObsolete) {
-                user.weekStats.date = now;
-                user.weekStats.clear();
+                user.weekStats.finalize();
             }
+            if(user.rangedDayStats.isObsolete) {
+                user.rangedDayStats.injectInto(user.rangedWeekStats);
+                user.rangedDayStats.finalize();
+            }
+            if(user.rangedWeekStats.isObsolete) {
+                user.rangedWeekStats.finalize();
+            }*/
 
             updateStats(userData.stats);
             updateStats(userData.dayStats.data);
+            
+            updateStats(userData.rangedDayStats.data, this.isInDayRange(now));
         })
 
         onDone();
+    }
+
+    public resetDayWeekStats(guild: Guild) {
+        const server = this.getServer(guild);
+
+        for(const userId in server.users) {
+            const user = new BigBrowserV2User(server.users[userId]);
+            user.resetDayWeekStats();
+        }
     }
 
     updateUserText(message)
@@ -787,17 +920,28 @@ export class BigBrowserV2 {
             const user = this.getUser(member);
             const now = Date.now();
 
-            if(user.stats.lastTextContent !== content)
-            {
-                ++user.stats.nbTextMessages;
-                user.stats.totalTextSize += message.content.length;
-                user.stats.lastNotDuplicateTextDate = now;
+            const updateData = (stats: IBigBrowserV2UserStats, updateData = true) => {
+                if(user.stats.lastTextContent !== content)
+                {
+                    if(updateData) {
+                        ++user.stats.nbTextMessages;
+                        user.stats.totalTextSize += message.content.length;
+                    }
+                    user.stats.lastNotDuplicateTextDate = now;
+                }
+
+                if(updateData) {
+                    user.stats.lastTextContent = content;
+                    ++user.stats.nbTextMessagesWithDuplicates;
+                    user.stats.totalTextSizeWithDuplicates += message.content.length;
+                }
+
+                user.stats.lastTextDate = now;
             }
 
-            user.stats.lastTextContent = content;
-            ++user.stats.nbTextMessagesWithDuplicates;
-            user.stats.totalTextSizeWithDuplicates += message.content.length;
-            user.stats.lastTextDate = now;
+            updateData(user.stats);
+            updateData(user.dayStats.data);
+            updateData(user.rangedDayStats.data, this.isInDayRange(now));
         }
     }
 

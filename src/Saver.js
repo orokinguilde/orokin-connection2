@@ -68,7 +68,13 @@ Saver.prototype.load = function(callback)
                 const data = JSON.parse(content);
 
                 if(data) {
+                    console.log(`**************`);
                     console.log('Data info :', data.___save);
+                    
+                    for(const propName in data) {
+                        console.log(`${propName}: ${JSON.stringify(data[propName]).length} chars`);
+                    }
+                    console.log(`**************`);
 
                     this.object.load(data);
                     dataLoaded = true;

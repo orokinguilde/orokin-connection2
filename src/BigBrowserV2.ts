@@ -60,7 +60,7 @@ export interface IBigBrowserV2User {
     tracking?: boolean
     bannerTemplateKey?: string
 
-    v1: IBigBrowserV2UserV1
+    //v1: IBigBrowserV2UserV1
 
     xpBonus?: number
 
@@ -170,6 +170,123 @@ export class BigBrowserV2UserStats {
     public get xp() {
         return this.voiceXp + this.textXp + this.xpBonus;
     }
+    
+    public get lastVocalDate() {
+        return this.stats.lastVocalDate;
+    }
+    public set lastVocalDate(value) {
+        this.stats.lastVocalDate = value;
+    }
+    public get totalVoiceTimeMs() {
+        return this.stats.totalVoiceTimeMs;
+    }
+    public set totalVoiceTimeMs(value) {
+        this.stats.totalVoiceTimeMs = value;
+    }
+    public get nbTextMessages() {
+        return this.stats.nbTextMessages;
+    }
+    public set nbTextMessages(value) {
+        this.stats.nbTextMessages = value;
+    }
+    public get nbTextMessagesWithDuplicates() {
+        return this.stats.nbTextMessagesWithDuplicates;
+    }
+    public set nbTextMessagesWithDuplicates(value) {
+        this.stats.nbTextMessagesWithDuplicates = value;
+    }
+    public get totalTextSize() {
+        return this.stats.totalTextSize;
+    }
+    public set totalTextSize(value) {
+        this.stats.totalTextSize = value;
+    }
+    public get totalTextSizeWithDuplicates() {
+        return this.stats.totalTextSizeWithDuplicates;
+    }
+    public set totalTextSizeWithDuplicates(value) {
+        this.stats.totalTextSizeWithDuplicates = value;
+    }
+    public get lastTextContent() {
+        return this.stats.lastTextContent;
+    }
+    public set lastTextContent(value) {
+        this.stats.lastTextContent = value;
+    }
+    public get lastTextDate() {
+        return this.stats.lastTextDate;
+    }
+    public set lastTextDate(value) {
+        this.stats.lastTextDate = value;
+    }
+    public get lastNotDuplicateTextDate() {
+        return this.stats.lastNotDuplicateTextDate;
+    }
+    public set lastNotDuplicateTextDate(value) {
+        this.stats.lastNotDuplicateTextDate = value;
+    }
+    public get wasVoicingLastTick() {
+        return this.stats.wasVoicingLastTick;
+    }
+    public set wasVoicingLastTick(value) {
+        this.stats.wasVoicingLastTick = value;
+    }
+
+    public get wasWarframeDiscordLastTickNot() {
+        return this.stats.wasWarframeDiscordLastTickNot;
+    }
+    public set wasWarframeDiscordLastTickNot(value) {
+        this.stats.wasWarframeDiscordLastTickNot = value;
+    }
+    public get totalWarframeDiscordTimeMsNot() {
+        return this.stats.totalWarframeDiscordTimeMsNot;
+    }
+    public set totalWarframeDiscordTimeMsNot(value) {
+        this.stats.totalWarframeDiscordTimeMsNot = value;
+    }
+    public get lastWarframeDiscordDateNot() {
+        return this.stats.lastWarframeDiscordDateNot;
+    }
+    public set lastWarframeDiscordDateNot(value) {
+        this.stats.lastWarframeDiscordDateNot = value;
+    }
+    public get wasWarframeDiscordLastTick() {
+        return this.stats.wasWarframeDiscordLastTick;
+    }
+    public set wasWarframeDiscordLastTick(value) {
+        this.stats.wasWarframeDiscordLastTick = value;
+    }
+    public get wasWarframeDiscordLastTickUndefined() {
+        return this.stats.wasWarframeDiscordLastTickUndefined;
+    }
+    public set wasWarframeDiscordLastTickUndefined(value) {
+        this.stats.wasWarframeDiscordLastTickUndefined = value;
+    }
+
+    public get totalWarframeDiscordTimeMsUndefined() {
+        return this.stats.totalWarframeDiscordTimeMsUndefined;
+    }
+    public set totalWarframeDiscordTimeMsUndefined(value) {
+        this.stats.totalWarframeDiscordTimeMsUndefined = value;
+    }
+    public get lastWarframeDiscordDateUndefined() {
+        return this.stats.lastWarframeDiscordDateUndefined;
+    }
+    public set lastWarframeDiscordDateUndefined(value) {
+        this.stats.lastWarframeDiscordDateUndefined = value;
+    }
+    public get totalWarframeDiscordTimeMs() {
+        return this.stats.totalWarframeDiscordTimeMs;
+    }
+    public set totalWarframeDiscordTimeMs(value) {
+        this.stats.totalWarframeDiscordTimeMs = value;
+    }
+    public get lastWarframeDiscordDate() {
+        return this.stats.lastWarframeDiscordDate;
+    }
+    public set lastWarframeDiscordDate(value) {
+        this.stats.lastWarframeDiscordDate = value;
+    }
 
     public get rank() {
         const exp = this.xp;
@@ -217,39 +334,39 @@ export class BigBrowserV2UserStats {
             delete this.stats[name];
         }
 
-        this.stats.lastVocalDate = undefined;
-        this.stats.totalVoiceTimeMs = 0;
-        this.stats.nbTextMessages = 0;
-        this.stats.nbTextMessagesWithDuplicates = 0;
-        this.stats.totalTextSize = 0;
-        this.stats.totalTextSizeWithDuplicates = 0;
-        this.stats.lastTextContent = undefined;
-        this.stats.lastTextDate = undefined;
-        this.stats.lastNotDuplicateTextDate = undefined;
-        this.stats.wasVoicingLastTick = false;
+        this.lastVocalDate = undefined;
+        this.totalVoiceTimeMs = 0;
+        this.nbTextMessages = 0;
+        this.nbTextMessagesWithDuplicates = 0;
+        this.totalTextSize = 0;
+        this.totalTextSizeWithDuplicates = 0;
+        this.lastTextContent = undefined;
+        this.lastTextDate = undefined;
+        this.lastNotDuplicateTextDate = undefined;
+        this.wasVoicingLastTick = false;
     }
     
     public injectInto(stats: BigBrowserV2UserStats) {
-        stats.stats.lastNotDuplicateTextDate = this.stats.lastNotDuplicateTextDate;
-        stats.stats.lastTextContent = this.stats.lastTextContent;
-        stats.stats.lastTextDate = this.stats.lastTextDate;
-        stats.stats.lastVocalDate = this.stats.lastVocalDate;
-        stats.stats.lastWarframeDiscordDate = this.stats.lastWarframeDiscordDate;
-        stats.stats.lastWarframeDiscordDateNot = this.stats.lastWarframeDiscordDateNot;
-        stats.stats.lastWarframeDiscordDateUndefined = this.stats.lastWarframeDiscordDateUndefined;
-        stats.stats.nbTextMessages += this.stats.nbTextMessages;
-        stats.stats.nbTextMessagesWithDuplicates += this.stats.nbTextMessagesWithDuplicates;
-        stats.stats.totalTextSize += this.stats.totalTextSize;
-        stats.stats.totalTextSizeWithDuplicates += this.stats.totalTextSizeWithDuplicates;
-        stats.stats.totalVoiceTimeMs += this.stats.totalVoiceTimeMs;
-        stats.stats.totalWarframeDiscordTimeMs += this.stats.totalWarframeDiscordTimeMs;
-        stats.stats.totalWarframeDiscordTimeMsNot += this.stats.totalWarframeDiscordTimeMsNot;
-        stats.stats.totalWarframeDiscordTimeMsUndefined += this.stats.totalWarframeDiscordTimeMsUndefined;
-        stats.stats.xpBonus = (stats.stats.xpBonus ?? 0) + (this.stats.xpBonus ?? 0);
-        stats.stats.wasVoicingLastTick = this.stats.wasVoicingLastTick;
-        stats.stats.wasWarframeDiscordLastTick = this.stats.wasWarframeDiscordLastTick;
-        stats.stats.wasWarframeDiscordLastTickNot = this.stats.wasWarframeDiscordLastTickNot;
-        stats.stats.wasWarframeDiscordLastTickUndefined = this.stats.wasWarframeDiscordLastTickUndefined;
+        stats.lastNotDuplicateTextDate = this.lastNotDuplicateTextDate;
+        stats.lastTextContent = this.lastTextContent;
+        stats.lastTextDate = this.lastTextDate;
+        stats.lastVocalDate = this.lastVocalDate;
+        stats.lastWarframeDiscordDate = this.lastWarframeDiscordDate;
+        stats.lastWarframeDiscordDateNot = this.lastWarframeDiscordDateNot;
+        stats.lastWarframeDiscordDateUndefined = this.lastWarframeDiscordDateUndefined;
+        stats.nbTextMessages += this.nbTextMessages;
+        stats.nbTextMessagesWithDuplicates += this.nbTextMessagesWithDuplicates;
+        stats.totalTextSize += this.totalTextSize;
+        stats.totalTextSizeWithDuplicates += this.totalTextSizeWithDuplicates;
+        stats.totalVoiceTimeMs += this.totalVoiceTimeMs;
+        stats.totalWarframeDiscordTimeMs += this.totalWarframeDiscordTimeMs;
+        stats.totalWarframeDiscordTimeMsNot += this.totalWarframeDiscordTimeMsNot;
+        stats.totalWarframeDiscordTimeMsUndefined += this.totalWarframeDiscordTimeMsUndefined;
+        stats.xpBonus = (stats.xpBonus ?? 0) + (this.xpBonus ?? 0);
+        stats.wasVoicingLastTick = this.wasVoicingLastTick;
+        stats.wasWarframeDiscordLastTick = this.wasWarframeDiscordLastTick;
+        stats.wasWarframeDiscordLastTickNot = this.wasWarframeDiscordLastTickNot;
+        stats.wasWarframeDiscordLastTickUndefined = this.wasWarframeDiscordLastTickUndefined;
     }
 
     public static merge(user: BigBrowserV2User, ...stats: BigBrowserV2UserStats[]) {
@@ -772,8 +889,47 @@ export class BigBrowserV2 {
         this.servers = obj.servers;
         this.xpMultiplier = obj.xpMultiplier;
         this.dayRange = obj.dayRange;
+        
+        this.cleanupData();
+        
+        if(obj.servers) {
+            console.log(`******* BigBrowserV2 info *******`);
+            console.log(`== Servers ==`);
+            for(const propName in obj.servers) {
+                const server = obj.servers[propName];
+
+                //console.log();
+                console.log(`> ${server.name} (${propName}): ${JSON.stringify(server).length} chars / ${Object.keys(server.users).length} users`);
+                //console.log(JSON.stringify(server.users[Object.keys(server.users)[0]]));
+                
+                /*console.log(`===== Users ==`);
+                for(const userId in server.users) {
+                    const user = server.users[userId];
+                    console.log(`= ${user.displayName} (${userId}): ${JSON.stringify(user).length} chars`);
+                }*/
+            }
+            console.log(`**************`);
+        }
     }
 
+    cleanupData() {
+        const servers = this.getServers();
+
+        for(const serverId in servers) {
+            const server = servers[serverId];
+
+            const users = server.users;
+            for(const userId in users) {
+                const user = users[userId] as any;
+
+                delete user.v1;
+                delete user.__debug;
+                delete user.___debug;
+            }
+        }
+    }
+
+    /*
     initWithV1Data(servers: any)
     {
         var now = Date.now();
@@ -827,7 +983,7 @@ export class BigBrowserV2 {
                 }
             }
         }
-    }
+    }*/
 
     updateServer(guild: Guild) {
         const now = Date.now();
@@ -865,7 +1021,7 @@ export class BigBrowserV2 {
                 isInWarframe = member.user.presence.game.name.toLowerCase() === 'warframe';
             }
 
-            const updateStats = (stats: IBigBrowserV2UserStats, updateData = true) => {
+            const updateStats = (stats: BigBrowserV2UserStats, updateData = true) => {
                 if(isInWarframe !== undefined)
                 {
                     if(isInWarframe)
@@ -957,10 +1113,10 @@ export class BigBrowserV2 {
                 user.rangedWeekStats.finalize();
             }
 
-            updateStats(user.stats.stats);
-            updateStats(user.dayStats.stats);
+            updateStats(user.stats);
+            updateStats(user.dayStats);
             
-            updateStats(user.rangedDayStats.stats, this.isInDayRange(now));
+            updateStats(user.rangedDayStats, this.isInDayRange(now));
         })
 
         onDone();
@@ -989,7 +1145,7 @@ export class BigBrowserV2 {
             const user = this.getUser(member);
             const now = Date.now();
 
-            const updateData = (stats: IBigBrowserV2UserStats, updateData = true) => {
+            const updateData = (stats: BigBrowserV2UserStats, updateData = true) => {
                 if(stats.lastTextContent !== content)
                 {
                     if(updateData) {
@@ -1008,9 +1164,9 @@ export class BigBrowserV2 {
                 stats.lastTextDate = now;
             }
 
-            updateData(user.stats.stats);
-            updateData(user.dayStats.stats);
-            updateData(user.rangedDayStats.stats, this.isInDayRange(now));
+            updateData(user.stats);
+            updateData(user.dayStats);
+            updateData(user.rangedDayStats, this.isInDayRange(now));
         }
     }
 
@@ -1465,29 +1621,29 @@ export class BigBrowserV2 {
                     formatter.asPercent(rank.expLeftToNextRankPercent),
 
                     formatter.asFloat(user.stats.voiceXp),
-                    formatter.asInteger(user.stats.stats.totalVoiceTimeMs),
-                    formatter.asDate(user.stats.stats.lastVocalDate),
+                    formatter.asInteger(user.stats.totalVoiceTimeMs),
+                    formatter.asDate(user.stats.lastVocalDate),
 
                     formatter.asFloat(user.stats.textXp),
-                    formatter.asDate(user.stats.stats.lastTextDate),
+                    formatter.asDate(user.stats.lastTextDate),
 
-                    formatter.asInteger(user.stats.stats.nbTextMessages),
-                    formatter.asInteger(user.stats.stats.totalTextSize),
-                    formatter.asInteger(user.stats.stats.nbTextMessagesWithDuplicates),
-                    formatter.asInteger(user.stats.stats.totalTextSizeWithDuplicates),
+                    formatter.asInteger(user.stats.nbTextMessages),
+                    formatter.asInteger(user.stats.totalTextSize),
+                    formatter.asInteger(user.stats.nbTextMessagesWithDuplicates),
+                    formatter.asInteger(user.stats.totalTextSizeWithDuplicates),
 
-                    !user.stats.stats.lastWarframeDiscordDate && !user.stats.stats.lastWarframeDiscordDateNot
+                    !user.stats.lastWarframeDiscordDate && !user.stats.lastWarframeDiscordDateNot
                         ? formatter.asString('N/A')
-                        : formatter.asPercent(user.stats.stats.totalWarframeDiscordTimeMs / (user.stats.stats.totalWarframeDiscordTimeMs + user.stats.stats.totalWarframeDiscordTimeMsNot + user.stats.stats.totalWarframeDiscordTimeMsUndefined)),
+                        : formatter.asPercent(user.stats.totalWarframeDiscordTimeMs / (user.stats.totalWarframeDiscordTimeMs + user.stats.totalWarframeDiscordTimeMsNot + user.stats.totalWarframeDiscordTimeMsUndefined)),
 
-                    formatter.asInteger(user.stats.stats.totalWarframeDiscordTimeMs),
-                    formatter.asDate(user.stats.stats.lastWarframeDiscordDate),
+                    formatter.asInteger(user.stats.totalWarframeDiscordTimeMs),
+                    formatter.asDate(user.stats.lastWarframeDiscordDate),
 
-                    formatter.asInteger(user.stats.stats.totalWarframeDiscordTimeMsNot),
-                    formatter.asDate(user.stats.stats.lastWarframeDiscordDateNot),
+                    formatter.asInteger(user.stats.totalWarframeDiscordTimeMsNot),
+                    formatter.asDate(user.stats.lastWarframeDiscordDateNot),
 
-                    formatter.asInteger(user.stats.stats.totalWarframeDiscordTimeMsUndefined),
-                    formatter.asDate(user.stats.stats.lastWarframeDiscordDateUndefined),
+                    formatter.asInteger(user.stats.totalWarframeDiscordTimeMsUndefined),
+                    formatter.asDate(user.stats.lastWarframeDiscordDateUndefined),
 
                     formatter.asDate(user.joinedTimestamp),
                     formatter.asString((user.roles || []).join(' / ')),

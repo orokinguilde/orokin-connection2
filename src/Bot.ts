@@ -69,8 +69,9 @@ export class Bot {
 
         if(obj.bigBrowser)
             this.bigBrowser.load(obj.bigBrowser, ctx);
-        if(obj.bigBrowserV2)
+        if(obj.bigBrowserV2) {
             this.bigBrowserV2.load(obj.bigBrowserV2, ctx);
+        }
         if(obj.mentoring)
             this.mentoring.load(obj.mentoring, ctx);
 

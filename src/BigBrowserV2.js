@@ -97,6 +97,196 @@ var BigBrowserV2UserStats = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "lastVocalDate", {
+        get: function () {
+            return this.stats.lastVocalDate;
+        },
+        set: function (value) {
+            this.stats.lastVocalDate = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "totalVoiceTimeMs", {
+        get: function () {
+            return this.stats.totalVoiceTimeMs;
+        },
+        set: function (value) {
+            this.stats.totalVoiceTimeMs = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "nbTextMessages", {
+        get: function () {
+            return this.stats.nbTextMessages;
+        },
+        set: function (value) {
+            this.stats.nbTextMessages = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "nbTextMessagesWithDuplicates", {
+        get: function () {
+            return this.stats.nbTextMessagesWithDuplicates;
+        },
+        set: function (value) {
+            this.stats.nbTextMessagesWithDuplicates = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "totalTextSize", {
+        get: function () {
+            return this.stats.totalTextSize;
+        },
+        set: function (value) {
+            this.stats.totalTextSize = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "totalTextSizeWithDuplicates", {
+        get: function () {
+            return this.stats.totalTextSizeWithDuplicates;
+        },
+        set: function (value) {
+            this.stats.totalTextSizeWithDuplicates = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "lastTextContent", {
+        get: function () {
+            return this.stats.lastTextContent;
+        },
+        set: function (value) {
+            this.stats.lastTextContent = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "lastTextDate", {
+        get: function () {
+            return this.stats.lastTextDate;
+        },
+        set: function (value) {
+            this.stats.lastTextDate = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "lastNotDuplicateTextDate", {
+        get: function () {
+            return this.stats.lastNotDuplicateTextDate;
+        },
+        set: function (value) {
+            this.stats.lastNotDuplicateTextDate = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "wasVoicingLastTick", {
+        get: function () {
+            return this.stats.wasVoicingLastTick;
+        },
+        set: function (value) {
+            this.stats.wasVoicingLastTick = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "wasWarframeDiscordLastTickNot", {
+        get: function () {
+            return this.stats.wasWarframeDiscordLastTickNot;
+        },
+        set: function (value) {
+            this.stats.wasWarframeDiscordLastTickNot = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "totalWarframeDiscordTimeMsNot", {
+        get: function () {
+            return this.stats.totalWarframeDiscordTimeMsNot;
+        },
+        set: function (value) {
+            this.stats.totalWarframeDiscordTimeMsNot = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "lastWarframeDiscordDateNot", {
+        get: function () {
+            return this.stats.lastWarframeDiscordDateNot;
+        },
+        set: function (value) {
+            this.stats.lastWarframeDiscordDateNot = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "wasWarframeDiscordLastTick", {
+        get: function () {
+            return this.stats.wasWarframeDiscordLastTick;
+        },
+        set: function (value) {
+            this.stats.wasWarframeDiscordLastTick = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "wasWarframeDiscordLastTickUndefined", {
+        get: function () {
+            return this.stats.wasWarframeDiscordLastTickUndefined;
+        },
+        set: function (value) {
+            this.stats.wasWarframeDiscordLastTickUndefined = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "totalWarframeDiscordTimeMsUndefined", {
+        get: function () {
+            return this.stats.totalWarframeDiscordTimeMsUndefined;
+        },
+        set: function (value) {
+            this.stats.totalWarframeDiscordTimeMsUndefined = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "lastWarframeDiscordDateUndefined", {
+        get: function () {
+            return this.stats.lastWarframeDiscordDateUndefined;
+        },
+        set: function (value) {
+            this.stats.lastWarframeDiscordDateUndefined = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "totalWarframeDiscordTimeMs", {
+        get: function () {
+            return this.stats.totalWarframeDiscordTimeMs;
+        },
+        set: function (value) {
+            this.stats.totalWarframeDiscordTimeMs = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "lastWarframeDiscordDate", {
+        get: function () {
+            return this.stats.lastWarframeDiscordDate;
+        },
+        set: function (value) {
+            this.stats.lastWarframeDiscordDate = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "rank", {
         get: function () {
             var exp = this.xp;
@@ -136,39 +326,39 @@ var BigBrowserV2UserStats = /** @class */ (function () {
         for (var name_1 in this.stats) {
             delete this.stats[name_1];
         }
-        this.stats.lastVocalDate = undefined;
-        this.stats.totalVoiceTimeMs = 0;
-        this.stats.nbTextMessages = 0;
-        this.stats.nbTextMessagesWithDuplicates = 0;
-        this.stats.totalTextSize = 0;
-        this.stats.totalTextSizeWithDuplicates = 0;
-        this.stats.lastTextContent = undefined;
-        this.stats.lastTextDate = undefined;
-        this.stats.lastNotDuplicateTextDate = undefined;
-        this.stats.wasVoicingLastTick = false;
+        this.lastVocalDate = undefined;
+        this.totalVoiceTimeMs = 0;
+        this.nbTextMessages = 0;
+        this.nbTextMessagesWithDuplicates = 0;
+        this.totalTextSize = 0;
+        this.totalTextSizeWithDuplicates = 0;
+        this.lastTextContent = undefined;
+        this.lastTextDate = undefined;
+        this.lastNotDuplicateTextDate = undefined;
+        this.wasVoicingLastTick = false;
     };
     BigBrowserV2UserStats.prototype.injectInto = function (stats) {
         var _a, _b;
-        stats.stats.lastNotDuplicateTextDate = this.stats.lastNotDuplicateTextDate;
-        stats.stats.lastTextContent = this.stats.lastTextContent;
-        stats.stats.lastTextDate = this.stats.lastTextDate;
-        stats.stats.lastVocalDate = this.stats.lastVocalDate;
-        stats.stats.lastWarframeDiscordDate = this.stats.lastWarframeDiscordDate;
-        stats.stats.lastWarframeDiscordDateNot = this.stats.lastWarframeDiscordDateNot;
-        stats.stats.lastWarframeDiscordDateUndefined = this.stats.lastWarframeDiscordDateUndefined;
-        stats.stats.nbTextMessages += this.stats.nbTextMessages;
-        stats.stats.nbTextMessagesWithDuplicates += this.stats.nbTextMessagesWithDuplicates;
-        stats.stats.totalTextSize += this.stats.totalTextSize;
-        stats.stats.totalTextSizeWithDuplicates += this.stats.totalTextSizeWithDuplicates;
-        stats.stats.totalVoiceTimeMs += this.stats.totalVoiceTimeMs;
-        stats.stats.totalWarframeDiscordTimeMs += this.stats.totalWarframeDiscordTimeMs;
-        stats.stats.totalWarframeDiscordTimeMsNot += this.stats.totalWarframeDiscordTimeMsNot;
-        stats.stats.totalWarframeDiscordTimeMsUndefined += this.stats.totalWarframeDiscordTimeMsUndefined;
-        stats.stats.xpBonus = ((_a = stats.stats.xpBonus) !== null && _a !== void 0 ? _a : 0) + ((_b = this.stats.xpBonus) !== null && _b !== void 0 ? _b : 0);
-        stats.stats.wasVoicingLastTick = this.stats.wasVoicingLastTick;
-        stats.stats.wasWarframeDiscordLastTick = this.stats.wasWarframeDiscordLastTick;
-        stats.stats.wasWarframeDiscordLastTickNot = this.stats.wasWarframeDiscordLastTickNot;
-        stats.stats.wasWarframeDiscordLastTickUndefined = this.stats.wasWarframeDiscordLastTickUndefined;
+        stats.lastNotDuplicateTextDate = this.lastNotDuplicateTextDate;
+        stats.lastTextContent = this.lastTextContent;
+        stats.lastTextDate = this.lastTextDate;
+        stats.lastVocalDate = this.lastVocalDate;
+        stats.lastWarframeDiscordDate = this.lastWarframeDiscordDate;
+        stats.lastWarframeDiscordDateNot = this.lastWarframeDiscordDateNot;
+        stats.lastWarframeDiscordDateUndefined = this.lastWarframeDiscordDateUndefined;
+        stats.nbTextMessages += this.nbTextMessages;
+        stats.nbTextMessagesWithDuplicates += this.nbTextMessagesWithDuplicates;
+        stats.totalTextSize += this.totalTextSize;
+        stats.totalTextSizeWithDuplicates += this.totalTextSizeWithDuplicates;
+        stats.totalVoiceTimeMs += this.totalVoiceTimeMs;
+        stats.totalWarframeDiscordTimeMs += this.totalWarframeDiscordTimeMs;
+        stats.totalWarframeDiscordTimeMsNot += this.totalWarframeDiscordTimeMsNot;
+        stats.totalWarframeDiscordTimeMsUndefined += this.totalWarframeDiscordTimeMsUndefined;
+        stats.xpBonus = ((_a = stats.xpBonus) !== null && _a !== void 0 ? _a : 0) + ((_b = this.xpBonus) !== null && _b !== void 0 ? _b : 0);
+        stats.wasVoicingLastTick = this.wasVoicingLastTick;
+        stats.wasWarframeDiscordLastTick = this.wasWarframeDiscordLastTick;
+        stats.wasWarframeDiscordLastTickNot = this.wasWarframeDiscordLastTickNot;
+        stats.wasWarframeDiscordLastTickUndefined = this.wasWarframeDiscordLastTickUndefined;
     };
     BigBrowserV2UserStats.merge = function (user) {
         var stats = [];
@@ -629,21 +819,60 @@ var BigBrowserV2 = /** @class */ (function () {
         this.servers = obj.servers;
         this.xpMultiplier = obj.xpMultiplier;
         this.dayRange = obj.dayRange;
+        this.cleanupData();
+        if (obj.servers) {
+            console.log("******* BigBrowserV2 info *******");
+            console.log("== Servers ==");
+            for (var propName in obj.servers) {
+                var server = obj.servers[propName];
+                //console.log();
+                console.log("> " + server.name + " (" + propName + "): " + JSON.stringify(server).length + " chars / " + Object.keys(server.users).length + " users");
+                //console.log(JSON.stringify(server.users[Object.keys(server.users)[0]]));
+                /*console.log(`===== Users ==`);
+                for(const userId in server.users) {
+                    const user = server.users[userId];
+                    console.log(`= ${user.displayName} (${userId}): ${JSON.stringify(user).length} chars`);
+                }*/
+            }
+            console.log("**************");
+        }
     };
-    BigBrowserV2.prototype.initWithV1Data = function (servers) {
-        var now = Date.now();
+    BigBrowserV2.prototype.cleanupData = function () {
+        var servers = this.getServers();
         for (var serverId in servers) {
-            var oldServer = servers[serverId];
-            var server = this.getServer({
+            var server = servers[serverId];
+            var users = server.users;
+            for (var userId in users) {
+                var user = users[userId];
+                delete user.v1;
+                delete user.__debug;
+                delete user.___debug;
+            }
+        }
+    };
+    /*
+    initWithV1Data(servers: any)
+    {
+        var now = Date.now();
+
+        for(const serverId in servers)
+        {
+            const oldServer = servers[serverId];
+            const server = this.getServer({
                 id: oldServer.__id__ || serverId,
                 name: oldServer.__name__
             });
-            if (!server.users)
+
+            if(!server.users)
                 server.users = {};
-            for (var userId in oldServer) {
-                if (userId !== '__name__' && userId !== '__id__') {
-                    var oldUser = oldServer[userId];
-                    var user = {
+
+            for(const userId in oldServer)
+            {
+                if(userId !== '__name__' && userId !== '__id__')
+                {
+                    const oldUser = oldServer[userId];
+
+                    const user: IBigBrowserV2User = {
                         displayName: oldUser.__name__,
                         isBot: false,
                         id: userId,
@@ -665,15 +894,17 @@ var BigBrowserV2 = /** @class */ (function () {
                             totalWarframeDiscordTimeMsUndefined: oldUser.warframeActivity_total ? oldUser.warframeActivity_total * 500 : undefined,
                             lastWarframeDiscordDateUndefined: oldUser.warframeActivity_date ? oldUser.warframeActivity_date : undefined
                         }
-                    };
+                    } as any;
+
                     user.stats = JSON.parse(JSON.stringify(user.v1));
                     user.v1.oldServerId = serverId;
                     user.v1.oldUser = oldUser;
+
                     server.users[userId] = user;
                 }
             }
         }
-    };
+    }*/
     BigBrowserV2.prototype.updateServer = function (guild) {
         var _this = this;
         var now = Date.now();
@@ -776,9 +1007,9 @@ var BigBrowserV2 = /** @class */ (function () {
             if (user.rangedWeekStats.isObsolete) {
                 user.rangedWeekStats.finalize();
             }
-            updateStats(user.stats.stats);
-            updateStats(user.dayStats.stats);
-            updateStats(user.rangedDayStats.stats, _this.isInDayRange(now));
+            updateStats(user.stats);
+            updateStats(user.dayStats);
+            updateStats(user.rangedDayStats, _this.isInDayRange(now));
         });
         onDone();
     };
@@ -814,9 +1045,9 @@ var BigBrowserV2 = /** @class */ (function () {
                 }
                 stats.lastTextDate = now_1;
             };
-            updateData(user.stats.stats);
-            updateData(user.dayStats.stats);
-            updateData(user.rangedDayStats.stats, this.isInDayRange(now_1));
+            updateData(user.stats);
+            updateData(user.dayStats);
+            updateData(user.rangedDayStats, this.isInDayRange(now_1));
         }
     };
     BigBrowserV2.prototype.setTrackingUser = function (member, isTracking) {
@@ -1137,9 +1368,9 @@ var BigBrowserV2 = /** @class */ (function () {
                 var user = users_1[_i];
                 var exp = user.stats.xp;
                 var rank = user.stats.rank;
-                text += formatter.row(formatter.asString(user.displayName), formatter.asString(user.name), formatter.asBool(user.isBot), formatter.asFloat(exp), formatter.asString(rank.currentRank ? rank.currentRank.name : undefined), formatter.asString(rank.nextRank ? rank.nextRank.name : undefined), formatter.asPercent(rank.currentExpPercentToNextRank), formatter.asFloat(rank.expLeftToNextRank), formatter.asPercent(rank.expLeftToNextRankPercent), formatter.asFloat(user.stats.voiceXp), formatter.asInteger(user.stats.stats.totalVoiceTimeMs), formatter.asDate(user.stats.stats.lastVocalDate), formatter.asFloat(user.stats.textXp), formatter.asDate(user.stats.stats.lastTextDate), formatter.asInteger(user.stats.stats.nbTextMessages), formatter.asInteger(user.stats.stats.totalTextSize), formatter.asInteger(user.stats.stats.nbTextMessagesWithDuplicates), formatter.asInteger(user.stats.stats.totalTextSizeWithDuplicates), !user.stats.stats.lastWarframeDiscordDate && !user.stats.stats.lastWarframeDiscordDateNot
+                text += formatter.row(formatter.asString(user.displayName), formatter.asString(user.name), formatter.asBool(user.isBot), formatter.asFloat(exp), formatter.asString(rank.currentRank ? rank.currentRank.name : undefined), formatter.asString(rank.nextRank ? rank.nextRank.name : undefined), formatter.asPercent(rank.currentExpPercentToNextRank), formatter.asFloat(rank.expLeftToNextRank), formatter.asPercent(rank.expLeftToNextRankPercent), formatter.asFloat(user.stats.voiceXp), formatter.asInteger(user.stats.totalVoiceTimeMs), formatter.asDate(user.stats.lastVocalDate), formatter.asFloat(user.stats.textXp), formatter.asDate(user.stats.lastTextDate), formatter.asInteger(user.stats.nbTextMessages), formatter.asInteger(user.stats.totalTextSize), formatter.asInteger(user.stats.nbTextMessagesWithDuplicates), formatter.asInteger(user.stats.totalTextSizeWithDuplicates), !user.stats.lastWarframeDiscordDate && !user.stats.lastWarframeDiscordDateNot
                     ? formatter.asString('N/A')
-                    : formatter.asPercent(user.stats.stats.totalWarframeDiscordTimeMs / (user.stats.stats.totalWarframeDiscordTimeMs + user.stats.stats.totalWarframeDiscordTimeMsNot + user.stats.stats.totalWarframeDiscordTimeMsUndefined)), formatter.asInteger(user.stats.stats.totalWarframeDiscordTimeMs), formatter.asDate(user.stats.stats.lastWarframeDiscordDate), formatter.asInteger(user.stats.stats.totalWarframeDiscordTimeMsNot), formatter.asDate(user.stats.stats.lastWarframeDiscordDateNot), formatter.asInteger(user.stats.stats.totalWarframeDiscordTimeMsUndefined), formatter.asDate(user.stats.stats.lastWarframeDiscordDateUndefined), formatter.asDate(user.joinedTimestamp), formatter.asString((user.roles || []).join(' / ')), formatter.asBool(user.isWeird || false));
+                    : formatter.asPercent(user.stats.totalWarframeDiscordTimeMs / (user.stats.totalWarframeDiscordTimeMs + user.stats.totalWarframeDiscordTimeMsNot + user.stats.totalWarframeDiscordTimeMsUndefined)), formatter.asInteger(user.stats.totalWarframeDiscordTimeMs), formatter.asDate(user.stats.lastWarframeDiscordDate), formatter.asInteger(user.stats.totalWarframeDiscordTimeMsNot), formatter.asDate(user.stats.lastWarframeDiscordDateNot), formatter.asInteger(user.stats.totalWarframeDiscordTimeMsUndefined), formatter.asDate(user.stats.lastWarframeDiscordDateUndefined), formatter.asDate(user.joinedTimestamp), formatter.asString((user.roles || []).join(' / ')), formatter.asBool(user.isWeird || false));
             }
             if (formatter.bodyEnd)
                 text += formatter.bodyEnd();

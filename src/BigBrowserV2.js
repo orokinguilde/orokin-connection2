@@ -29,26 +29,26 @@ var BigBrowserV2UserStats = /** @class */ (function () {
     });
     BigBrowserV2UserStats.create = function (user) {
         return new BigBrowserV2UserStats(user, {
-            lastVocalDate: undefined,
-            totalVoiceTimeMs: 0,
-            nbTextMessages: 0,
-            nbTextMessagesWithDuplicates: 0,
-            totalTextSize: 0,
-            totalTextSizeWithDuplicates: 0,
-            lastTextContent: undefined,
-            lastTextDate: undefined,
-            lastNotDuplicateTextDate: undefined,
-            wasVoicingLastTick: false,
-            lastWarframeDiscordDate: undefined,
-            lastWarframeDiscordDateNot: undefined,
-            lastWarframeDiscordDateUndefined: undefined,
-            totalWarframeDiscordTimeMs: undefined,
-            totalWarframeDiscordTimeMsNot: undefined,
-            totalWarframeDiscordTimeMsUndefined: undefined,
-            wasWarframeDiscordLastTick: undefined,
-            wasWarframeDiscordLastTickNot: undefined,
-            wasWarframeDiscordLastTickUndefined: undefined,
-            xpBonus: 0
+            lvd: undefined,
+            tvt: 0,
+            ntm: 0,
+            ntmd: 0,
+            tts: 0,
+            ttsd: 0,
+            ltc: undefined,
+            ltd: undefined,
+            lndtd: undefined,
+            wvlt: false,
+            lwddd: undefined,
+            lwdd: undefined,
+            lwddy: undefined,
+            twdtm: undefined,
+            twdt: undefined,
+            twdtu: undefined,
+            wwdl: undefined,
+            wwdltn: undefined,
+            wwdlt: undefined,
+            xb: 0
         });
     };
     Object.defineProperty(BigBrowserV2UserStats.prototype, "stats", {
@@ -68,24 +68,24 @@ var BigBrowserV2UserStats = /** @class */ (function () {
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "voiceXp", {
         get: function () {
-            return this.stats.totalVoiceTimeMs / (1000 * 60 * 30);
+            return this.stats.tvt / (1000 * 60 * 30);
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "textXp", {
         get: function () {
-            return this.stats.totalTextSize / 500;
+            return this.stats.tts / 500;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "xpBonus", {
         get: function () {
-            return this.stats.xpBonus || 0;
+            return this.stats.xb || 0;
         },
         set: function (value) {
-            this.stats.xpBonus = value;
+            this.stats.xb = value;
         },
         enumerable: false,
         configurable: true
@@ -99,190 +99,190 @@ var BigBrowserV2UserStats = /** @class */ (function () {
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "lastVocalDate", {
         get: function () {
-            return this.stats.lastVocalDate;
+            return this.stats.lvd;
         },
         set: function (value) {
-            this.stats.lastVocalDate = value;
+            this.stats.lvd = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "totalVoiceTimeMs", {
         get: function () {
-            return this.stats.totalVoiceTimeMs;
+            return this.stats.tvt;
         },
         set: function (value) {
-            this.stats.totalVoiceTimeMs = value;
+            this.stats.tvt = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "nbTextMessages", {
         get: function () {
-            return this.stats.nbTextMessages;
+            return this.stats.ntm;
         },
         set: function (value) {
-            this.stats.nbTextMessages = value;
+            this.stats.ntm = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "nbTextMessagesWithDuplicates", {
         get: function () {
-            return this.stats.nbTextMessagesWithDuplicates;
+            return this.stats.ntmd;
         },
         set: function (value) {
-            this.stats.nbTextMessagesWithDuplicates = value;
+            this.stats.ntmd = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "totalTextSize", {
         get: function () {
-            return this.stats.totalTextSize;
+            return this.stats.tts;
         },
         set: function (value) {
-            this.stats.totalTextSize = value;
+            this.stats.tts = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "totalTextSizeWithDuplicates", {
         get: function () {
-            return this.stats.totalTextSizeWithDuplicates;
+            return this.stats.ttsd;
         },
         set: function (value) {
-            this.stats.totalTextSizeWithDuplicates = value;
+            this.stats.ttsd = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "lastTextContent", {
         get: function () {
-            return this.stats.lastTextContent;
+            return this.stats.ltc;
         },
         set: function (value) {
-            this.stats.lastTextContent = value;
+            this.stats.ltc = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "lastTextDate", {
         get: function () {
-            return this.stats.lastTextDate;
+            return this.stats.ltd;
         },
         set: function (value) {
-            this.stats.lastTextDate = value;
+            this.stats.ltd = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "lastNotDuplicateTextDate", {
         get: function () {
-            return this.stats.lastNotDuplicateTextDate;
+            return this.stats.lndtd;
         },
         set: function (value) {
-            this.stats.lastNotDuplicateTextDate = value;
+            this.stats.lndtd = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "wasVoicingLastTick", {
         get: function () {
-            return this.stats.wasVoicingLastTick;
+            return this.stats.wvlt;
         },
         set: function (value) {
-            this.stats.wasVoicingLastTick = value;
+            this.stats.wvlt = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "wasWarframeDiscordLastTickNot", {
         get: function () {
-            return this.stats.wasWarframeDiscordLastTickNot;
+            return this.stats.wwdltn;
         },
         set: function (value) {
-            this.stats.wasWarframeDiscordLastTickNot = value;
+            this.stats.wwdltn = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "totalWarframeDiscordTimeMsNot", {
         get: function () {
-            return this.stats.totalWarframeDiscordTimeMsNot;
+            return this.stats.twdt;
         },
         set: function (value) {
-            this.stats.totalWarframeDiscordTimeMsNot = value;
+            this.stats.twdt = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "lastWarframeDiscordDateNot", {
         get: function () {
-            return this.stats.lastWarframeDiscordDateNot;
+            return this.stats.lwdd;
         },
         set: function (value) {
-            this.stats.lastWarframeDiscordDateNot = value;
+            this.stats.lwdd = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "wasWarframeDiscordLastTick", {
         get: function () {
-            return this.stats.wasWarframeDiscordLastTick;
+            return this.stats.wwdl;
         },
         set: function (value) {
-            this.stats.wasWarframeDiscordLastTick = value;
+            this.stats.wwdl = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "wasWarframeDiscordLastTickUndefined", {
         get: function () {
-            return this.stats.wasWarframeDiscordLastTickUndefined;
+            return this.stats.wwdlt;
         },
         set: function (value) {
-            this.stats.wasWarframeDiscordLastTickUndefined = value;
+            this.stats.wwdlt = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "totalWarframeDiscordTimeMsUndefined", {
         get: function () {
-            return this.stats.totalWarframeDiscordTimeMsUndefined;
+            return this.stats.twdtu;
         },
         set: function (value) {
-            this.stats.totalWarframeDiscordTimeMsUndefined = value;
+            this.stats.twdtu = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "lastWarframeDiscordDateUndefined", {
         get: function () {
-            return this.stats.lastWarframeDiscordDateUndefined;
+            return this.stats.lwddy;
         },
         set: function (value) {
-            this.stats.lastWarframeDiscordDateUndefined = value;
+            this.stats.lwddy = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "totalWarframeDiscordTimeMs", {
         get: function () {
-            return this.stats.totalWarframeDiscordTimeMs;
+            return this.stats.twdtm;
         },
         set: function (value) {
-            this.stats.totalWarframeDiscordTimeMs = value;
+            this.stats.twdtm = value;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "lastWarframeDiscordDate", {
         get: function () {
-            return this.stats.lastWarframeDiscordDate;
+            return this.stats.lwddd;
         },
         set: function (value) {
-            this.stats.lastWarframeDiscordDate = value;
+            this.stats.lwddd = value;
         },
         enumerable: false,
         configurable: true
@@ -798,7 +798,7 @@ var BigBrowserV2 = /** @class */ (function () {
         if (member.roles)
             user.roles = member.roles.array().map(function (role) { return role.name; });
         if (member.roles)
-            user.isWeird = member.roles.array().some(function (role) { return role.name === 'EN phase de test' || role.name === 'Tenno'; }) && !user.stats.totalVoiceTimeMs;
+            user.isWeird = member.roles.array().some(function (role) { return role.name === 'EN phase de test' || role.name === 'Tenno'; }) && !user.stats.tvt;
         var zero = function (name) {
             if (user.stats[name] === undefined)
                 user.stats[name] = 0;
@@ -838,6 +838,50 @@ var BigBrowserV2 = /** @class */ (function () {
         }
     };
     BigBrowserV2.prototype.cleanupData = function () {
+        var oldP = [
+            'lastVocalDate',
+            'totalVoiceTimeMs',
+            'nbTextMessages',
+            'nbTextMessagesWithDuplicates',
+            'totalTextSize',
+            'totalTextSizeWithDuplicates',
+            'lastTextContent',
+            'lastTextDate',
+            'lastNotDuplicateTextDate',
+            'wasVoicingLastTick',
+            'wasWarframeDiscordLastTickNot',
+            'totalWarframeDiscordTimeMsNot',
+            'lastWarframeDiscordDateNot',
+            'wasWarframeDiscordLastTick',
+            'wasWarframeDiscordLastTickUndefined',
+            'totalWarframeDiscordTimeMsUndefined',
+            'lastWarframeDiscordDateUndefined',
+            'totalWarframeDiscordTimeMs',
+            'lastWarframeDiscordDate',
+            'xpBonus',
+        ];
+        var newP = [
+            'lvd',
+            'tvt',
+            'ntm',
+            'ntmd',
+            'tts',
+            'ttsd',
+            'ltc',
+            'ltd',
+            'lndtd',
+            'wvlt',
+            'wwdltn',
+            'twdt',
+            'lwdd',
+            'wwdl',
+            'wwdlt',
+            'twdtu',
+            'lwddy',
+            'twdtm',
+            'lwddd',
+            'xb',
+        ];
         var servers = this.getServers();
         for (var serverId in servers) {
             var server = servers[serverId];
@@ -847,6 +891,28 @@ var BigBrowserV2 = /** @class */ (function () {
                 delete user.v1;
                 delete user.__debug;
                 delete user.___debug;
+                var clean = function (obj) {
+                    if (!obj) {
+                        return;
+                    }
+                    for (var i = 0; i < oldP.length; ++i) {
+                        var oldPropName = oldP[i];
+                        var newPropName = newP[i];
+                        if (obj[oldPropName] !== undefined) {
+                            obj[newPropName] = obj[oldPropName];
+                            delete obj[oldPropName];
+                        }
+                    }
+                };
+                clean(user.stats);
+                clean(user.dayStats.data);
+                clean(user.weekStats.data);
+                clean(user.rangedDayStats.data);
+                clean(user.rangedWeekStats.data);
+                clean(user.dayStats.last);
+                clean(user.weekStats.last);
+                clean(user.rangedDayStats.last);
+                clean(user.rangedWeekStats.last);
             }
         }
     };

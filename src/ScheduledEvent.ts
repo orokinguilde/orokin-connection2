@@ -1,6 +1,6 @@
 import * as moment from 'moment'
 import { Guild, TextChannel, RichEmbed, Channel } from 'discord.js';
-import { BigBrowserV2 } from './BigBrowserV2';
+import { BigBrowserV2, BigBrowserV2User } from './BigBrowserV2';
 
 export interface ScheduledEventContext {
     periodMs: number
@@ -124,7 +124,7 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
 
     private _messageTimeoutSec: number
     public get messageTimeoutSec() {
-        return this._messageTimeoutSec ?? 10;
+        return this._messageTimeoutSec ?? 20;
     }
     public set messageTimeoutSec(value) {
         this._messageTimeoutSec = value;
@@ -166,24 +166,48 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
         return channels[Math.floor(Math.random() * channels.length)];
     }
 
+    public get emojis() {
+        return [
+            'beaugoss',
+            '🐰'
+        ].map(name => this.guild.emojis.find(emoji => emoji.name === name) || `${name}`)
+    }
+
     public async runtime(ctx: ScheduledEventContext) {
         const channel = this.pickRandomChannel();
         if(channel) {
 
+            const vocalUserIds: { [id: string]: BigBrowserV2User } = {};
+
             for(const m of this.guild.members.array()) {
                 if(m.voiceChannelID) {
                     const user = this.bigBrowser.getUser(m);
-                    user.addXPBonus(this.xpBonusOnPopUp);
+                    vocalUserIds[user.id] = user;
                 }
             }
 
             const message = await channel.send(new RichEmbed({
+                description: `@here, ${this.xpBonusOnPopUp} points pour ceux en vocal, ${this.xpBonusOnReact} en plus pour les réactions à ce message ! :rabbit:`,
                 image: {
                     url: 'https://media.discordapp.net/attachments/514178068835860498/718771722307764314/XP-bonus.gif'
                 }
             }));
 
+            this.emojis.forEach(emoji => message.react(emoji).catch(() => {}));
+
             setTimeout(() => {
+
+                for(const m of this.guild.members.array()) {
+                    if(m.voiceChannelID) {
+                        const user = this.bigBrowser.getUser(m);
+                        vocalUserIds[user.id] = user;
+                    }
+                }
+                
+                for(const id in vocalUserIds) {
+                    const user = vocalUserIds[id];
+                    user.addXPBonus(this.xpBonusOnPopUp);
+                }
                 
                 const userIds: { [id: string]: true } = {};
                 for(const reaction of message.reactions.array()) {

@@ -193,7 +193,7 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
     Object.defineProperty(XPBonusScheduledEvent.prototype, "messageTimeoutSec", {
         get: function () {
             var _a;
-            return (_a = this._messageTimeoutSec) !== null && _a !== void 0 ? _a : 10;
+            return (_a = this._messageTimeoutSec) !== null && _a !== void 0 ? _a : 20;
         },
         set: function (value) {
             this._messageTimeoutSec = value;
@@ -239,42 +239,67 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
         var channels = this.channels;
         return channels[Math.floor(Math.random() * channels.length)];
     };
+    Object.defineProperty(XPBonusScheduledEvent.prototype, "emojis", {
+        get: function () {
+            var _this = this;
+            return [
+                'beaugoss',
+                '🐰'
+            ].map(function (name) { return _this.guild.emojis.find(function (emoji) { return emoji.name === name; }) || "" + name; });
+        },
+        enumerable: false,
+        configurable: true
+    });
     XPBonusScheduledEvent.prototype.runtime = function (ctx) {
         return __awaiter(this, void 0, void 0, function () {
-            var channel, _i, _a, m, user, message_1;
+            var channel, vocalUserIds_1, _i, _a, m, user, message_1;
             var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         channel = this.pickRandomChannel();
                         if (!channel) return [3 /*break*/, 2];
+                        vocalUserIds_1 = {};
                         for (_i = 0, _a = this.guild.members.array(); _i < _a.length; _i++) {
                             m = _a[_i];
                             if (m.voiceChannelID) {
                                 user = this.bigBrowser.getUser(m);
-                                user.addXPBonus(this.xpBonusOnPopUp);
+                                vocalUserIds_1[user.id] = user;
                             }
                         }
                         return [4 /*yield*/, channel.send(new discord_js_1.RichEmbed({
+                                description: "@here, " + this.xpBonusOnPopUp + " points pour ceux en vocal, " + this.xpBonusOnReact + " en plus pour les r\u00E9actions \u00E0 ce message ! :rabbit:",
                                 image: {
                                     url: 'https://media.discordapp.net/attachments/514178068835860498/718771722307764314/XP-bonus.gif'
                                 }
                             }))];
                     case 1:
                         message_1 = _b.sent();
+                        this.emojis.forEach(function (emoji) { return message_1.react(emoji).catch(function () { }); });
                         setTimeout(function () {
+                            for (var _i = 0, _a = _this.guild.members.array(); _i < _a.length; _i++) {
+                                var m = _a[_i];
+                                if (m.voiceChannelID) {
+                                    var user = _this.bigBrowser.getUser(m);
+                                    vocalUserIds_1[user.id] = user;
+                                }
+                            }
+                            for (var id in vocalUserIds_1) {
+                                var user = vocalUserIds_1[id];
+                                user.addXPBonus(_this.xpBonusOnPopUp);
+                            }
                             var userIds = {};
-                            for (var _i = 0, _a = message_1.reactions.array(); _i < _a.length; _i++) {
-                                var reaction = _a[_i];
-                                for (var _b = 0, _c = reaction.users.array(); _b < _c.length; _b++) {
-                                    var user = _c[_b];
+                            for (var _b = 0, _c = message_1.reactions.array(); _b < _c.length; _b++) {
+                                var reaction = _c[_b];
+                                for (var _d = 0, _e = reaction.users.array(); _d < _e.length; _d++) {
+                                    var user = _e[_d];
                                     userIds[user.id] = true;
                                 }
                             }
                             var users = Object.keys(userIds)
                                 .map(function (id) { return _this.bigBrowser.getUserById(message_1.guild, id); });
-                            for (var _d = 0, users_1 = users; _d < users_1.length; _d++) {
-                                var user = users_1[_d];
+                            for (var _f = 0, users_1 = users; _f < users_1.length; _f++) {
+                                var user = users_1[_f];
                                 user.addXPBonus(_this.xpBonusOnReact);
                             }
                             message_1.delete();

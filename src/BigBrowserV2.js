@@ -740,21 +740,20 @@ var BigBrowserV2 = /** @class */ (function () {
                     stats.wasVoicingLastTick = false;
                 }
             };
-            /*
-                        if(user.dayStats.isObsolete) {
-                            user.dayStats.injectInto(user.weekStats);
-                            user.dayStats.finalize();
-                        }
-                        if(user.weekStats.isObsolete) {
-                            user.weekStats.finalize();
-                        }
-                        if(user.rangedDayStats.isObsolete) {
-                            user.rangedDayStats.injectInto(user.rangedWeekStats);
-                            user.rangedDayStats.finalize();
-                        }
-                        if(user.rangedWeekStats.isObsolete) {
-                            user.rangedWeekStats.finalize();
-                        }*/
+            if (user.dayStats.isObsolete) {
+                user.dayStats.injectInto(user.weekStats);
+                user.dayStats.finalize();
+            }
+            if (user.weekStats.isObsolete) {
+                user.weekStats.finalize();
+            }
+            if (user.rangedDayStats.isObsolete) {
+                user.rangedDayStats.injectInto(user.rangedWeekStats);
+                user.rangedDayStats.finalize();
+            }
+            if (user.rangedWeekStats.isObsolete) {
+                user.rangedWeekStats.finalize();
+            }
             updateStats(userData.stats);
             updateStats(userData.dayStats.data);
             updateStats(userData.rangedDayStats.data, _this.isInDayRange(now));

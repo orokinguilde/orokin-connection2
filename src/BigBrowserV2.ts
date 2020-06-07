@@ -872,7 +872,7 @@ export class BigBrowserV2 {
                     stats.wasVoicingLastTick = false;
                 }
             }
-/*
+
             if(user.dayStats.isObsolete) {
                 user.dayStats.injectInto(user.weekStats);
                 user.dayStats.finalize();
@@ -886,7 +886,7 @@ export class BigBrowserV2 {
             }
             if(user.rangedWeekStats.isObsolete) {
                 user.rangedWeekStats.finalize();
-            }*/
+            }
 
             updateStats(userData.stats);
             updateStats(userData.dayStats.data);

@@ -16,11 +16,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BigBrowserV2 = exports.BigBrowserV2User = exports.BigBrowserV2UserStatsTimedWeek = exports.BigBrowserV2UserStatsTimedDay = exports.BigBrowserV2UserStatsTimed = exports.BigBrowserV2UserStats = void 0;
 var moment = require("moment-timezone");
 var BigBrowserV2UserStats = /** @class */ (function () {
-    function BigBrowserV2UserStats(stats) {
+    function BigBrowserV2UserStats(user, stats) {
         this._stats = stats;
+        this._user = user;
     }
-    BigBrowserV2UserStats.create = function () {
-        return new BigBrowserV2UserStats({
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "user", {
+        get: function () {
+            return this._user;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    BigBrowserV2UserStats.create = function (user) {
+        return new BigBrowserV2UserStats(user, {
             lastVocalDate: undefined,
             totalVoiceTimeMs: 0,
             nbTextMessages: 0,
@@ -71,9 +79,54 @@ var BigBrowserV2UserStats = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "xpBonus", {
+        get: function () {
+            return this.user.xpBonus || 0;
+        },
+        set: function (value) {
+            this.user.xpBonus = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "xp", {
         get: function () {
-            return this.voiceXp + this.textXp;
+            return this.voiceXp + this.textXp + this.xpBonus;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2UserStats.prototype, "rank", {
+        get: function () {
+            var exp = this.xp;
+            var ranks = BigBrowserV2.ranks;
+            var lastMatchingRank = ranks[0];
+            var nextRank = undefined;
+            for (var rankStart in ranks) {
+                var rank = ranks[rankStart];
+                if (exp >= rank.start) {
+                    lastMatchingRank = rank;
+                }
+                else if (!nextRank) {
+                    nextRank = rank;
+                    break;
+                }
+            }
+            if (nextRank === lastMatchingRank)
+                nextRank = undefined;
+            var expFromCurrentToNextRank = nextRank ? nextRank.start - lastMatchingRank.start : 0;
+            var expLeftToNextRank = nextRank ? nextRank.start - exp : 0;
+            var expLeftToNextRankPercent = nextRank ? expLeftToNextRank / expFromCurrentToNextRank : 1;
+            return {
+                exp: exp,
+                currentRank: lastMatchingRank,
+                nextRank: nextRank,
+                expInCurrentRank: exp - lastMatchingRank.start,
+                expFromCurrentToNextRank: expFromCurrentToNextRank,
+                expLeftToNextRank: expLeftToNextRank,
+                expLeftToNextRankPercent: expLeftToNextRankPercent,
+                currentExpPercentToNextRank: 1 - expLeftToNextRankPercent
+            };
         },
         enumerable: false,
         configurable: true
@@ -127,15 +180,15 @@ var BigBrowserV2UserStats = /** @class */ (function () {
         return result;
     };
     BigBrowserV2UserStats.prototype.clone = function () {
-        return new BigBrowserV2UserStats(JSON.parse(JSON.stringify(this.stats)));
+        return new BigBrowserV2UserStats(this.user, JSON.parse(JSON.stringify(this.stats)));
     };
     return BigBrowserV2UserStats;
 }());
 exports.BigBrowserV2UserStats = BigBrowserV2UserStats;
 var BigBrowserV2UserStatsTimed = /** @class */ (function (_super) {
     __extends(BigBrowserV2UserStatsTimed, _super);
-    function BigBrowserV2UserStatsTimed(stats, timeDivider) {
-        var _this = _super.call(this, stats.data) || this;
+    function BigBrowserV2UserStatsTimed(user, stats, timeDivider) {
+        var _this = _super.call(this, user, stats.data) || this;
         _this._statsTimed = stats;
         _this._timeDivider = timeDivider;
         return _this;
@@ -163,7 +216,7 @@ var BigBrowserV2UserStatsTimed = /** @class */ (function (_super) {
                 return undefined;
             }
             else {
-                return new BigBrowserV2UserStats(this.statsTimed.last);
+                return new BigBrowserV2UserStats(this.user, this.statsTimed.last);
             }
         },
         enumerable: false,
@@ -198,16 +251,16 @@ var BigBrowserV2UserStatsTimed = /** @class */ (function (_super) {
 exports.BigBrowserV2UserStatsTimed = BigBrowserV2UserStatsTimed;
 var BigBrowserV2UserStatsTimedDay = /** @class */ (function (_super) {
     __extends(BigBrowserV2UserStatsTimedDay, _super);
-    function BigBrowserV2UserStatsTimedDay(stats) {
-        return _super.call(this, stats, function (date) { return date.day(); }) || this;
+    function BigBrowserV2UserStatsTimedDay(user, stats) {
+        return _super.call(this, user, stats, function (date) { return date.day(); }) || this;
     }
     return BigBrowserV2UserStatsTimedDay;
 }(BigBrowserV2UserStatsTimed));
 exports.BigBrowserV2UserStatsTimedDay = BigBrowserV2UserStatsTimedDay;
 var BigBrowserV2UserStatsTimedWeek = /** @class */ (function (_super) {
     __extends(BigBrowserV2UserStatsTimedWeek, _super);
-    function BigBrowserV2UserStatsTimedWeek(stats) {
-        return _super.call(this, stats, function (date) { return date.week(); }) || this;
+    function BigBrowserV2UserStatsTimedWeek(user, stats) {
+        return _super.call(this, user, stats, function (date) { return date.week(); }) || this;
     }
     return BigBrowserV2UserStatsTimedWeek;
 }(BigBrowserV2UserStatsTimed));
@@ -225,35 +278,114 @@ var BigBrowserV2User = /** @class */ (function () {
     });
     Object.defineProperty(BigBrowserV2User.prototype, "stats", {
         get: function () {
-            return new BigBrowserV2UserStats(this.userData.stats);
+            return new BigBrowserV2UserStats(this, this.userData.stats);
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2User.prototype, "dayStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimedDay(this.userData.dayStats);
+            return new BigBrowserV2UserStatsTimedDay(this, this.userData.dayStats);
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2User.prototype, "weekStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimedWeek(this.userData.weekStats);
+            return new BigBrowserV2UserStatsTimedWeek(this, this.userData.weekStats);
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2User.prototype, "rangedDayStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimedDay(this.userData.rangedDayStats);
+            return new BigBrowserV2UserStatsTimedDay(this, this.userData.rangedDayStats);
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2User.prototype, "rangedWeekStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimedWeek(this.userData.rangedWeekStats);
+            return new BigBrowserV2UserStatsTimedWeek(this, this.userData.rangedWeekStats);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "tracking", {
+        get: function () {
+            return this.userData.tracking;
+        },
+        set: function (value) {
+            this.userData.tracking = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "xpBonus", {
+        get: function () {
+            return this.userData.xpBonus || 0;
+        },
+        set: function (value) {
+            this.userData.xpBonus = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "displayName", {
+        get: function () {
+            return this.userData.displayName;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "name", {
+        get: function () {
+            return this.userData.name;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "isBot", {
+        get: function () {
+            return this.userData.isBot;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "joinedTimestamp", {
+        get: function () {
+            return this.userData.joinedTimestamp;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "roles", {
+        get: function () {
+            return this.userData.roles || [];
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "isWeird", {
+        get: function () {
+            return this.userData.isWeird || false;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "id", {
+        get: function () {
+            return this.userData.id;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "bannerTemplateKey", {
+        get: function () {
+            return this.userData.bannerTemplateKey;
+        },
+        set: function (value) {
+            this.userData.bannerTemplateKey = value;
         },
         enumerable: false,
         configurable: true
@@ -261,19 +393,19 @@ var BigBrowserV2User = /** @class */ (function () {
     BigBrowserV2User.prototype.resetDayWeekStats = function () {
         this.userData.dayStats = {
             date: 0,
-            data: BigBrowserV2UserStats.create().stats
+            data: BigBrowserV2UserStats.create(this).stats
         };
         this.userData.weekStats = {
             date: 0,
-            data: BigBrowserV2UserStats.create().stats
+            data: BigBrowserV2UserStats.create(this).stats
         };
         this.userData.rangedDayStats = {
             date: 0,
-            data: BigBrowserV2UserStats.create().stats
+            data: BigBrowserV2UserStats.create(this).stats
         };
         this.userData.rangedWeekStats = {
             date: 0,
-            data: BigBrowserV2UserStats.create().stats
+            data: BigBrowserV2UserStats.create(this).stats
         };
     };
     return BigBrowserV2User;
@@ -281,83 +413,6 @@ var BigBrowserV2User = /** @class */ (function () {
 exports.BigBrowserV2User = BigBrowserV2User;
 var BigBrowserV2 = /** @class */ (function () {
     function BigBrowserV2() {
-        this.ranks = {
-            0: {
-                name: 'Chair à canon'
-            },
-            50: {
-                name: 'Galinette cendrée'
-            },
-            100: {
-                name: 'Rejeté'
-            },
-            150: {
-                name: 'Bouclier humain'
-            },
-            200: {
-                name: 'Noob'
-            },
-            250: {
-                name: 'Mauvaise herbe'
-            },
-            300: {
-                name: 'Jeune pousse écrasée'
-            },
-            350: {
-                name: 'Poussin KFC'
-            },
-            400: {
-                name: 'Pion du neant'
-            },
-            450: {
-                name: 'Vagabon'
-            },
-            500: {
-                name: 'Tenno'
-            },
-            550: {
-                name: 'Portier de Lua'
-            },
-            600: {
-                name: 'Apprenti samurai'
-            },
-            650: {
-                name: 'Samurai'
-            },
-            700: {
-                name: 'Rōnin'
-            },
-            750: {
-                name: 'Acharné'
-            },
-            800: {
-                name: 'Fanatique'
-            },
-            850: {
-                name: 'Dur à cuire'
-            },
-            900: {
-                name: 'Orokin apprenti'
-            },
-            950: {
-                name: 'Orokin'
-            },
-            1000: {
-                name: 'Orokin officier'
-            },
-            1050: {
-                name: 'Orokin general'
-            },
-            1100: {
-                name: 'Orokin etat major'
-            },
-            1150: {
-                name: 'Orokin marechal'
-            },
-            1200: {
-                name: 'Vaulted'
-            }
-        };
         this._xpMultiplier = 1;
         this.dayRangeDefault = [{
                 name: 'Semaine',
@@ -371,16 +426,6 @@ var BigBrowserV2 = /** @class */ (function () {
                 end: 23
             }];
         this._dayRange = this.dayRangeDefault;
-        var index = -1;
-        var lastRank = undefined;
-        for (var rankStart in this.ranks) {
-            var rank = this.ranks[rankStart];
-            rank.start = rankStart;
-            rank.index = ++index;
-            if (lastRank)
-                lastRank.end = rank.start;
-            lastRank = rank;
-        }
     }
     BigBrowserV2.prototype.getRosterRanks = function (guild, nbRoster, getLast) {
         if (nbRoster === void 0) { nbRoster = 10; }
@@ -393,8 +438,7 @@ var BigBrowserV2 = /** @class */ (function () {
             stats: statsMapper(user)
         }); })
             .filter(function (obj) { return obj.stats; })
-            .sort(function (a, b) { return b.stats.stats.lastVocalDate - a.stats.stats.lastVocalDate; })
-            .sort(function (a, b) { return b.stats.voiceXp - a.stats.voiceXp; })
+            .sort(function (a, b) { return b.stats.xp - a.stats.xp; })
             .slice(0, nbRoster); };
         var day = getLast ? function (user) { return user.rangedDayStats.last; } : function (user) { return user.rangedDayStats; };
         var week = getLast ? function (user) { return user.rangedWeekStats.last; } : function (user) { return user.rangedWeekStats; };
@@ -463,19 +507,26 @@ var BigBrowserV2 = /** @class */ (function () {
         }
         return server;
     };
-    BigBrowserV2.prototype.getUserVoiceExp = function (user) {
-        var score30minutes = user.stats.totalVoiceTimeMs / (1000 * 60 * 30);
+    /*
+    getUserVoiceExp(user: IBigBrowserV2User)
+    {
+        const score30minutes = user.stats.totalVoiceTimeMs / (1000 * 60 * 30);
         return score30minutes;
-    };
-    BigBrowserV2.prototype.getUserTextExp = function (user) {
-        var score500chars = user.stats.totalTextSize / 500;
+    }
+
+    getUserTextExp(user: IBigBrowserV2User)
+    {
+        const score500chars = user.stats.totalTextSize / 500;
         return score500chars;
-    };
-    BigBrowserV2.prototype.getUserExp = function (user) {
-        var voiceScore = this.getUserVoiceExp(user);
-        var textScore = this.getUserTextExp(user);
+    }
+
+    getUserExp(user: IBigBrowserV2User)
+    {
+        const voiceScore = this.getUserVoiceExp(user);
+        const textScore = this.getUserTextExp(user);
+
         return voiceScore + textScore;
-    };
+    }*/
     BigBrowserV2.prototype.getUserRanking = function (user, server) {
         var users = this.getSortedUsers(server).reverse();
         var len = users.length;
@@ -489,38 +540,6 @@ var BigBrowserV2 = /** @class */ (function () {
             total: len
         };
     };
-    BigBrowserV2.prototype.getUserRank = function (user, exp) {
-        if (exp === undefined)
-            exp = this.getUserExp(user);
-        var ranks = this.ranks;
-        var lastMatchingRank = ranks[0];
-        var nextRank = undefined;
-        for (var rankStart in ranks) {
-            var rank = ranks[rankStart];
-            if (exp >= rank.start) {
-                lastMatchingRank = rank;
-            }
-            else if (!nextRank) {
-                nextRank = rank;
-                break;
-            }
-        }
-        if (nextRank === lastMatchingRank)
-            nextRank = undefined;
-        var expFromCurrentToNextRank = nextRank ? nextRank.start - lastMatchingRank.start : 0;
-        var expLeftToNextRank = nextRank ? nextRank.start - exp : 0;
-        var expLeftToNextRankPercent = nextRank ? expLeftToNextRank / expFromCurrentToNextRank : 1;
-        return {
-            exp: exp,
-            currentRank: lastMatchingRank,
-            nextRank: nextRank,
-            expInCurrentRank: exp - lastMatchingRank.start,
-            expFromCurrentToNextRank: expFromCurrentToNextRank,
-            expLeftToNextRank: expLeftToNextRank,
-            expLeftToNextRankPercent: expLeftToNextRankPercent,
-            currentExpPercentToNextRank: 1 - expLeftToNextRankPercent
-        };
-    };
     BigBrowserV2.prototype.deleteUser = function (member) {
         var id = member.id;
         var server = this.getServer(member.guild);
@@ -531,6 +550,11 @@ var BigBrowserV2 = /** @class */ (function () {
     BigBrowserV2.prototype.deleteServer = function (guild) {
         var servers = this.getServers();
         delete servers[guild.id];
+    };
+    BigBrowserV2.prototype.getUserById = function (guild, userId) {
+        var server = this.getServer(guild);
+        var user = server.users[userId];
+        return user && new BigBrowserV2User(user);
     };
     BigBrowserV2.prototype.getUser = function (member) {
         var now = Date.now();
@@ -546,6 +570,7 @@ var BigBrowserV2 = /** @class */ (function () {
             };
             server.users[id] = user;
         }
+        var userInst = new BigBrowserV2User(user);
         user.lastUpdate = now;
         user.displayName = member.displayName;
         user.name = member.nickname;
@@ -554,30 +579,30 @@ var BigBrowserV2 = /** @class */ (function () {
         if (member.user && member.user.bot !== undefined)
             user.isBot = member.user.bot;
         if (!user.stats) {
-            user.stats = BigBrowserV2UserStats.create().stats;
+            user.stats = BigBrowserV2UserStats.create(userInst).stats;
         }
         if (!user.dayStats) {
             user.dayStats = {
                 date: 0,
-                data: BigBrowserV2UserStats.create().stats
+                data: BigBrowserV2UserStats.create(userInst).stats
             };
         }
         if (!user.weekStats) {
             user.weekStats = {
                 date: 0,
-                data: BigBrowserV2UserStats.create().stats
+                data: BigBrowserV2UserStats.create(userInst).stats
             };
         }
         if (!user.rangedDayStats) {
             user.rangedDayStats = {
                 date: 0,
-                data: BigBrowserV2UserStats.create().stats
+                data: BigBrowserV2UserStats.create(userInst).stats
             };
         }
         if (!user.rangedWeekStats) {
             user.rangedWeekStats = {
                 date: 0,
-                data: BigBrowserV2UserStats.create().stats
+                data: BigBrowserV2UserStats.create(userInst).stats
             };
         }
         if (!user.joinedTimestamp)
@@ -593,7 +618,7 @@ var BigBrowserV2 = /** @class */ (function () {
         zero('totalWarframeDiscordTimeMs');
         zero('totalWarframeDiscordTimeMsNot');
         zero('totalWarframeDiscordTimeMsUndefined');
-        return user;
+        return new BigBrowserV2User(user);
     };
     BigBrowserV2.prototype.save = function () {
         return {
@@ -677,8 +702,7 @@ var BigBrowserV2 = /** @class */ (function () {
             /*
             if(member.displayName !== 'Akamelia ♡')
                 return;*/
-            var userData = _this.getUser(member);
-            var user = new BigBrowserV2User(userData);
+            var user = _this.getUser(member);
             var isInWarframe = undefined;
             if (member.user.presence && member.user.presence.game && member.user.presence.game.name) {
                 isInWarframe = member.user.presence.game.name.toLowerCase() === 'warframe';
@@ -754,9 +778,9 @@ var BigBrowserV2 = /** @class */ (function () {
             if (user.rangedWeekStats.isObsolete) {
                 user.rangedWeekStats.finalize();
             }
-            updateStats(userData.stats);
-            updateStats(userData.dayStats.data);
-            updateStats(userData.rangedDayStats.data, _this.isInDayRange(now));
+            updateStats(user.stats.stats);
+            updateStats(user.dayStats.stats);
+            updateStats(user.rangedDayStats.stats, _this.isInDayRange(now));
         });
         onDone();
     };
@@ -774,39 +798,41 @@ var BigBrowserV2 = /** @class */ (function () {
             /*
             if(member.displayName !== 'Akamelia ♡')
                 return;*/
-            var user_1 = this.getUser(member);
+            var user = this.getUser(member);
             var now_1 = Date.now();
             var updateData = function (stats, updateData) {
                 if (updateData === void 0) { updateData = true; }
-                if (user_1.stats.lastTextContent !== content) {
+                if (stats.lastTextContent !== content) {
                     if (updateData) {
-                        ++user_1.stats.nbTextMessages;
-                        user_1.stats.totalTextSize += message.content.length;
+                        ++stats.nbTextMessages;
+                        stats.totalTextSize += message.content.length;
                     }
-                    user_1.stats.lastNotDuplicateTextDate = now_1;
+                    stats.lastNotDuplicateTextDate = now_1;
                 }
                 if (updateData) {
-                    user_1.stats.lastTextContent = content;
-                    ++user_1.stats.nbTextMessagesWithDuplicates;
-                    user_1.stats.totalTextSizeWithDuplicates += message.content.length;
+                    stats.lastTextContent = content;
+                    ++stats.nbTextMessagesWithDuplicates;
+                    stats.totalTextSizeWithDuplicates += message.content.length;
                 }
-                user_1.stats.lastTextDate = now_1;
+                stats.lastTextDate = now_1;
             };
-            updateData(user_1.stats);
-            updateData(user_1.dayStats.data);
-            updateData(user_1.rangedDayStats.data, this.isInDayRange(now_1));
+            updateData(user.stats.stats);
+            updateData(user.dayStats.stats);
+            updateData(user.rangedDayStats.stats, this.isInDayRange(now_1));
         }
     };
     BigBrowserV2.prototype.setTrackingUser = function (member, isTracking) {
         var user = this.getUser(member);
         if (isTracking) {
-            if (user && user.tracking === false)
+            if (user && user.tracking === false) {
                 this.deleteUser(member);
+            }
         }
         else {
             if (user) {
-                for (var propName in user)
+                for (var propName in user) {
                     delete user[propName];
+                }
                 user.tracking = false;
             }
         }
@@ -826,6 +852,7 @@ var BigBrowserV2 = /** @class */ (function () {
         }
     };
     BigBrowserV2.prototype.getServersText = function (servers, withBOM) {
+        if (withBOM === void 0) { withBOM = false; }
         var result = '';
         var isFirst = true;
         for (var _i = 0, servers_1 = servers; _i < servers_1.length; _i++) {
@@ -1049,7 +1076,6 @@ var BigBrowserV2 = /** @class */ (function () {
         return users;
     };
     BigBrowserV2.prototype.getSortedUsers = function (_server) {
-        var _this = this;
         if (_server.constructor && _server.constructor.name === 'Guild')
             _server = this.getServer(_server);
         var server = _server;
@@ -1057,9 +1083,10 @@ var BigBrowserV2 = /** @class */ (function () {
             .map(function (id) { return server.users[id]; })
             .filter(function (user) { return !user.removedDate; })
             .filter(function (user) { return user.tracking !== false; })
+            .map(function (user) { return new BigBrowserV2User(user); })
             .sort(function (u1, u2) {
-            var u1exp = _this.getUserExp(u1);
-            var u2exp = _this.getUserExp(u2);
+            var u1exp = u1.stats.xp;
+            var u2exp = u2.stats.xp;
             return u1exp > u2exp ? 1 : u1exp === u2exp ? 0 : -1;
         });
         return users;
@@ -1110,17 +1137,107 @@ var BigBrowserV2 = /** @class */ (function () {
                 text += formatter.bodyStart();
             for (var _i = 0, users_1 = users; _i < users_1.length; _i++) {
                 var user = users_1[_i];
-                var exp = this.getUserExp(user);
-                var rank = this.getUserRank(user, exp);
-                text += formatter.row(formatter.asString(user.displayName), formatter.asString(user.name), formatter.asBool(user.isBot), formatter.asFloat(exp), formatter.asString(rank.currentRank ? rank.currentRank.name : undefined), formatter.asString(rank.nextRank ? rank.nextRank.name : undefined), formatter.asPercent(rank.currentExpPercentToNextRank), formatter.asFloat(rank.expLeftToNextRank), formatter.asPercent(rank.expLeftToNextRankPercent), formatter.asFloat(this.getUserVoiceExp(user)), formatter.asInteger(user.stats.totalVoiceTimeMs), formatter.asDate(user.stats.lastVocalDate), formatter.asFloat(this.getUserTextExp(user)), formatter.asDate(user.stats.lastTextDate), formatter.asInteger(user.stats.nbTextMessages), formatter.asInteger(user.stats.totalTextSize), formatter.asInteger(user.stats.nbTextMessagesWithDuplicates), formatter.asInteger(user.stats.totalTextSizeWithDuplicates), !user.stats.lastWarframeDiscordDate && !user.stats.lastWarframeDiscordDateNot
+                var exp = user.stats.xp;
+                var rank = user.stats.rank;
+                text += formatter.row(formatter.asString(user.displayName), formatter.asString(user.name), formatter.asBool(user.isBot), formatter.asFloat(exp), formatter.asString(rank.currentRank ? rank.currentRank.name : undefined), formatter.asString(rank.nextRank ? rank.nextRank.name : undefined), formatter.asPercent(rank.currentExpPercentToNextRank), formatter.asFloat(rank.expLeftToNextRank), formatter.asPercent(rank.expLeftToNextRankPercent), formatter.asFloat(user.stats.voiceXp), formatter.asInteger(user.stats.stats.totalVoiceTimeMs), formatter.asDate(user.stats.stats.lastVocalDate), formatter.asFloat(user.stats.textXp), formatter.asDate(user.stats.stats.lastTextDate), formatter.asInteger(user.stats.stats.nbTextMessages), formatter.asInteger(user.stats.stats.totalTextSize), formatter.asInteger(user.stats.stats.nbTextMessagesWithDuplicates), formatter.asInteger(user.stats.stats.totalTextSizeWithDuplicates), !user.stats.stats.lastWarframeDiscordDate && !user.stats.stats.lastWarframeDiscordDateNot
                     ? formatter.asString('N/A')
-                    : formatter.asPercent(user.stats.totalWarframeDiscordTimeMs / (user.stats.totalWarframeDiscordTimeMs + user.stats.totalWarframeDiscordTimeMsNot + user.stats.totalWarframeDiscordTimeMsUndefined)), formatter.asInteger(user.stats.totalWarframeDiscordTimeMs), formatter.asDate(user.stats.lastWarframeDiscordDate), formatter.asInteger(user.stats.totalWarframeDiscordTimeMsNot), formatter.asDate(user.stats.lastWarframeDiscordDateNot), formatter.asInteger(user.stats.totalWarframeDiscordTimeMsUndefined), formatter.asDate(user.stats.lastWarframeDiscordDateUndefined), formatter.asDate(user.joinedTimestamp), formatter.asString((user.roles || []).join(' / ')), formatter.asBool(user.isWeird || false));
+                    : formatter.asPercent(user.stats.stats.totalWarframeDiscordTimeMs / (user.stats.stats.totalWarframeDiscordTimeMs + user.stats.stats.totalWarframeDiscordTimeMsNot + user.stats.stats.totalWarframeDiscordTimeMsUndefined)), formatter.asInteger(user.stats.stats.totalWarframeDiscordTimeMs), formatter.asDate(user.stats.stats.lastWarframeDiscordDate), formatter.asInteger(user.stats.stats.totalWarframeDiscordTimeMsNot), formatter.asDate(user.stats.stats.lastWarframeDiscordDateNot), formatter.asInteger(user.stats.stats.totalWarframeDiscordTimeMsUndefined), formatter.asDate(user.stats.stats.lastWarframeDiscordDateUndefined), formatter.asDate(user.joinedTimestamp), formatter.asString((user.roles || []).join(' / ')), formatter.asBool(user.isWeird || false));
             }
             if (formatter.bodyEnd)
                 text += formatter.bodyEnd();
         }
         return text.trimRight();
     };
+    BigBrowserV2.ranks = (function () {
+        var ranks = {
+            0: {
+                name: 'Chair à canon'
+            },
+            50: {
+                name: 'Galinette cendrée'
+            },
+            100: {
+                name: 'Rejeté'
+            },
+            150: {
+                name: 'Bouclier humain'
+            },
+            200: {
+                name: 'Noob'
+            },
+            250: {
+                name: 'Mauvaise herbe'
+            },
+            300: {
+                name: 'Jeune pousse écrasée'
+            },
+            350: {
+                name: 'Poussin KFC'
+            },
+            400: {
+                name: 'Pion du neant'
+            },
+            450: {
+                name: 'Vagabon'
+            },
+            500: {
+                name: 'Tenno'
+            },
+            550: {
+                name: 'Portier de Lua'
+            },
+            600: {
+                name: 'Apprenti samurai'
+            },
+            650: {
+                name: 'Samurai'
+            },
+            700: {
+                name: 'Rōnin'
+            },
+            750: {
+                name: 'Acharné'
+            },
+            800: {
+                name: 'Fanatique'
+            },
+            850: {
+                name: 'Dur à cuire'
+            },
+            900: {
+                name: 'Orokin apprenti'
+            },
+            950: {
+                name: 'Orokin'
+            },
+            1000: {
+                name: 'Orokin officier'
+            },
+            1050: {
+                name: 'Orokin general'
+            },
+            1100: {
+                name: 'Orokin etat major'
+            },
+            1150: {
+                name: 'Orokin marechal'
+            },
+            1200: {
+                name: 'Vaulted'
+            }
+        };
+        var index = -1;
+        var lastRank = undefined;
+        for (var rankStart in ranks) {
+            var rank = ranks[rankStart];
+            rank.start = rankStart;
+            rank.index = ++index;
+            if (lastRank)
+                lastRank.end = rank.start;
+            lastRank = rank;
+        }
+        return ranks;
+    })();
     return BigBrowserV2;
 }());
 exports.BigBrowserV2 = BigBrowserV2;

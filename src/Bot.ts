@@ -852,6 +852,18 @@ ${createStrLine(result.week)}\`\`\``);
                 message.delete();
                 message.reply(':small_blue_diamond: démarrage du stockage de ton expérience.');
 
+            } else if(checkForCommand(/^\s*!xpbonus\s+pop\s*$/img)) {
+
+                Bot.adminOnly(message, () => {
+                    const xpBonusScheduledEvent = this.xpBonusScheduledEvents.find(item => item.guild.id === message.guild.id);
+    
+                    if(xpBonusScheduledEvent) {
+                        xpBonusScheduledEvent.runtime({
+                            periodMs: 0
+                        });
+                    }
+                })
+
             } else if(checkForCommand(/^\s*!xpbonus\s+(enable|disable)\s*$/img)) {
 
                 Bot.adminOnly(message, () => {

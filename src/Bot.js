@@ -660,6 +660,16 @@ var Bot = /** @class */ (function () {
                 message.delete();
                 message.reply(':small_blue_diamond: démarrage du stockage de ton expérience.');
             }
+            else if (checkForCommand(/^\s*!xpbonus\s+pop\s*$/img)) {
+                Bot.adminOnly(message, function () {
+                    var xpBonusScheduledEvent = _this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
+                    if (xpBonusScheduledEvent) {
+                        xpBonusScheduledEvent.runtime({
+                            periodMs: 0
+                        });
+                    }
+                });
+            }
             else if (checkForCommand(/^\s*!xpbonus\s+(enable|disable)\s*$/img)) {
                 Bot.adminOnly(message, function () {
                     var action = params[1];

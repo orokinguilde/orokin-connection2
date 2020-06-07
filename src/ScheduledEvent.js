@@ -240,7 +240,7 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
                             m = _a[_i];
                             if (m.voiceChannelID) {
                                 user = this.bigBrowser.getUser(m);
-                                user.xpBonus += this.xpBonusOnPopUp;
+                                user.addXPBonus(this.xpBonusOnPopUp);
                             }
                         }
                         return [4 /*yield*/, channel.send(new discord_js_1.RichEmbed({
@@ -263,7 +263,7 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
                                 .map(function (id) { return _this.bigBrowser.getUserById(message_1.guild, id); });
                             for (var _d = 0, users_1 = users; _d < users_1.length; _d++) {
                                 var user = users_1[_d];
-                                user.xpBonus += _this.xpBonusOnReact;
+                                user.addXPBonus(_this.xpBonusOnReact);
                             }
                             message_1.delete();
                         }, this.messageTimeoutMs);

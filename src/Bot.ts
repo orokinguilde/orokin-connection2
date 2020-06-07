@@ -1,4 +1,4 @@
-import { BigBrowserV2 } from "./BigBrowserV2";
+import { BigBrowserV2, BigBrowserV2UserStats, BigBrowserV2User } from "./BigBrowserV2";
 import { Client, TextChannel, VoiceChannel } from "discord.js";
 import { XPBonusScheduledEvent } from "./ScheduledEvent";
 
@@ -721,8 +721,8 @@ export class Bot {
 
                 const result = this.bigBrowserV2.getRosterRanks(message.guild, nbRoster, !!getLast);
 
-                const createStrLine = (entries: any[]) => entries
-                    .map((u, i) => u.stats.xp <= 0 ? `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} -` : `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} ${Math.round(u.stats.xp * 100) / 100} :: ${u.user.userData.displayName}`)
+                const createStrLine = (entries: { stats: BigBrowserV2UserStats, user: BigBrowserV2User }[]) => entries
+                    .map((u, i) => u.stats.xp <= 0 ? `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} -` : `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} ${(Math.round(u.stats.xp * 100) / 100).toString().padStart(7, ' ')}${Math.round(u.stats.xpBonus * 100) / 100 > 0 ? ` BONNUS (${Math.round(u.stats.xpBonus * 100) / 100})` : ''} :: ${u.user.userData.displayName}`)
                     .reduce((p, c) => !p ? c : `${p}\n${c}`, '');
                 
                 message.delete();

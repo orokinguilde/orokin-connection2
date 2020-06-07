@@ -165,7 +165,7 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
             for(const m of this.guild.members.array()) {
                 if(m.voiceChannelID) {
                     const user = this.bigBrowser.getUser(m);
-                    user.xpBonus += this.xpBonusOnPopUp;
+                    user.addXPBonus(this.xpBonusOnPopUp);
                 }
             }
 
@@ -188,7 +188,7 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
                     .map(id => this.bigBrowser.getUserById(message.guild, id));
 
                 for(const user of users) {
-                    user.xpBonus += this.xpBonusOnReact;
+                    user.addXPBonus(this.xpBonusOnReact);
                 }
 
                 message.delete();

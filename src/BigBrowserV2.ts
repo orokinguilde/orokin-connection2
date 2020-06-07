@@ -99,6 +99,8 @@ export interface IBigBrowserV2UserStats {
     lastWarframeDiscordDateUndefined: number
     totalWarframeDiscordTimeMs: number
     lastWarframeDiscordDate: number
+
+    xpBonus?: number
 }
 
 export class BigBrowserV2UserStats {
@@ -132,7 +134,8 @@ export class BigBrowserV2UserStats {
             totalWarframeDiscordTimeMsUndefined: undefined,
             wasWarframeDiscordLastTick: undefined,
             wasWarframeDiscordLastTickNot: undefined,
-            wasWarframeDiscordLastTickUndefined: undefined
+            wasWarframeDiscordLastTickUndefined: undefined,
+            xpBonus: 0
         });
     }
 
@@ -158,10 +161,10 @@ export class BigBrowserV2UserStats {
     }
 
     public get xpBonus() {
-        return this.user.xpBonus || 0;
+        return this.stats.xpBonus || 0;
     }
     public set xpBonus(value) {
-        this.user.xpBonus = value;
+        this.stats.xpBonus = value;
     }
     
     public get xp() {
@@ -242,14 +245,15 @@ export class BigBrowserV2UserStats {
         stats.stats.totalWarframeDiscordTimeMs += this.stats.totalWarframeDiscordTimeMs;
         stats.stats.totalWarframeDiscordTimeMsNot += this.stats.totalWarframeDiscordTimeMsNot;
         stats.stats.totalWarframeDiscordTimeMsUndefined += this.stats.totalWarframeDiscordTimeMsUndefined;
+        stats.stats.xpBonus = (stats.stats.xpBonus ?? 0) + (this.stats.xpBonus ?? 0);
         stats.stats.wasVoicingLastTick = this.stats.wasVoicingLastTick;
         stats.stats.wasWarframeDiscordLastTick = this.stats.wasWarframeDiscordLastTick;
         stats.stats.wasWarframeDiscordLastTickNot = this.stats.wasWarframeDiscordLastTickNot;
         stats.stats.wasWarframeDiscordLastTickUndefined = this.stats.wasWarframeDiscordLastTickUndefined;
     }
 
-    public merge(...stats: BigBrowserV2UserStats[]) {
-        const result = this.clone();
+    public static merge(user: BigBrowserV2User, ...stats: BigBrowserV2UserStats[]) {
+        const result = BigBrowserV2UserStats.create(user);
 
         for(const item of stats) {
             item.injectInto(result);
@@ -357,11 +361,10 @@ export class BigBrowserV2User {
         this.userData.tracking = value;
     }
 
-    public get xpBonus() {
-        return this.userData.xpBonus || 0;
-    }
-    public set xpBonus(value) {
-        this.userData.xpBonus = value;
+    public addXPBonus(value: number) {
+        this.stats.xpBonus += value;
+        this.dayStats.xpBonus += value;
+        this.rangedDayStats.xpBonus += value;
     }
 
     public get displayName() {
@@ -432,7 +435,7 @@ export class BigBrowserV2 {
         
         return {
             day: extract(day),
-            week: extract(user => week(user).merge(day(user))),
+            week: extract(user => BigBrowserV2UserStats.merge(user, week(user), day(user))),
             global: extract(user => user.stats)
         }
     }

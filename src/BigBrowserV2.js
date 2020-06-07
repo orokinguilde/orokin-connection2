@@ -47,7 +47,8 @@ var BigBrowserV2UserStats = /** @class */ (function () {
             totalWarframeDiscordTimeMsUndefined: undefined,
             wasWarframeDiscordLastTick: undefined,
             wasWarframeDiscordLastTickNot: undefined,
-            wasWarframeDiscordLastTickUndefined: undefined
+            wasWarframeDiscordLastTickUndefined: undefined,
+            xpBonus: 0
         });
     };
     Object.defineProperty(BigBrowserV2UserStats.prototype, "stats", {
@@ -81,10 +82,10 @@ var BigBrowserV2UserStats = /** @class */ (function () {
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "xpBonus", {
         get: function () {
-            return this.user.xpBonus || 0;
+            return this.stats.xpBonus || 0;
         },
         set: function (value) {
-            this.user.xpBonus = value;
+            this.stats.xpBonus = value;
         },
         enumerable: false,
         configurable: true
@@ -147,6 +148,7 @@ var BigBrowserV2UserStats = /** @class */ (function () {
         this.stats.wasVoicingLastTick = false;
     };
     BigBrowserV2UserStats.prototype.injectInto = function (stats) {
+        var _a, _b;
         stats.stats.lastNotDuplicateTextDate = this.stats.lastNotDuplicateTextDate;
         stats.stats.lastTextContent = this.stats.lastTextContent;
         stats.stats.lastTextDate = this.stats.lastTextDate;
@@ -162,17 +164,18 @@ var BigBrowserV2UserStats = /** @class */ (function () {
         stats.stats.totalWarframeDiscordTimeMs += this.stats.totalWarframeDiscordTimeMs;
         stats.stats.totalWarframeDiscordTimeMsNot += this.stats.totalWarframeDiscordTimeMsNot;
         stats.stats.totalWarframeDiscordTimeMsUndefined += this.stats.totalWarframeDiscordTimeMsUndefined;
+        stats.stats.xpBonus = ((_a = stats.stats.xpBonus) !== null && _a !== void 0 ? _a : 0) + ((_b = this.stats.xpBonus) !== null && _b !== void 0 ? _b : 0);
         stats.stats.wasVoicingLastTick = this.stats.wasVoicingLastTick;
         stats.stats.wasWarframeDiscordLastTick = this.stats.wasWarframeDiscordLastTick;
         stats.stats.wasWarframeDiscordLastTickNot = this.stats.wasWarframeDiscordLastTickNot;
         stats.stats.wasWarframeDiscordLastTickUndefined = this.stats.wasWarframeDiscordLastTickUndefined;
     };
-    BigBrowserV2UserStats.prototype.merge = function () {
+    BigBrowserV2UserStats.merge = function (user) {
         var stats = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            stats[_i] = arguments[_i];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            stats[_i - 1] = arguments[_i];
         }
-        var result = this.clone();
+        var result = BigBrowserV2UserStats.create(user);
         for (var _a = 0, stats_1 = stats; _a < stats_1.length; _a++) {
             var item = stats_1[_a];
             item.injectInto(result);
@@ -321,16 +324,11 @@ var BigBrowserV2User = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(BigBrowserV2User.prototype, "xpBonus", {
-        get: function () {
-            return this.userData.xpBonus || 0;
-        },
-        set: function (value) {
-            this.userData.xpBonus = value;
-        },
-        enumerable: false,
-        configurable: true
-    });
+    BigBrowserV2User.prototype.addXPBonus = function (value) {
+        this.stats.xpBonus += value;
+        this.dayStats.xpBonus += value;
+        this.rangedDayStats.xpBonus += value;
+    };
     Object.defineProperty(BigBrowserV2User.prototype, "displayName", {
         get: function () {
             return this.userData.displayName;
@@ -444,7 +442,7 @@ var BigBrowserV2 = /** @class */ (function () {
         var week = getLast ? function (user) { return user.rangedWeekStats.last; } : function (user) { return user.rangedWeekStats; };
         return {
             day: extract(day),
-            week: extract(function (user) { return week(user).merge(day(user)); }),
+            week: extract(function (user) { return BigBrowserV2UserStats.merge(user, week(user), day(user)); }),
             global: extract(function (user) { return user.stats; })
         };
     };

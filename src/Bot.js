@@ -571,7 +571,7 @@ var Bot = /** @class */ (function () {
                 var nbRoster = nbRosterStr && parseInt(nbRosterStr);
                 var result = _this.bigBrowserV2.getRosterRanks(message.guild, nbRoster, !!getLast);
                 var createStrLine = function (entries) { return entries
-                    .map(function (u, i) { return u.stats.xp <= 0 ? (i + 1 + ".").padEnd(entries.length.toString().length + 1, ' ') + " -" : (i + 1 + ".").padEnd(entries.length.toString().length + 1, ' ') + " " + Math.round(u.stats.xp * 100) / 100 + " :: " + u.user.userData.displayName; })
+                    .map(function (u, i) { return u.stats.xp <= 0 ? (i + 1 + ".").padEnd(entries.length.toString().length + 1, ' ') + " -" : (i + 1 + ".").padEnd(entries.length.toString().length + 1, ' ') + " " + (Math.round(u.stats.xp * 100) / 100).toString().padStart(7, ' ') + (Math.round(u.stats.xpBonus * 100) / 100 > 0 ? " BONNUS (" + Math.round(u.stats.xpBonus * 100) / 100 + ")" : '') + " :: " + u.user.userData.displayName; })
                     .reduce(function (p, c) { return !p ? c : p + "\n" + c; }, ''); };
                 message.delete();
                 message.reply('\r\n' + ("```::: Jour :::\n" + createStrLine(result.day) + "\n\n::: Semaine :::\n" + createStrLine(result.week) + "```"));

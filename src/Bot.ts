@@ -10,6 +10,7 @@ const Discord = require('discord.js');
 const Message = require('./Message');
 const globals = require('./globals');
 const Banner = require('./Banner');
+const util = require('util');
 
 export class Bot {
     public constructor(options) {
@@ -32,6 +33,38 @@ export class Bot {
 
         if(!this.noAutoInitialization)
             this.initialize();
+
+        let lasts: any = {};
+        let totals: any = {};
+        setInterval(() => {
+            const objs = {
+                application: this.application,
+                bigBrowser: this.bigBrowser,
+                bigBrowserV2: this.bigBrowserV2,
+                mentoring: this.mentoring,
+                errorCounters: this.errorCounters,
+                stops: this.stops,
+                xpBonusScheduledEvents: this.xpBonusScheduledEvents,
+                saver: globals.saver,
+            }
+
+            console.log('************************************* MEM STAT **');
+            for(const name in objs) {
+                const obj = objs[name];
+                const str = util.inspect(obj, {
+                    depth: 5
+                });
+                const value = str.length;
+
+                if(lasts[name] !== undefined) {
+                    totals[name] = (totals[name] ?? 0) + (value - lasts[name]);
+                }
+
+                console.log(name + ':', value, lasts[name] !== undefined ? `(${lasts[name]} | ${value - lasts[name]})` : '', totals[name] !== undefined ? `(total: ${totals[name]})` : '');
+                lasts[name] = value;
+            }
+            console.log('*************************************************');
+        }, 5000);
     }
     
     public _onReady;
@@ -41,7 +74,11 @@ export class Bot {
     public bigBrowserV2: BigBrowserV2;
     public mentoring;
     public errorCounters;
-    public stops;
+    public stops: {
+        memberAdd: any,
+        memberRemove: any,
+        eidolonsWarning: any
+    };
     public noAutoInitialization;
     public client: Client;
     public debug = false;

@@ -12,8 +12,10 @@ var Discord = require('discord.js');
 var Message = require('./Message');
 var globals = require('./globals');
 var Banner = require('./Banner');
+var util = require('util');
 var Bot = /** @class */ (function () {
     function Bot(options) {
+        var _this = this;
         this.debug = false;
         this.xpBonusScheduledEvents = [];
         if (!options)
@@ -31,6 +33,35 @@ var Bot = /** @class */ (function () {
         };
         if (!this.noAutoInitialization)
             this.initialize();
+        var lasts = {};
+        var totals = {};
+        setInterval(function () {
+            var _a;
+            var objs = {
+                application: _this.application,
+                bigBrowser: _this.bigBrowser,
+                bigBrowserV2: _this.bigBrowserV2,
+                mentoring: _this.mentoring,
+                errorCounters: _this.errorCounters,
+                stops: _this.stops,
+                xpBonusScheduledEvents: _this.xpBonusScheduledEvents,
+                saver: globals.saver,
+            };
+            console.log('************************************* MEM STAT **');
+            for (var name_1 in objs) {
+                var obj = objs[name_1];
+                var str = util.inspect(obj, {
+                    depth: 5
+                });
+                var value = str.length;
+                if (lasts[name_1] !== undefined) {
+                    totals[name_1] = ((_a = totals[name_1]) !== null && _a !== void 0 ? _a : 0) + (value - lasts[name_1]);
+                }
+                console.log(name_1 + ':', value, lasts[name_1] !== undefined ? "(" + lasts[name_1] + " | " + (value - lasts[name_1]) + ")" : '', totals[name_1] !== undefined ? "(total: " + totals[name_1] + ")" : '');
+                lasts[name_1] = value;
+            }
+            console.log('*************************************************');
+        }, 5000);
     }
     Bot.prototype.save = function () {
         return {
@@ -394,12 +425,12 @@ var Bot = /** @class */ (function () {
                 message.channel.send(msg);
             }
             else if (checkForCommand(/^\s*!rank template (.+)$/img)) {
-                var name_1 = /^\s*!rank template (.+)$/img.exec(message.content)[1].trim().toLowerCase();
+                var name_2 = /^\s*!rank template (.+)$/img.exec(message.content)[1].trim().toLowerCase();
                 var user = _this.bigBrowserV2.getUser(message.member);
                 var template = undefined;
                 for (var _i = 0, _a = bannerTemplates.list; _i < _a.length; _i++) {
                     var templateItem = _a[_i];
-                    if (templateItem.key.toString().toLowerCase() == name_1) {
+                    if (templateItem.key.toString().toLowerCase() == name_2) {
                         template = templateItem;
                         break;
                     }
@@ -407,7 +438,7 @@ var Bot = /** @class */ (function () {
                 if (!template) {
                     for (var _b = 0, _c = bannerTemplates.list; _b < _c.length; _b++) {
                         var templateItem = _c[_b];
-                        if (templateItem.name.toString().toLowerCase().indexOf(name_1) > -1) {
+                        if (templateItem.name.toString().toLowerCase().indexOf(name_2) > -1) {
                             template = templateItem;
                             break;
                         }
@@ -416,18 +447,18 @@ var Bot = /** @class */ (function () {
                 if (!template) {
                     for (var _d = 0, _e = bannerTemplates.list; _d < _e.length; _d++) {
                         var templateItem = _e[_d];
-                        if ((templateItem.key + ". " + templateItem.name).toLowerCase().indexOf(name_1) > -1) {
+                        if ((templateItem.key + ". " + templateItem.name).toLowerCase().indexOf(name_2) > -1) {
                             template = templateItem;
                             break;
                         }
                     }
                 }
                 if (!template) {
-                    message.channel.send(message.member + ", le template \"" + name_1 + "\" n'a pas \u00E9t\u00E9 trouv\u00E9 \uD83D\uDE22");
+                    message.channel.send(message.member + ", le template \"" + name_2 + "\" n'a pas \u00E9t\u00E9 trouv\u00E9 \uD83D\uDE22");
                 }
                 else {
                     user.bannerTemplateKey = template.key;
-                    message.channel.send(message.member + ", le template \"" + name_1 + "\" t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
+                    message.channel.send(message.member + ", le template \"" + name_2 + "\" t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
                     message.delete();
                     globals.saver.save();
                 }

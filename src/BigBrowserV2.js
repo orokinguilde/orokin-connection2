@@ -16,19 +16,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BigBrowserV2 = exports.BigBrowserV2User = exports.BigBrowserV2UserStatsTimedWeek = exports.BigBrowserV2UserStatsTimedDay = exports.BigBrowserV2UserStatsTimed = exports.BigBrowserV2UserStats = void 0;
 var moment = require("moment-timezone");
 var BigBrowserV2UserStats = /** @class */ (function () {
-    function BigBrowserV2UserStats(user, stats) {
+    function BigBrowserV2UserStats(stats) {
         this._stats = stats;
-        this._user = user;
     }
-    Object.defineProperty(BigBrowserV2UserStats.prototype, "user", {
-        get: function () {
-            return this._user;
-        },
-        enumerable: false,
-        configurable: true
-    });
     BigBrowserV2UserStats.create = function (user) {
-        return new BigBrowserV2UserStats(user, {
+        return new BigBrowserV2UserStats({
             lvd: undefined,
             tvt: 0,
             ntm: 0,
@@ -373,15 +365,15 @@ var BigBrowserV2UserStats = /** @class */ (function () {
         return result;
     };
     BigBrowserV2UserStats.prototype.clone = function () {
-        return new BigBrowserV2UserStats(this.user, JSON.parse(JSON.stringify(this.stats)));
+        return new BigBrowserV2UserStats(JSON.parse(JSON.stringify(this.stats)));
     };
     return BigBrowserV2UserStats;
 }());
 exports.BigBrowserV2UserStats = BigBrowserV2UserStats;
 var BigBrowserV2UserStatsTimed = /** @class */ (function (_super) {
     __extends(BigBrowserV2UserStatsTimed, _super);
-    function BigBrowserV2UserStatsTimed(user, stats, timeDivider) {
-        var _this = _super.call(this, user, stats.data) || this;
+    function BigBrowserV2UserStatsTimed(stats, timeDivider) {
+        var _this = _super.call(this, stats.data) || this;
         _this._statsTimed = stats;
         _this._timeDivider = timeDivider;
         return _this;
@@ -409,7 +401,7 @@ var BigBrowserV2UserStatsTimed = /** @class */ (function (_super) {
                 return undefined;
             }
             else {
-                return new BigBrowserV2UserStats(this.user, this.statsTimed.last);
+                return new BigBrowserV2UserStats(this.statsTimed.last);
             }
         },
         enumerable: false,
@@ -444,16 +436,16 @@ var BigBrowserV2UserStatsTimed = /** @class */ (function (_super) {
 exports.BigBrowserV2UserStatsTimed = BigBrowserV2UserStatsTimed;
 var BigBrowserV2UserStatsTimedDay = /** @class */ (function (_super) {
     __extends(BigBrowserV2UserStatsTimedDay, _super);
-    function BigBrowserV2UserStatsTimedDay(user, stats) {
-        return _super.call(this, user, stats, function (date) { return date.day(); }) || this;
+    function BigBrowserV2UserStatsTimedDay(stats) {
+        return _super.call(this, stats, function (date) { return date.day(); }) || this;
     }
     return BigBrowserV2UserStatsTimedDay;
 }(BigBrowserV2UserStatsTimed));
 exports.BigBrowserV2UserStatsTimedDay = BigBrowserV2UserStatsTimedDay;
 var BigBrowserV2UserStatsTimedWeek = /** @class */ (function (_super) {
     __extends(BigBrowserV2UserStatsTimedWeek, _super);
-    function BigBrowserV2UserStatsTimedWeek(user, stats) {
-        return _super.call(this, user, stats, function (date) { return date.week(); }) || this;
+    function BigBrowserV2UserStatsTimedWeek(stats) {
+        return _super.call(this, stats, function (date) { return date.week(); }) || this;
     }
     return BigBrowserV2UserStatsTimedWeek;
 }(BigBrowserV2UserStatsTimed));
@@ -462,6 +454,20 @@ var BigBrowserV2User = /** @class */ (function () {
     function BigBrowserV2User(userData) {
         this._userData = userData;
     }
+    BigBrowserV2User.get = function (user) {
+        if (!user) {
+            return undefined;
+        }
+        if (user.constructor) {
+            return user;
+        }
+        if (user.__userInst) {
+            return user.__userInst;
+        }
+        var result = new BigBrowserV2User(user);
+        user.__userInst = result;
+        return result;
+    };
     Object.defineProperty(BigBrowserV2User.prototype, "userData", {
         get: function () {
             return this._userData;
@@ -471,35 +477,50 @@ var BigBrowserV2User = /** @class */ (function () {
     });
     Object.defineProperty(BigBrowserV2User.prototype, "stats", {
         get: function () {
-            return new BigBrowserV2UserStats(this, this.userData.stats);
+            if (!this._stats) {
+                this._stats = new BigBrowserV2UserStats(this.userData.stats);
+            }
+            return this._stats;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2User.prototype, "dayStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimedDay(this, this.userData.dayStats);
+            if (!this._dayStats) {
+                this._dayStats = new BigBrowserV2UserStatsTimedDay(this.userData.dayStats);
+            }
+            return this._dayStats;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2User.prototype, "weekStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimedWeek(this, this.userData.weekStats);
+            if (!this._weekStats) {
+                this._weekStats = new BigBrowserV2UserStatsTimedWeek(this.userData.weekStats);
+            }
+            return this._weekStats;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2User.prototype, "rangedDayStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimedDay(this, this.userData.rangedDayStats);
+            if (!this._rangedDayStats) {
+                this._rangedDayStats = new BigBrowserV2UserStatsTimedDay(this.userData.rangedDayStats);
+            }
+            return this._rangedDayStats;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2User.prototype, "rangedWeekStats", {
         get: function () {
-            return new BigBrowserV2UserStatsTimedWeek(this, this.userData.rangedWeekStats);
+            if (!this._rangedWeekStats) {
+                this._rangedWeekStats = new BigBrowserV2UserStatsTimedWeek(this.userData.rangedWeekStats);
+            }
+            return this._rangedWeekStats;
         },
         enumerable: false,
         configurable: true
@@ -595,6 +616,9 @@ var BigBrowserV2User = /** @class */ (function () {
             date: 0,
             data: BigBrowserV2UserStats.create(this).stats
         };
+    };
+    BigBrowserV2User.toJSON = function () {
+        return undefined;
     };
     return BigBrowserV2User;
 }());
@@ -742,7 +766,7 @@ var BigBrowserV2 = /** @class */ (function () {
     BigBrowserV2.prototype.getUserById = function (guild, userId) {
         var server = this.getServer(guild);
         var user = server.users[userId];
-        return user && new BigBrowserV2User(user);
+        return user && BigBrowserV2User.get(user);
     };
     BigBrowserV2.prototype.getUser = function (member) {
         var now = Date.now();
@@ -758,7 +782,7 @@ var BigBrowserV2 = /** @class */ (function () {
             };
             server.users[id] = user;
         }
-        var userInst = new BigBrowserV2User(user);
+        var userInst = BigBrowserV2User.get(user);
         user.lastUpdate = now;
         user.displayName = member.displayName;
         user.name = member.nickname;
@@ -806,7 +830,7 @@ var BigBrowserV2 = /** @class */ (function () {
         zero('totalWarframeDiscordTimeMs');
         zero('totalWarframeDiscordTimeMsNot');
         zero('totalWarframeDiscordTimeMsUndefined');
-        return new BigBrowserV2User(user);
+        return BigBrowserV2User.get(user);
     };
     BigBrowserV2.prototype.save = function () {
         return {
@@ -1082,7 +1106,7 @@ var BigBrowserV2 = /** @class */ (function () {
     BigBrowserV2.prototype.resetDayWeekStats = function (guild) {
         var server = this.getServer(guild);
         for (var userId in server.users) {
-            var user = new BigBrowserV2User(server.users[userId]);
+            var user = BigBrowserV2User.get(server.users[userId]);
             user.resetDayWeekStats();
         }
     };
@@ -1367,7 +1391,7 @@ var BigBrowserV2 = /** @class */ (function () {
             .map(function (id) { return server.users[id]; })
             .filter(function (user) { return !user.removedDate; })
             .filter(function (user) { return user.tracking !== false; })
-            .map(function (user) { return new BigBrowserV2User(user); });
+            .map(function (user) { return BigBrowserV2User.get(user); });
         return users;
     };
     BigBrowserV2.prototype.getSortedUsers = function (_server) {
@@ -1378,7 +1402,7 @@ var BigBrowserV2 = /** @class */ (function () {
             .map(function (id) { return server.users[id]; })
             .filter(function (user) { return !user.removedDate; })
             .filter(function (user) { return user.tracking !== false; })
-            .map(function (user) { return new BigBrowserV2User(user); })
+            .map(function (user) { return BigBrowserV2User.get(user); })
             .sort(function (u1, u2) {
             var u1exp = u1.stats.xp;
             var u2exp = u2.stats.xp;

@@ -81,7 +81,8 @@ var ScheduledEvent = /** @class */ (function () {
         }
         this.refreshPeriod();
         var periodMs = this.periodMs;
-        setTimeout(function () {
+        var tm = setTimeout(function () {
+            clearTimeout(tm);
             try {
                 if (_this.enabled) {
                     _this.runtime({
@@ -252,7 +253,7 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
     });
     XPBonusScheduledEvent.prototype.runtime = function (ctx) {
         return __awaiter(this, void 0, void 0, function () {
-            var channel, vocalUserIds_1, _i, _a, m, user, message_1;
+            var channel, vocalUserIds_1, _i, _a, m, user, message_1, tm_1;
             var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
@@ -276,7 +277,8 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
                     case 1:
                         message_1 = _b.sent();
                         this.emojis.forEach(function (emoji) { return message_1.react(emoji).catch(function () { }); });
-                        setTimeout(function () {
+                        tm_1 = setTimeout(function () {
+                            clearTimeout(tm_1);
                             for (var _i = 0, _a = _this.guild.members.array(); _i < _a.length; _i++) {
                                 var m = _a[_i];
                                 if (m.voiceChannelID) {

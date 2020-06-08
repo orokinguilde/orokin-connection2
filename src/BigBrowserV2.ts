@@ -104,18 +104,12 @@ export interface IBigBrowserV2UserStats {
 }
 
 export class BigBrowserV2UserStats {
-    public constructor(user: BigBrowserV2User, stats: IBigBrowserV2UserStats) {
+    public constructor(stats: IBigBrowserV2UserStats) {
         this._stats = stats;
-        this._user = user;
-    }
-
-    private _user: BigBrowserV2User;
-    public get user() {
-        return this._user;
     }
 
     public static create(user: BigBrowserV2User) {
-        return new BigBrowserV2UserStats(user, {
+        return new BigBrowserV2UserStats({
             lvd: undefined,
             tvt: 0,
             ntm: 0,
@@ -380,13 +374,13 @@ export class BigBrowserV2UserStats {
     }
 
     public clone() {
-        return new BigBrowserV2UserStats(this.user, JSON.parse(JSON.stringify(this.stats)));
+        return new BigBrowserV2UserStats(JSON.parse(JSON.stringify(this.stats)));
     }
 }
 
 export class BigBrowserV2UserStatsTimed extends BigBrowserV2UserStats {
-    public constructor(user: BigBrowserV2User, stats: IBigBrowserV2UserStatsTimed, timeDivider: (date: moment.Moment) => number) {
-        super(user, stats.data);
+    public constructor(stats: IBigBrowserV2UserStatsTimed, timeDivider: (date: moment.Moment) => number) {
+        super(stats.data);
 
         this._statsTimed = stats;
         this._timeDivider = timeDivider;
@@ -408,7 +402,7 @@ export class BigBrowserV2UserStatsTimed extends BigBrowserV2UserStats {
         if(!this.statsTimed.last) {
             return undefined;
         } else {
-            return new BigBrowserV2UserStats(this.user, this.statsTimed.last);
+            return new BigBrowserV2UserStats(this.statsTimed.last);
         }
     }
 
@@ -434,19 +428,37 @@ export class BigBrowserV2UserStatsTimed extends BigBrowserV2UserStats {
     }
 }
 export class BigBrowserV2UserStatsTimedDay extends BigBrowserV2UserStatsTimed {
-    public constructor(user: BigBrowserV2User, stats: IBigBrowserV2UserStatsTimed) {
-        super(user, stats, date => date.day());
+    public constructor(stats: IBigBrowserV2UserStatsTimed) {
+        super(stats, date => date.day());
     }
 }
 export class BigBrowserV2UserStatsTimedWeek extends BigBrowserV2UserStatsTimed {
-    public constructor(user: BigBrowserV2User, stats: IBigBrowserV2UserStatsTimed) {
-        super(user, stats, date => date.week());
+    public constructor(stats: IBigBrowserV2UserStatsTimed) {
+        super(stats, date => date.week());
     }
 }
 
 export class BigBrowserV2User {
-    public constructor(userData: IBigBrowserV2User) {
+    protected constructor(userData: IBigBrowserV2User) {
         this._userData = userData;
+    }
+
+    public static get(user: BigBrowserV2User | IBigBrowserV2User) {
+        if(!user) {
+            return undefined;
+        }
+
+        if(user.constructor) {
+            return user;
+        }
+
+        if((user as any).__userInst) {
+            return (user as any).__userInst;
+        }
+
+        const result = new BigBrowserV2User(user as IBigBrowserV2User);
+        (user as any).__userInst = result;
+        return result;
     }
 
     private _userData: IBigBrowserV2User
@@ -454,21 +466,47 @@ export class BigBrowserV2User {
         return this._userData;
     }
 
+    private _stats: BigBrowserV2UserStats;
     public get stats() {
-        return new BigBrowserV2UserStats(this, this.userData.stats);
-    }
-    public get dayStats() {
-        return new BigBrowserV2UserStatsTimedDay(this, this.userData.dayStats);
-    }
-    public get weekStats() {
-        return new BigBrowserV2UserStatsTimedWeek(this, this.userData.weekStats);
+        if(!this._stats) {
+            this._stats = new BigBrowserV2UserStats(this.userData.stats);
+        }
+
+        return this._stats;
     }
 
-    public get rangedDayStats() {
-        return new BigBrowserV2UserStatsTimedDay(this, this.userData.rangedDayStats);
+    private _dayStats: BigBrowserV2UserStatsTimedDay;
+    public get dayStats() {
+        if(!this._dayStats) {
+            this._dayStats = new BigBrowserV2UserStatsTimedDay(this.userData.dayStats);
+        }
+
+        return this._dayStats;
     }
+    private _weekStats: BigBrowserV2UserStatsTimedWeek;
+    public get weekStats() {
+        if(!this._weekStats) {
+            this._weekStats = new BigBrowserV2UserStatsTimedWeek(this.userData.weekStats);
+        }
+
+        return this._weekStats;
+    }
+
+    private _rangedDayStats: BigBrowserV2UserStatsTimedDay;
+    public get rangedDayStats() {
+        if(!this._rangedDayStats) {
+            this._rangedDayStats = new BigBrowserV2UserStatsTimedDay(this.userData.rangedDayStats);
+        }
+
+        return this._rangedDayStats;
+    }
+    private _rangedWeekStats: BigBrowserV2UserStatsTimedWeek;
     public get rangedWeekStats() {
-        return new BigBrowserV2UserStatsTimedWeek(this, this.userData.rangedWeekStats);
+        if(!this._rangedWeekStats) {
+            this._rangedWeekStats = new BigBrowserV2UserStatsTimedWeek(this.userData.rangedWeekStats);
+        }
+
+        return this._rangedWeekStats;
     }
 
     public get tracking() {
@@ -530,6 +568,10 @@ export class BigBrowserV2User {
             date: 0,
             data: BigBrowserV2UserStats.create(this).stats
         }
+    }
+
+    public static toJSON() {
+        return undefined;
     }
 }
 
@@ -793,7 +835,7 @@ export class BigBrowserV2 {
         const server = this.getServer(guild);
         const user = server.users[userId];
 
-        return user && new BigBrowserV2User(user);
+        return user && BigBrowserV2User.get(user);
     }
 
     getUser(member: GuildMember): BigBrowserV2User {
@@ -815,7 +857,7 @@ export class BigBrowserV2 {
             server.users[id] = user;
         }
 
-        const userInst = new BigBrowserV2User(user);
+        const userInst = BigBrowserV2User.get(user);
         
         user.lastUpdate = now;
         user.displayName = member.displayName;
@@ -874,7 +916,7 @@ export class BigBrowserV2 {
         zero('totalWarframeDiscordTimeMsNot');
         zero('totalWarframeDiscordTimeMsUndefined');
 
-        return new BigBrowserV2User(user);
+        return BigBrowserV2User.get(user);
     }
 
     save()
@@ -1199,7 +1241,7 @@ export class BigBrowserV2 {
         const server = this.getServer(guild);
 
         for(const userId in server.users) {
-            const user = new BigBrowserV2User(server.users[userId]);
+            const user = BigBrowserV2User.get(server.users[userId]);
             user.resetDayWeekStats();
         }
     }
@@ -1550,7 +1592,7 @@ export class BigBrowserV2 {
             .map(id => server.users[id])
             .filter(user => !user.removedDate)
             .filter(user => user.tracking !== false)
-            .map(user => new BigBrowserV2User(user));
+            .map(user => BigBrowserV2User.get(user));
 
         return users;
     }
@@ -1565,7 +1607,7 @@ export class BigBrowserV2 {
             .map(id => server.users[id])
             .filter(user => !user.removedDate)
             .filter(user => user.tracking !== false)
-            .map(user => new BigBrowserV2User(user))
+            .map(user => BigBrowserV2User.get(user))
             .sort((u1, u2) => {
                 const u1exp = u1.stats.xp;
                 const u2exp = u2.stats.xp;

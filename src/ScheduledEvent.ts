@@ -31,7 +31,9 @@ export abstract class ScheduledEvent {
         this.refreshPeriod();
         const periodMs = this.periodMs;
 
-        setTimeout(() => {
+        const tm = setTimeout(() => {
+            clearTimeout(tm);
+            
             try {
                 if(this.enabled) {
                     this.runtime({
@@ -195,7 +197,8 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
 
             this.emojis.forEach(emoji => message.react(emoji).catch(() => {}));
 
-            setTimeout(() => {
+            const tm = setTimeout(() => {
+                clearTimeout(tm);
 
                 for(const m of this.guild.members.array()) {
                     if(m.voiceChannelID) {

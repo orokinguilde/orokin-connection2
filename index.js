@@ -1,16 +1,12 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
 const fs = require('fs');
 
-moment.locale('fr');
-
-console.log(moment(new Date()).format('LT'));
-console.log(moment(new Date()).format('H:mm'));
-
+moment.locale('fr')
 
 process.env = fs.existsSync('./env.json') ? JSON.parse(fs.readFileSync('./env.json')) : process.env;
 
 const { initialize } = require('./src/globals');
-const Bot = require('./src/Bot');
+const { Bot } = require('./src/Bot');
 
 const bot = new Bot({
     token: process.env.TOKEN

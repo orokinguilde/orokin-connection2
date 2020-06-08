@@ -1072,8 +1072,6 @@ ${createStrLine(result.week)}\`\`\``);
                 this.application.start();
                 
                 setInterval(() => {
-                    const c = ++this.ct;
-                    console.log('>>>>>>>>>>>>>>>>>>>>>> b', c);
                     const voiceChannels = client.channels.filter(channel => channel.type === 'voice').array() as VoiceChannel[];
 
                     for(const voiceChannel of voiceChannels) {
@@ -1089,7 +1087,6 @@ ${createStrLine(result.week)}\`\`\``);
                             }
                         }
                     }
-                    console.log('<<<<<<<<<<<<<< b', c);
                 }, 500);
 
                 for(const guild of this.client.guilds.array()) {
@@ -1104,13 +1101,10 @@ ${createStrLine(result.week)}\`\`\``);
                     this.bigBrowserV2.initWithV1Data(this.bigBrowser.servers);*/
                 
                 setInterval(() => {
-                    const c = ++this.ct;
-                    console.log('>>>>>>>>>>>>>>>>>>>>>> a', c);
                     this.client.guilds.forEach((guild) => {
                         //if(guild.name === 'Orokin Guilde Académie')
                         this.bigBrowserV2.updateServer(guild);
                     })
-                    console.log('<<<<<<<<<<<<<< a', c);
                 }, 1000)
             }
 
@@ -1120,7 +1114,6 @@ ${createStrLine(result.week)}\`\`\``);
                 startRuntime();
         })
     }
-    protected ct = 0;
 
     public onReady(fn) {
         this._onReady = fn;

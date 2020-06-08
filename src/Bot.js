@@ -18,7 +18,6 @@ var Bot = /** @class */ (function () {
         var _this = this;
         this.debug = false;
         this.xpBonusScheduledEvents = [];
-        this.ct = 0;
         if (!options)
             options = {};
         this.options = options;
@@ -837,8 +836,6 @@ var Bot = /** @class */ (function () {
             var startRuntime = function () {
                 _this.application.start();
                 setInterval(function () {
-                    var c = ++_this.ct;
-                    console.log('>>>>>>>>>>>>>>>>>>>>>> b', c);
                     var voiceChannels = client.channels.filter(function (channel) { return channel.type === 'voice'; }).array();
                     for (var _i = 0, voiceChannels_1 = voiceChannels; _i < voiceChannels_1.length; _i++) {
                         var voiceChannel = voiceChannels_1[_i];
@@ -854,7 +851,6 @@ var Bot = /** @class */ (function () {
                             }
                         }
                     }
-                    console.log('<<<<<<<<<<<<<< b', c);
                 }, 500);
                 var _loop_1 = function (guild) {
                     if (!_this.xpBonusScheduledEvents.some(function (item) { return item.guild.id === guild.id; })) {
@@ -869,13 +865,10 @@ var Bot = /** @class */ (function () {
                 /*if(this.bigBrowser.servers && Object.keys(this.bigBrowser.servers).length > 0)
                     this.bigBrowserV2.initWithV1Data(this.bigBrowser.servers);*/
                 setInterval(function () {
-                    var c = ++_this.ct;
-                    console.log('>>>>>>>>>>>>>>>>>>>>>> a', c);
                     _this.client.guilds.forEach(function (guild) {
                         //if(guild.name === 'Orokin Guilde Académie')
                         _this.bigBrowserV2.updateServer(guild);
                     });
-                    console.log('<<<<<<<<<<<<<< a', c);
                 }, 1000);
             };
             if (_this._onReady)

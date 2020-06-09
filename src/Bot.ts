@@ -46,13 +46,14 @@ export class Bot {
                 stops: this.stops,
                 xpBonusScheduledEvents: this.xpBonusScheduledEvents,
                 saver: globals.saver,
+                client: this.client
             }
 
             console.log('************************************* MEM STAT **');
             for(const name in objs) {
                 const obj = objs[name];
                 const str = util.inspect(obj, {
-                    depth: 5
+                    depth: name === 'client' ? 4 : 5
                 });
                 const value = str.length;
 

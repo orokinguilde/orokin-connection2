@@ -46,12 +46,13 @@ var Bot = /** @class */ (function () {
                 stops: _this.stops,
                 xpBonusScheduledEvents: _this.xpBonusScheduledEvents,
                 saver: globals.saver,
+                client: _this.client
             };
             console.log('************************************* MEM STAT **');
             for (var name_1 in objs) {
                 var obj = objs[name_1];
                 var str = util.inspect(obj, {
-                    depth: 5
+                    depth: name_1 === 'client' ? 4 : 5
                 });
                 var value = str.length;
                 if (lasts[name_1] !== undefined) {

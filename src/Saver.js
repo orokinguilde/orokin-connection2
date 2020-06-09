@@ -9,6 +9,12 @@ function Saver(fileId, object)
     //this.executionPool = new ExecutionPool();
     this.pendingSave = [];
 }
+Saver.prototype.toJSON = function() {
+    return {
+        file: this.file,
+        pendingSave: this.pendingSave
+    }
+}
 Saver.prototype.startAutosave = function() {
     this.forceSave(() => {
         setTimeout(() => this.startAutosave(), 3000);

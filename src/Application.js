@@ -18,6 +18,15 @@ function Application(bot, options)
     this.servers = [];
     this.bot = bot;
 }
+Application.prototype.toJSON = function() {
+    return {
+        options: this.options,
+        currentTwitchIndex: this.currentTwitchIndex,
+        twitches: this.twitches,
+        eidelon: this.eidelon,
+        servers: this.servers
+    }
+}
 Application.prototype.save = function() {
     return {
         servers: this.servers.map(server => server.save()),

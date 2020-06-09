@@ -458,7 +458,7 @@ var BigBrowserV2User = /** @class */ (function () {
         if (!user) {
             return undefined;
         }
-        if (user.constructor) {
+        if (user instanceof BigBrowserV2User) {
             return user;
         }
         if (user.__userInst) {
@@ -617,7 +617,7 @@ var BigBrowserV2User = /** @class */ (function () {
             data: BigBrowserV2UserStats.create(this).stats
         };
     };
-    BigBrowserV2User.toJSON = function () {
+    BigBrowserV2User.prototype.toJSON = function () {
         return undefined;
     };
     return BigBrowserV2User;
@@ -915,6 +915,7 @@ var BigBrowserV2 = /** @class */ (function () {
                 delete user.v1;
                 delete user.__debug;
                 delete user.___debug;
+                delete user.__userInst;
                 var clean = function (obj) {
                     if (!obj) {
                         return;

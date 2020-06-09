@@ -45,6 +45,7 @@ export interface IBigBrowserV2UserV1 {
     oldUser?: string
 }
 export interface IBigBrowserV2User {
+    __userInst?: BigBrowserV2User
     
     displayName: string
     name: string
@@ -443,21 +444,21 @@ export class BigBrowserV2User {
         this._userData = userData;
     }
 
-    public static get(user: BigBrowserV2User | IBigBrowserV2User) {
+    public static get(user: BigBrowserV2User | IBigBrowserV2User): BigBrowserV2User {
         if(!user) {
             return undefined;
         }
 
-        if(user.constructor) {
+        if(user instanceof BigBrowserV2User) {
             return user;
         }
 
-        if((user as any).__userInst) {
-            return (user as any).__userInst;
+        if(user.__userInst) {
+            return user.__userInst;
         }
 
-        const result = new BigBrowserV2User(user as IBigBrowserV2User);
-        (user as any).__userInst = result;
+        const result = new BigBrowserV2User(user);
+        user.__userInst = result;
         return result;
     }
 
@@ -570,7 +571,7 @@ export class BigBrowserV2User {
         }
     }
 
-    public static toJSON() {
+    public toJSON() {
         return undefined;
     }
 }
@@ -919,8 +920,7 @@ export class BigBrowserV2 {
         return BigBrowserV2User.get(user);
     }
 
-    save()
-    {
+    save() {
         return {
             servers: this.getServers(),
             xpMultiplier: this.xpMultiplier,
@@ -1014,6 +1014,7 @@ export class BigBrowserV2 {
                 delete (user as any).v1;
                 delete (user as any).__debug;
                 delete (user as any).___debug;
+                delete user.__userInst;
 
                 const clean = (obj) => {
                     if(!obj) {

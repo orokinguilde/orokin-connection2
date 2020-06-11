@@ -17,7 +17,7 @@ var getPeriod = function() {
 
 module.exports = {
     initialize: function(bot) {
-        const saver = new Saver(process.env.STORAGE_FILE_ID, bot);
+        const saver = new Saver(process.env.STORAGE_FILE_ID, bot, process.env.STORAGE_FILE_ID_FALLBACK);
         bot.saver = saver;
         bot.onReady((callback) => {
             saver.load(callback);

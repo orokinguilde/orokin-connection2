@@ -2,9 +2,10 @@ const ExecutionPool = require('./ExecutionPool');
 const StorageFile = require('./StorageFile');
 const moment = require('moment');
 
-function Saver(fileId, object)
+function Saver(fileId, object, fileIdFallback)
 {
     this.file = new StorageFile(fileId);
+    this.fileFallback = fileIdFallback && new StorageFile(fileIdFallback);
     this.object = object;
     //this.executionPool = new ExecutionPool();
     this.pendingSave = [];
@@ -64,7 +65,7 @@ Saver.prototype.save = function(callback) {
 }
 Saver.prototype.load = function(callback)
 {
-    this.file.getContent((e, content) => {
+    const load = (e, content) => {
         let dataLoaded = false;
 
         if(!e && content) {
@@ -99,6 +100,14 @@ Saver.prototype.load = function(callback)
         }
 
         setTimeout(() => this.startAutosave(), 1000);
+    }
+
+    this.file.getContent((e, content) => {
+        if(e && this.fileFallback) {
+            this.fileFallback.getContent((e, content) => load(e, content));
+        } else {
+            load(undefined, content);
+        }
     })
 }
 

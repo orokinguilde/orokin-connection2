@@ -1,7 +1,6 @@
 const Discord = require('discord.js');
 const Message = require('./Message');
 const globals = require('./globals');
-const { IBot } = require('./Bot');
 const moment = require('moment-timezone');
 
 function Server(application, eidelon)
@@ -25,6 +24,7 @@ Server.prototype.load = function(obj, ctx) {
     {
         this.warnForEidolonsTimeout = obj.warnForEidolonsTimeout;
         
+        const { IBot } = require('./Bot');
         const channelGeneral = IBot.findGeneralChannel(this.messageManager.getGuild().channels);
         channelGeneral.fetchMessage(obj.warnForEidolonsMessage).then((msg) => {
             if(msg)
@@ -64,6 +64,7 @@ Server.prototype.warnForEidolons = function(info, force) {
     {
         this.expirationDate = info.expirationDate;
 
+        const { IBot } = require('./Bot');
         const channelGeneral = IBot.findGeneralChannel(this.messageManager.getGuild().channels);
         
         if(channelGeneral)

@@ -20,6 +20,16 @@ var IBot = /** @class */ (function () {
     IBot.prototype.start = function (token) {
         if (token === void 0) { token = this.options.token; }
         this.client.login(token);
+        setInterval(function () {
+            if (global.gc) {
+                console.log('Start GC');
+                global.gc();
+                console.log('GC executed');
+            }
+            else {
+                console.log('GC not available for manual triggering');
+            }
+        });
     };
     IBot.findGeneralChannel = function (channels) {
         var channelNames = [

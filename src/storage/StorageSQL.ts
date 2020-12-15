@@ -7,6 +7,8 @@ export class StorageSQL implements IStorage {
     }
 
     public name: string;
+    public defaultNbRetries = 10;
+    public defaultRetryTimeout = 1000;
 
     protected connect() {
         const connection = mysql.createConnection({
@@ -36,12 +38,16 @@ export class StorageSQL implements IStorage {
         connection.end();
     }
 
-    public getContent(callback: (e: any, content?: string) => void) {
+    public getContent(callback: (e: any, content?: string) => void, nbTries = this.defaultNbRetries, retryTimeout = this.defaultRetryTimeout) {
         const connection = this.connect();
         
         connection.query(`SELECT json FROM json_data WHERE name = ?`, [ this.name ], (error, results, fields) => {
             if(error || !results || !results[0]) {
-                callback(error || new Error('Cannot read Database'));
+                if(nbTries > 0) {
+                    setTimeout(() => this.getContent(callback, nbTries - 1), retryTimeout);
+                } else {
+                    callback(error || new Error('Cannot read Database'));
+                }
             } else {
                 const json = results[0].json;
                 

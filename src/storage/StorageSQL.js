@@ -4,6 +4,8 @@ exports.StorageSQL = void 0;
 var mysql = require("mysql");
 var StorageSQL = /** @class */ (function () {
     function StorageSQL(name) {
+        this.defaultNbRetries = 10;
+        this.defaultRetryTimeout = 1000;
         this.name = name;
     }
     StorageSQL.prototype.connect = function () {
@@ -29,11 +31,19 @@ var StorageSQL = /** @class */ (function () {
         });
         connection.end();
     };
-    StorageSQL.prototype.getContent = function (callback) {
+    StorageSQL.prototype.getContent = function (callback, nbTries, retryTimeout) {
+        var _this = this;
+        if (nbTries === void 0) { nbTries = this.defaultNbRetries; }
+        if (retryTimeout === void 0) { retryTimeout = this.defaultRetryTimeout; }
         var connection = this.connect();
         connection.query("SELECT json FROM json_data WHERE name = ?", [this.name], function (error, results, fields) {
             if (error || !results || !results[0]) {
-                callback(error || new Error('Cannot read Database'));
+                if (nbTries > 0) {
+                    setTimeout(function () { return _this.getContent(callback, nbTries - 1); }, retryTimeout);
+                }
+                else {
+                    callback(error || new Error('Cannot read Database'));
+                }
             }
             else {
                 var json = results[0].json;

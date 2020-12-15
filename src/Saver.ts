@@ -18,6 +18,8 @@ export class Saver {
     protected pendingSave: any[] = [];
     protected lastData: any;
 
+    protected dataCreationDate: number = Date.now();
+
     public toJSON = function() {
         return {
             file: this.file,
@@ -27,7 +29,7 @@ export class Saver {
     
     public startAutosave() {
         this.forceSave(() => {
-            setTimeout(() => this.startAutosave(), 3000);
+            setTimeout(() => this.startAutosave(), 10000);
         });
     }
     public saveIfChanged(callback) {
@@ -47,7 +49,8 @@ export class Saver {
         const obj = this.object.save();
         obj.___save = {
             dateStr: moment().format(),
-            date: Date.now()
+            date: Date.now(),
+            dataCreationDate: this.dataCreationDate
         }
 
         const data = JSON.stringify(obj);
@@ -79,6 +82,7 @@ export class Saver {
                         }
                         console.log(`**************`);
 
+                        this.dataCreationDate = data.___save?.dataCreationDate || this.dataCreationDate;
                         this.object.load(data);
                         dataLoaded = true;
                     }

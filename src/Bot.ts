@@ -31,6 +31,7 @@ export abstract class IBot {
     public start(token: string = this.options.token) {
         this.client.login(token);
 
+        /*
         setInterval(() => {
             if(global.gc) {
                 console.log('Start GC');
@@ -39,7 +40,7 @@ export abstract class IBot {
             } else {
                 console.log('GC not available for manual triggering');
             }
-        }, 1000 * 60);
+        }, 1000 * 60);*/
     }
 
     public static findGeneralChannel(channels: Collection<string, GuildChannel>): TextChannel {

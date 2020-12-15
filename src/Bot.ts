@@ -39,7 +39,7 @@ export abstract class IBot {
             } else {
                 console.log('GC not available for manual triggering');
             }
-        })
+        }, 1000 * 60);
     }
 
     public static findGeneralChannel(channels: Collection<string, GuildChannel>): TextChannel {

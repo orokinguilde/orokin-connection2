@@ -29,7 +29,7 @@ var IBot = /** @class */ (function () {
             else {
                 console.log('GC not available for manual triggering');
             }
-        });
+        }, 1000 * 60);
     };
     IBot.findGeneralChannel = function (channels) {
         var channelNames = [

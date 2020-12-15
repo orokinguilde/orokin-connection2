@@ -1,16 +1,4 @@
-import { BigBrowserV2, BigBrowserV2UserStats, BigBrowserV2User } from "./BigBrowserV2";
-import { Client, TextChannel, VoiceChannel, GuildChannel, Collection, Message } from "discord.js";
-import { XPBonusScheduledEvent } from "./ScheduledEvent";
-
-const bannerTemplates = require('./BannerTemplate');
-const Application = require('./Application');
-const BigBrowser = require('./BigBrowser');
-const Mentoring = require('./Mentoring');
-const Discord = require('discord.js');
-const MessageThis = require('./Message');
-const globals = require('./globals');
-const Banner = require('./Banner');
-const util = require('util');
+import { Client, TextChannel, GuildChannel, Collection, Message } from "discord.js";
 
 export abstract class IBot {
     public constructor(options) {

@@ -1,5 +1,5 @@
 const moment = require('moment-timezone');
-const Saver = require('./Saver');
+const Saver = require('./Saver').Saver;
 
 moment.locale('fr');
 

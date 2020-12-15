@@ -1231,7 +1231,6 @@ export class BigBrowserV2 {
 
             updateStats(user.stats);
             updateStats(user.dayStats);
-            
             updateStats(user.rangedDayStats, this.isInDayRange(now));
         })
 

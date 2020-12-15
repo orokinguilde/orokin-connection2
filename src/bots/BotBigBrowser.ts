@@ -1,13 +1,10 @@
 import { BigBrowserV2, BigBrowserV2UserStats, BigBrowserV2User } from "../BigBrowserV2";
-import { Client, TextChannel, VoiceChannel, Message, RichEmbed, Attachment } from "discord.js";
+import { TextChannel, VoiceChannel, Message, Attachment } from "discord.js";
 import { XPBonusScheduledEvent } from "../ScheduledEvent";
 import { IBot } from "../Bot";
 
 const bannerTemplates = require('../BannerTemplate');
-const Application = require('../Application');
 const BigBrowser = require('../BigBrowser');
-const Mentoring = require('../Mentoring');
-const MessageThis = require('../Message');
 const globals = require('../globals');
 const Banner = require('../Banner');
 

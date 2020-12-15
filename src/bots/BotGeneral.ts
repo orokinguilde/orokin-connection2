@@ -1,15 +1,10 @@
-import { BigBrowserV2, BigBrowserV2UserStats, BigBrowserV2User } from "../BigBrowserV2";
-import { Client, TextChannel, VoiceChannel, Message, RichEmbed, Attachment } from "discord.js";
-import { XPBonusScheduledEvent } from "../ScheduledEvent";
+import { TextChannel, Message, RichEmbed, Attachment } from "discord.js";
 import { IBot } from "../Bot";
 
-const bannerTemplates = require('../BannerTemplate');
 const Application = require('../Application');
-const BigBrowser = require('../BigBrowser');
 const Mentoring = require('../Mentoring');
 const MessageThis = require('../Message');
 const globals = require('../globals');
-const Banner = require('../Banner');
 
 export class BotGeneral extends IBot {
     public constructor(options) {
@@ -44,8 +39,13 @@ export class BotGeneral extends IBot {
     }
 
     public _load(obj, ctx) {
-        this.application.load(obj.application, ctx);
-        this.stops = obj.stops;
+        if(obj.application) {
+            this.application.load(obj.application, ctx);
+        }
+
+        if(obj.stops) {
+            this.stops = obj.stops;
+        }
 
         if(obj.mentoring) {
             this.mentoring.load(obj.mentoring, ctx);

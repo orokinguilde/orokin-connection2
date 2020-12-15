@@ -16,13 +16,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BotGeneral = void 0;
 var discord_js_1 = require("discord.js");
 var Bot_1 = require("../Bot");
-var bannerTemplates = require('../BannerTemplate');
 var Application = require('../Application');
-var BigBrowser = require('../BigBrowser');
 var Mentoring = require('../Mentoring');
 var MessageThis = require('../Message');
 var globals = require('../globals');
-var Banner = require('../Banner');
 var BotGeneral = /** @class */ (function (_super) {
     __extends(BotGeneral, _super);
     function BotGeneral(options) {
@@ -45,8 +42,12 @@ var BotGeneral = /** @class */ (function (_super) {
         };
     };
     BotGeneral.prototype._load = function (obj, ctx) {
-        this.application.load(obj.application, ctx);
-        this.stops = obj.stops;
+        if (obj.application) {
+            this.application.load(obj.application, ctx);
+        }
+        if (obj.stops) {
+            this.stops = obj.stops;
+        }
         if (obj.mentoring) {
             this.mentoring.load(obj.mentoring, ctx);
         }

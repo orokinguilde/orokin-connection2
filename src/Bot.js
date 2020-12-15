@@ -2,15 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IBot = void 0;
 var discord_js_1 = require("discord.js");
-var bannerTemplates = require('./BannerTemplate');
-var Application = require('./Application');
-var BigBrowser = require('./BigBrowser');
-var Mentoring = require('./Mentoring');
-var Discord = require('discord.js');
-var MessageThis = require('./Message');
-var globals = require('./globals');
-var Banner = require('./Banner');
-var util = require('util');
 var IBot = /** @class */ (function () {
     function IBot(options) {
         this.debug = false;

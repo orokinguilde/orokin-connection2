@@ -18,7 +18,7 @@ export class Saver {
     protected pendingSave: any[] = [];
     protected lastData: any;
 
-    protected dataCreationDate: number = Date.now();
+    public dataCreationDate: number = Date.now();
 
     public toJSON = function() {
         return {

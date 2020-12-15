@@ -1,5 +1,6 @@
 import { TextChannel, Message, RichEmbed, Attachment } from "discord.js";
 import { IBot } from "../Bot";
+import * as moment from 'moment-timezone'
 
 const Application = require('../Application');
 const Mentoring = require('../Mentoring');
@@ -362,6 +363,11 @@ export class BotGeneral extends IBot {
 
             message.channel.send(`**${success}** chaine(s) de recrutement réussie(s) / **${unsuccess + success}** chaine(s) au total (**${unsuccess}** en attente)\r\n**${Math.round(success / (unsuccess + success) * 10000) / 100}%** de réussite`);
 
+        }
+        else if(checkForCommand(/^\s*!dbinfo\s*$/img))
+        {
+            const time = (this as any).saver.dataCreationDate;
+            message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
         }
         else if(checkForCommand(/^\s*!nonotif\s+memberadd\s*$/img))
         {

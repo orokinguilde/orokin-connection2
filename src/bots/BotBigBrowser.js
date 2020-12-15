@@ -18,6 +18,7 @@ var BigBrowserV2_1 = require("../BigBrowserV2");
 var discord_js_1 = require("discord.js");
 var ScheduledEvent_1 = require("../ScheduledEvent");
 var Bot_1 = require("../Bot");
+var moment = require("moment-timezone");
 var bannerTemplates = require('../BannerTemplate');
 var BigBrowser = require('../BigBrowser');
 var globals = require('../globals');
@@ -234,6 +235,10 @@ var BotBigBrowser = /** @class */ (function (_super) {
                 .reduce(function (p, c) { return !p ? c : p + "\n" + c; }, ''); };
             message.delete();
             message.reply('\r\n' + ("```::: Jour :::\n" + createStrLine(result.day) + "\n\n::: Semaine :::\n" + createStrLine(result.week) + "```"));
+        }
+        else if (checkForCommand(/^\s*!dbinfo\s*$/img)) {
+            var time = this.saver.dataCreationDate;
+            message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
         }
         else if (checkForCommand(/^\s*!server\s+xp\s*$/img)) {
             console.log('SERVER STATS');

@@ -7,8 +7,8 @@ export class StorageSQL implements IStorage {
     }
 
     public name: string;
-    public defaultNbRetries = 10;
-    public defaultRetryTimeout = 1000;
+    public defaultNbRetries = 10000;
+    public defaultRetryTimeout = 5000;
 
     protected connect() {
         const connection = mysql.createConnection({
@@ -44,6 +44,7 @@ export class StorageSQL implements IStorage {
         connection.query(`SELECT json FROM json_data WHERE name = ?`, [ this.name ], (error, results, fields) => {
             if(error || !results || !results[0]) {
                 if(nbTries > 0) {
+                    console.log('Cannot read Database => retry left:', nbTries);
                     setTimeout(() => this.getContent(callback, nbTries - 1), retryTimeout);
                 } else {
                     callback(error || new Error('Cannot read Database'));

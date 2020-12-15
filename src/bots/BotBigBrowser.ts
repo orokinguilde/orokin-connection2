@@ -2,6 +2,7 @@ import { BigBrowserV2, BigBrowserV2UserStats, BigBrowserV2User } from "../BigBro
 import { TextChannel, VoiceChannel, Message, Attachment } from "discord.js";
 import { XPBonusScheduledEvent } from "../ScheduledEvent";
 import { IBot } from "../Bot";
+import * as moment from 'moment-timezone'
 
 const bannerTemplates = require('../BannerTemplate');
 const BigBrowser = require('../BigBrowser');
@@ -254,6 +255,11 @@ ${createStrLine(result.day)}
 
 ::: Semaine :::
 ${createStrLine(result.week)}\`\`\``);
+        }
+        else if(checkForCommand(/^\s*!dbinfo\s*$/img))
+        {
+            const time = (this as any).saver.dataCreationDate;
+            message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
         }
         else if(checkForCommand(/^\s*!server\s+xp\s*$/img))
         {

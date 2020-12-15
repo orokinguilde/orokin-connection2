@@ -366,8 +366,10 @@ export class BotGeneral extends IBot {
         }
         else if(checkForCommand(/^\s*!dbinfo\s*$/img))
         {
-            const time = (this as any).saver.dataCreationDate;
-            message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
+            BotGeneral.adminOnly(message, () => {
+                const time = (this as any).saver.dataCreationDate;
+                message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
+            })
         }
         else if(checkForCommand(/^\s*!nonotif\s+memberadd\s*$/img))
         {

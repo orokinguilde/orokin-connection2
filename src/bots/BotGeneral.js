@@ -279,8 +279,10 @@ var BotGeneral = /** @class */ (function (_super) {
             message.channel.send("**" + success + "** chaine(s) de recrutement r\u00E9ussie(s) / **" + (unsuccess + success) + "** chaine(s) au total (**" + unsuccess + "** en attente)\r\n**" + Math.round(success / (unsuccess + success) * 10000) / 100 + "%** de r\u00E9ussite");
         }
         else if (checkForCommand(/^\s*!dbinfo\s*$/img)) {
-            var time = this.saver.dataCreationDate;
-            message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
+            BotGeneral.adminOnly(message, function () {
+                var time = _this.saver.dataCreationDate;
+                message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
+            });
         }
         else if (checkForCommand(/^\s*!nonotif\s+memberadd\s*$/img)) {
             setCommonSetting(message, function () {

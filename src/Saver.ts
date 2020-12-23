@@ -3,7 +3,8 @@ import { StorageFile } from './storage/StorageFile';
 import { StorageSQL } from './storage/StorageSQL';
 import * as moment from 'moment-timezone'
 
-const StorageSystem = StorageSQL; // StorageFile
+//const StorageSystem = StorageSQL;
+const StorageSystem = StorageFile
 
 export class Saver {
     public constructor(fileId: string, object: any, fileIdFallback: string) {

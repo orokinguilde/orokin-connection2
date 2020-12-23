@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Saver = void 0;
-var StorageSQL_1 = require("./storage/StorageSQL");
+var StorageFile_1 = require("./storage/StorageFile");
 var moment = require("moment-timezone");
-var StorageSystem = StorageSQL_1.StorageSQL; // StorageFile
+//const StorageSystem = StorageSQL;
+var StorageSystem = StorageFile_1.StorageFile;
 var Saver = /** @class */ (function () {
     function Saver(fileId, object, fileIdFallback) {
         this.pendingSave = [];

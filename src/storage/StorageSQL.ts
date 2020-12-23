@@ -7,7 +7,7 @@ export class StorageSQL implements IStorage {
     }
 
     public name: string;
-    public defaultNbRetries = 10000;
+    public defaultNbRetries = Infinity;
     public defaultRetryTimeout = 5000;
 
     protected connect() {

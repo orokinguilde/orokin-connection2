@@ -4,7 +4,7 @@ exports.StorageSQL = void 0;
 var mysql = require("mysql");
 var StorageSQL = /** @class */ (function () {
     function StorageSQL(name) {
-        this.defaultNbRetries = 10000;
+        this.defaultNbRetries = Infinity;
         this.defaultRetryTimeout = 5000;
         this.name = name;
     }

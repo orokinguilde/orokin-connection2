@@ -105,7 +105,7 @@ var StorageFile = /** @class */ (function () {
                         })];
                     case 9:
                         _a.sent();
-                        callback();
+                        process.nextTick(callback);
                         return [3 /*break*/, 11];
                     case 10:
                         ex_3 = _a.sent();
@@ -128,7 +128,7 @@ var StorageFile = /** @class */ (function () {
                         onData = function (r) {
                             var fileBinary = r.fileBinary;
                             console.log('StorageFile has been read with ' + fileBinary.toString().length + ' chars');
-                            callback(undefined, fileBinary);
+                            process.nextTick(function () { return callback(undefined, fileBinary); });
                         };
                         _d.label = 1;
                     case 1:

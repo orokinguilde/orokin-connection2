@@ -63,7 +63,7 @@ export class StorageFile {
                 to_path: this.fileId,
             });
 
-            callback();
+            process.nextTick(callback);
         } catch(ex) {
             console.error(ex);
             console.error(`Restart in 5 sec`);
@@ -77,7 +77,7 @@ export class StorageFile {
             const fileBinary = (r as any).fileBinary;
 
             console.log('StorageFile has been read with ' + fileBinary.toString().length + ' chars');
-            callback(undefined, fileBinary);
+            process.nextTick(() => callback(undefined, fileBinary));
         }
 
         try {

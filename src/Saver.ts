@@ -33,20 +33,8 @@ export class Saver {
             setTimeout(() => this.startAutosave(), 10000);
         });
     }
-    public saveIfChanged(callback) {
-        const obj = this.object.save();
-        const data = JSON.stringify(obj);
 
-        if(this.lastData !== data) {
-            this.lastData = data;
-            this.forceSaveOf(data, callback);
-
-            return true;
-        } else {
-            return false;
-        }
-    }
-    public forceSave(callback) {
+    protected forceSave(callback: () => void) {
         const obj = this.object.save();
         obj.___save = {
             dateStr: moment().format(),
@@ -56,15 +44,10 @@ export class Saver {
 
         const data = JSON.stringify(obj);
 
-        this.forceSaveOf(data, callback);
+        this.file.setContent(data, () => callback && callback())
     }
-    public forceSaveOf(dataStr, callback) {
-        this.file.setContent(dataStr, () => callback && callback())
-    }
-    public save(callback) {
-        process.nextTick(() => callback && callback());
-    }
-    public load(callback) {
+
+    public load(callback: () => void) {
         const load = (e, content) => {
             let dataLoaded = false;
 
@@ -104,11 +87,12 @@ export class Saver {
         }
 
         this.file.getContent((e, content) => {
-            if(e && this.fileFallback) {
+            /*if(e && this.fileFallback) {
                 this.fileFallback.getContent((e, content) => load(e, content));
             } else {
                 load(undefined, content);
-            }
+            }*/
+            load(undefined, content);
         })
     }
 }

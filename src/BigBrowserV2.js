@@ -998,111 +998,112 @@ var BigBrowserV2 = /** @class */ (function () {
     }*/
     BigBrowserV2.prototype.updateServer = function (guild) {
         var _this = this;
-        var now = Date.now();
-        var server = this.getServer(guild);
-        var nbUsers = Object.keys(server.users).length + 1;
-        var onDone = function () {
-            --nbUsers;
-            if (nbUsers === 0) {
-                _this.save();
-            }
-        };
-        var _loop_1 = function (userId) {
-            var user = server.users[userId];
-            guild.fetchMember(userId).then(function () {
-                delete user.removedDate;
-            }).catch(function () {
-                user.removedDate = Date.now();
-            }).finally(function () { return onDone(); });
-        };
-        for (var userId in server.users) {
-            _loop_1(userId);
-        }
-        guild.members.array().forEach(function (member) {
-            /*
-            if(member.displayName !== 'Akamelia ♡')
-                return;*/
-            var user = _this.getUser(member);
-            var isInWarframe = undefined;
-            if (member.user.presence && member.user.presence.game && member.user.presence.game.name) {
-                isInWarframe = member.user.presence.game.name.toLowerCase() === 'warframe';
-            }
-            var updateStats = function (stats, updateData) {
-                if (updateData === void 0) { updateData = true; }
-                if (isInWarframe !== undefined) {
-                    if (isInWarframe) {
-                        if (!stats.wasWarframeDiscordLastTick) {
-                            stats.wasWarframeDiscordLastTick = true;
-                        }
-                        else {
-                            if (updateData) {
-                                stats.totalWarframeDiscordTimeMs += now - stats.lastWarframeDiscordDate;
-                            }
-                        }
-                        stats.lastWarframeDiscordDate = now;
-                        stats.wasWarframeDiscordLastTickNot = false;
-                    }
-                    else {
-                        if (!stats.wasWarframeDiscordLastTickNot) {
-                            stats.wasWarframeDiscordLastTickNot = true;
-                        }
-                        else {
-                            if (updateData) {
-                                stats.totalWarframeDiscordTimeMsNot += now - stats.lastWarframeDiscordDateNot;
-                            }
-                        }
-                        stats.lastWarframeDiscordDateNot = now;
-                        stats.wasWarframeDiscordLastTick = false;
-                    }
-                    stats.wasWarframeDiscordLastTickUndefined = false;
+        return new Promise(function (resolve) {
+            var server = _this.getServer(guild);
+            var members = guild.members.array();
+            var _loop_1 = function (userId) {
+                var user = server.users[userId];
+                if (members.some(function (m) { return m.id === userId; })) {
+                    delete user.removedDate;
                 }
                 else {
-                    if (!stats.wasWarframeDiscordLastTickUndefined) {
-                        stats.wasWarframeDiscordLastTickUndefined = true;
-                    }
-                    else {
-                        if (updateData) {
-                            stats.totalWarframeDiscordTimeMsUndefined += now - stats.lastWarframeDiscordDateUndefined;
-                        }
-                    }
-                    stats.lastWarframeDiscordDateUndefined = now;
-                    stats.wasWarframeDiscordLastTickNot = false;
-                    stats.wasWarframeDiscordLastTick = false;
-                }
-                if (member.voiceChannelID && !member.deaf && member.voiceChannelID !== guild.afkChannelID) {
-                    if (!stats.wasVoicingLastTick) {
-                        stats.wasVoicingLastTick = true;
-                    }
-                    else {
-                        if (updateData) {
-                            stats.totalVoiceTimeMs += now - stats.lastVocalDate;
-                        }
-                    }
-                    stats.lastVocalDate = now;
-                }
-                else {
-                    stats.wasVoicingLastTick = false;
+                    user.removedDate = Date.now();
                 }
             };
-            if (user.dayStats.isObsolete) {
-                user.dayStats.injectInto(user.weekStats);
-                user.dayStats.finalize();
+            for (var userId in server.users) {
+                _loop_1(userId);
             }
-            if (user.weekStats.isObsolete) {
-                user.weekStats.finalize();
+            var _loop_2 = function (member) {
+                var now = Date.now();
+                /*
+                if(member.displayName !== 'Akamelia ♡')
+                    return;*/
+                var user = _this.getUser(member);
+                var isInWarframe = undefined;
+                if (member.user.presence && member.user.presence.game && member.user.presence.game.name) {
+                    isInWarframe = member.user.presence.game.name.toLowerCase() === 'warframe';
+                }
+                var updateStats = function (stats, updateData) {
+                    if (updateData === void 0) { updateData = true; }
+                    if (isInWarframe !== undefined) {
+                        if (isInWarframe) {
+                            if (!stats.wasWarframeDiscordLastTick) {
+                                stats.wasWarframeDiscordLastTick = true;
+                            }
+                            else {
+                                if (updateData) {
+                                    stats.totalWarframeDiscordTimeMs += now - stats.lastWarframeDiscordDate;
+                                }
+                            }
+                            stats.lastWarframeDiscordDate = now;
+                            stats.wasWarframeDiscordLastTickNot = false;
+                        }
+                        else {
+                            if (!stats.wasWarframeDiscordLastTickNot) {
+                                stats.wasWarframeDiscordLastTickNot = true;
+                            }
+                            else {
+                                if (updateData) {
+                                    stats.totalWarframeDiscordTimeMsNot += now - stats.lastWarframeDiscordDateNot;
+                                }
+                            }
+                            stats.lastWarframeDiscordDateNot = now;
+                            stats.wasWarframeDiscordLastTick = false;
+                        }
+                        stats.wasWarframeDiscordLastTickUndefined = false;
+                    }
+                    else {
+                        if (!stats.wasWarframeDiscordLastTickUndefined) {
+                            stats.wasWarframeDiscordLastTickUndefined = true;
+                        }
+                        else {
+                            if (updateData) {
+                                stats.totalWarframeDiscordTimeMsUndefined += now - stats.lastWarframeDiscordDateUndefined;
+                            }
+                        }
+                        stats.lastWarframeDiscordDateUndefined = now;
+                        stats.wasWarframeDiscordLastTickNot = false;
+                        stats.wasWarframeDiscordLastTick = false;
+                    }
+                    if (member.voiceChannelID && !member.deaf && member.voiceChannelID !== guild.afkChannelID) {
+                        if (!stats.wasVoicingLastTick) {
+                            stats.wasVoicingLastTick = true;
+                        }
+                        else {
+                            if (updateData) {
+                                stats.totalVoiceTimeMs += now - stats.lastVocalDate;
+                            }
+                        }
+                        stats.lastVocalDate = now;
+                    }
+                    else {
+                        stats.wasVoicingLastTick = false;
+                    }
+                };
+                if (user.dayStats.isObsolete) {
+                    user.dayStats.injectInto(user.weekStats);
+                    user.dayStats.finalize();
+                }
+                if (user.weekStats.isObsolete) {
+                    user.weekStats.finalize();
+                }
+                if (user.rangedDayStats.isObsolete) {
+                    user.rangedDayStats.injectInto(user.rangedWeekStats);
+                    user.rangedDayStats.finalize();
+                }
+                if (user.rangedWeekStats.isObsolete) {
+                    user.rangedWeekStats.finalize();
+                }
+                updateStats(user.stats);
+                updateStats(user.dayStats);
+                updateStats(user.rangedDayStats, _this.isInDayRange(now));
+            };
+            for (var _i = 0, members_1 = members; _i < members_1.length; _i++) {
+                var member = members_1[_i];
+                _loop_2(member);
             }
-            if (user.rangedDayStats.isObsolete) {
-                user.rangedDayStats.injectInto(user.rangedWeekStats);
-                user.rangedDayStats.finalize();
-            }
-            if (user.rangedWeekStats.isObsolete) {
-                user.rangedWeekStats.finalize();
-            }
-            updateStats(user.stats);
-            updateStats(user.dayStats);
-            updateStats(user.rangedDayStats, _this.isInDayRange(now));
+            process.nextTick(resolve);
         });
-        onDone();
     };
     BigBrowserV2.prototype.resetDayWeekStats = function (guild) {
         var server = this.getServer(guild);

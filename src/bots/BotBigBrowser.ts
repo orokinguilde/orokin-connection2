@@ -480,8 +480,7 @@ ${createStrLine(result.week)}\`\`\``);
     }
 
     protected startRuntime() {
-                
-        setInterval(() => {
+        const updateVoices = () => {
             const voiceChannels = this.client.channels.filter(channel => channel.type === 'voice').array() as VoiceChannel[];
 
             for(const voiceChannel of voiceChannels) {
@@ -497,7 +496,11 @@ ${createStrLine(result.week)}\`\`\``);
                     }
                 }
             }
-        }, 500);
+
+            setTimeout(updateVoices, 500);
+        }
+
+        setTimeout(updateVoices, 500);
 
         for(const guild of this.client.guilds.array()) {
             if(!this.xpBonusScheduledEvents.some(item => item.guild.id === guild.id)) {
@@ -509,12 +512,14 @@ ${createStrLine(result.week)}\`\`\``);
 
         /*if(this.bigBrowser.servers && Object.keys(this.bigBrowser.servers).length > 0)
             this.bigBrowserV2.initWithV1Data(this.bigBrowser.servers);*/
+
+        const updateServersTimeout = 10000;
+        const updateServers = async () => {
+            await Promise.all(this.client.guilds.array().map(guild => this.bigBrowserV2.updateServer(guild)));
+
+            setTimeout(updateServers, updateServersTimeout);
+        }
         
-        setInterval(() => {
-            this.client.guilds.forEach((guild) => {
-                //if(guild.name === 'Orokin Guilde Académie')
-                this.bigBrowserV2.updateServer(guild);
-            })
-        }, 1000)
+        setTimeout(updateServers, updateServersTimeout);
     }
 }

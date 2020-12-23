@@ -25,18 +25,6 @@ var Saver = /** @class */ (function () {
             setTimeout(function () { return _this.startAutosave(); }, 10000);
         });
     };
-    Saver.prototype.saveIfChanged = function (callback) {
-        var obj = this.object.save();
-        var data = JSON.stringify(obj);
-        if (this.lastData !== data) {
-            this.lastData = data;
-            this.forceSaveOf(data, callback);
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
     Saver.prototype.forceSave = function (callback) {
         var obj = this.object.save();
         obj.___save = {
@@ -45,13 +33,7 @@ var Saver = /** @class */ (function () {
             dataCreationDate: this.dataCreationDate
         };
         var data = JSON.stringify(obj);
-        this.forceSaveOf(data, callback);
-    };
-    Saver.prototype.forceSaveOf = function (dataStr, callback) {
-        this.file.setContent(dataStr, function () { return callback && callback(); });
-    };
-    Saver.prototype.save = function (callback) {
-        process.nextTick(function () { return callback && callback(); });
+        this.file.setContent(data, function () { return callback && callback(); });
     };
     Saver.prototype.load = function (callback) {
         var _this = this;
@@ -87,12 +69,12 @@ var Saver = /** @class */ (function () {
             setTimeout(function () { return _this.startAutosave(); }, 1000);
         };
         this.file.getContent(function (e, content) {
-            if (e && _this.fileFallback) {
-                _this.fileFallback.getContent(function (e, content) { return load(e, content); });
-            }
-            else {
+            /*if(e && this.fileFallback) {
+                this.fileFallback.getContent((e, content) => load(e, content));
+            } else {
                 load(undefined, content);
-            }
+            }*/
+            load(undefined, content);
         });
     };
     return Saver;

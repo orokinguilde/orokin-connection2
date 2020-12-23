@@ -46,7 +46,7 @@ export class StorageFile {
                     path: this.fileIdSave,
                 })
             } catch(ex) {
-                console.error(ex);
+                console.error(`Cannot delete file`, this.fileIdSave);
             }
 
             try {
@@ -55,7 +55,7 @@ export class StorageFile {
                     to_path: this.fileIdSave,
                 });
             } catch(ex) {
-                console.error(ex);
+                console.error(`Cannot move file from`, this.fileId, 'to', this.fileIdSave);
             }
 
             await dbx.filesMoveV2({
@@ -65,8 +65,9 @@ export class StorageFile {
 
             process.nextTick(callback);
         } catch(ex) {
-            console.error(ex);
+            console.error(`Cannot write in file`, this.fileIdTemp, ' or move file from', this.fileIdTemp, 'to', this.fileId);
             console.error(`Restart in 5 sec`);
+            
             setTimeout(() => this.setContent(content, callback), 5000);
         }
     }
@@ -95,7 +96,8 @@ export class StorageFile {
                         path: this.fileIdSave
                     }))
                 } catch(ex) {
-                    console.error(ex);
+                    console.error(`Could not read files`, this.fileId, this.fileIdTemp, this.fileIdSave);
+                    console.error(`Restart in 5 sec`);
         
                     setTimeout(() => this.getContent(callback), 5000);
                 }

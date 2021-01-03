@@ -47,7 +47,7 @@ var StorageSQL = /** @class */ (function () {
                 }
             }
             else {
-                var json = results[0].json;
+                var json = JSON.parse(results[0].json);
                 callback(undefined, json);
             }
         });

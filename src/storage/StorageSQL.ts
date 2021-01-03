@@ -38,7 +38,7 @@ export class StorageSQL implements IStorage {
         connection.end();
     }
 
-    public getContent(callback: (e: any, content?: string) => void, nbTries = this.defaultNbRetries, retryTimeout = this.defaultRetryTimeout) {
+    public getContent(callback: (e: any, content?: any) => void, nbTries = this.defaultNbRetries, retryTimeout = this.defaultRetryTimeout) {
         const connection = this.connect();
         
         connection.query(`SELECT json FROM json_data WHERE name = ?`, [ this.name ], (error, results, fields) => {
@@ -50,7 +50,7 @@ export class StorageSQL implements IStorage {
                     callback(error || new Error('Cannot read Database'));
                 }
             } else {
-                const json = results[0].json;
+                const json = JSON.parse(results[0].json);
                 
                 callback(undefined, json);
             }

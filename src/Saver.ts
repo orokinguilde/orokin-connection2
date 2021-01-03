@@ -48,29 +48,21 @@ export class Saver {
     }
 
     public load(callback: () => void) {
-        const load = (e, content) => {
+        const load = (e, data) => {
             let dataLoaded = false;
 
-            if(!e && content) {
-                content = content.toString().trim();
-
-                if(content && content.length > 0) {
-                    const data = JSON.parse(content);
-
-                    if(data) {
-                        console.log(`**************`);
-                        console.log('Data info :', data.___save);
-                        
-                        for(const propName in data) {
-                            console.log(`${propName}: ${JSON.stringify(data[propName]).length} chars`);
-                        }
-                        console.log(`**************`);
-
-                        this.dataCreationDate = data.___save?.dataCreationDate || this.dataCreationDate;
-                        this.object.load(data);
-                        dataLoaded = true;
-                    }
+            if(data) {
+                console.log(`**************`);
+                console.log('Data info :', data.___save);
+                
+                for(const propName in data) {
+                    console.log(`${propName}: ${JSON.stringify(data[propName]).length} chars`);
                 }
+                console.log(`**************`);
+
+                this.dataCreationDate = data.___save?.dataCreationDate || this.dataCreationDate;
+                this.object.load(data);
+                dataLoaded = true;
             }
 
             if(dataLoaded) {

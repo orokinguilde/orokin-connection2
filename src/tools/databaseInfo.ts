@@ -7,12 +7,10 @@ const storage = new StorageSQL(process.env.STORAGE_FILE_ID);
 
 console.log('Loading...');
 
-storage.getContent((e, content) => {
+storage.getContent((e, data) => {
     if(e) {
         console.error(e);
     } else {
-        const data = JSON.parse(content.toString());
-
         console.log(data.___save);
     }
 })

@@ -1,15 +1,21 @@
 import { IStorage } from "./storage/IStorage";
 import { StorageFile } from './storage/StorageFile';
-import { StorageSQL } from './storage/StorageSQL';
+//import { StorageSQL } from './storage/StorageSQL';
 import * as moment from 'moment-timezone'
+import config from "./config";
 
 //const StorageSystem = StorageSQL;
 const StorageSystem = StorageFile
 
 export class Saver {
     public constructor(fileId: string, object: any, fileIdFallback: string) {
-        this.file = new StorageSystem(fileId);
-        this.fileFallback = fileIdFallback && new StorageSystem(fileIdFallback);
+        const muter = (fileId: string) => fileId.replace('/', `/${config.server.fsFriendlyName}_`);
+
+        if(fileId) {
+            this.file = new StorageSystem(muter(fileId));
+            this.fileFallback = fileIdFallback && new StorageSystem(muter(fileIdFallback));
+        }
+        
         this.object = object;
     }
 
@@ -35,19 +41,29 @@ export class Saver {
     }
 
     protected forceSave(callback: () => void) {
-        const obj = this.object.save();
-        obj.___save = {
-            dateStr: moment().format(),
-            date: Date.now(),
-            dataCreationDate: this.dataCreationDate
+        if(this.file) {
+            const obj = this.object.save();
+            obj.___save = {
+                dateStr: moment().format(),
+                date: Date.now(),
+                dataCreationDate: this.dataCreationDate
+            }
+
+            const data = JSON.stringify(obj);
+
+            this.file.setContent(data, () => callback && callback())
+        } else {
+            callback && process.nextTick(callback);
         }
-
-        const data = JSON.stringify(obj);
-
-        this.file.setContent(data, () => callback && callback())
     }
 
     public load(callback: () => void) {
+        if(!this.file) {
+            callback && process.nextTick(callback);
+
+            return;
+        }
+
         const load = (e, data) => {
             let dataLoaded = false;
 

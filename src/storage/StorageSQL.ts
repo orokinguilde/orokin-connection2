@@ -1,5 +1,6 @@
-import mysql = require('mysql');
+//import mysql = require('mysql');
 import { IStorage } from './IStorage';
+const mysql: any = undefined;
 
 export class StorageSQL implements IStorage {
     public constructor(name: string) {

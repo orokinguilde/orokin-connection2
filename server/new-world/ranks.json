@@ -1,0 +1,62 @@
+{
+    "0": {
+        "name": "Stagiaire"
+    },
+    "50": {
+        "name": "Brosse a chiotte"
+    },
+    "100": {
+        "name": "Raclure de Bidet"
+    },
+    "150": {
+        "name": "Poussin KFC"
+    },
+    "200": {
+        "name": "Mocheté"
+    },
+    "250": {
+        "name": "Nordiste"
+    },
+    "300": {
+        "name": "Bizut"
+    },
+    "350": {
+        "name": "Gueux"
+    },
+    "400": {
+        "name": "Esclave"
+    },
+    "450": {
+        "name": "Plebe"
+    },
+    "500": {
+        "name": "Sous-fifre"
+    },
+    "550": {
+        "name": "Secrétaire"
+    },
+    "600": {
+        "name": "Loubard"
+    },
+    "650": {
+        "name": "Explorateur"
+    },
+    "700": {
+        "name": "Combattant"
+    },
+    "750": {
+        "name": "Chevalier"
+    },
+    "800": {
+        "name": "Saigneur eu d bière"
+    },
+    "850": {
+        "name": "Conquérant"
+    },
+    "900": {
+        "name": "Couillupted Suprême"
+    },
+    "950": {
+        "name": "pré-Consul"
+    }
+}

@@ -3,6 +3,7 @@ import { TextChannel, VoiceChannel, Message, Attachment } from "discord.js";
 import { XPBonusScheduledEvent } from "../ScheduledEvent";
 import { IBot } from "../Bot";
 import * as moment from 'moment-timezone'
+import config from '../config'
 
 const bannerTemplates = require('../BannerTemplate');
 const BigBrowser = require('../BigBrowser');
@@ -477,6 +478,11 @@ ${createStrLine(result.week)}\`\`\``);
     }
 
     protected ready() {
+        setTimeout(() => {
+            this.client.user.setAvatar(`./server/${process.env.SERVER_FOLDER_NAME}/icon.png`).catch(() => {});
+        }, 5000);
+
+        this.client.user.setActivity(config.server.info.activity);
     }
 
     protected startRuntime() {

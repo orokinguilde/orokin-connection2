@@ -55,6 +55,7 @@ var discord_js_1 = require("discord.js");
 var ScheduledEvent_1 = require("../ScheduledEvent");
 var Bot_1 = require("../Bot");
 var moment = require("moment-timezone");
+var config_1 = require("../config");
 var bannerTemplates = require('../BannerTemplate');
 var BigBrowser = require('../BigBrowser');
 var globals = require('../globals');
@@ -438,6 +439,11 @@ var BotBigBrowser = /** @class */ (function (_super) {
     BotBigBrowser.prototype._initialize = function () {
     };
     BotBigBrowser.prototype.ready = function () {
+        var _this = this;
+        setTimeout(function () {
+            _this.client.user.setAvatar("./server/" + process.env.SERVER_FOLDER_NAME + "/icon.png").catch(function () { });
+        }, 5000);
+        this.client.user.setActivity(config_1.default.server.info.activity);
     };
     BotBigBrowser.prototype.startRuntime = function () {
         var _this = this;

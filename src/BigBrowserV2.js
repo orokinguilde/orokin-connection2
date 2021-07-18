@@ -15,6 +15,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BigBrowserV2 = exports.BigBrowserV2User = exports.BigBrowserV2UserStatsTimedWeek = exports.BigBrowserV2UserStatsTimedDay = exports.BigBrowserV2UserStatsTimed = exports.BigBrowserV2UserStats = void 0;
 var moment = require("moment-timezone");
+var config_1 = require("./config");
 var BigBrowserV2UserStats = /** @class */ (function () {
     function BigBrowserV2UserStats(stats) {
         this._stats = stats;
@@ -1470,83 +1471,7 @@ var BigBrowserV2 = /** @class */ (function () {
         return text.trimRight();
     };
     BigBrowserV2.ranks = (function () {
-        var ranks = {
-            0: {
-                name: 'Chair à canon'
-            },
-            50: {
-                name: 'Galinette cendrée'
-            },
-            100: {
-                name: 'Rejeté'
-            },
-            150: {
-                name: 'Bouclier humain'
-            },
-            200: {
-                name: 'Noob'
-            },
-            250: {
-                name: 'Mauvaise herbe'
-            },
-            300: {
-                name: 'Jeune pousse écrasée'
-            },
-            350: {
-                name: 'Poussin KFC'
-            },
-            400: {
-                name: 'Pion du neant'
-            },
-            450: {
-                name: 'Vagabon'
-            },
-            500: {
-                name: 'Tenno'
-            },
-            550: {
-                name: 'Portier de Lua'
-            },
-            600: {
-                name: 'Apprenti samurai'
-            },
-            650: {
-                name: 'Samurai'
-            },
-            700: {
-                name: 'Rōnin'
-            },
-            750: {
-                name: 'Acharné'
-            },
-            800: {
-                name: 'Fanatique'
-            },
-            850: {
-                name: 'Dur à cuire'
-            },
-            900: {
-                name: 'Orokin apprenti'
-            },
-            950: {
-                name: 'Orokin'
-            },
-            1000: {
-                name: 'Orokin officier'
-            },
-            1050: {
-                name: 'Orokin general'
-            },
-            1100: {
-                name: 'Orokin etat major'
-            },
-            1150: {
-                name: 'Orokin marechal'
-            },
-            1200: {
-                name: 'Vaulted'
-            }
-        };
+        var ranks = config_1.default.server.ranks;
         var index = -1;
         var lastRank = undefined;
         for (var rankStart in ranks) {

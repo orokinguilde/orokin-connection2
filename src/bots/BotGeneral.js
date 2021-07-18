@@ -17,6 +17,7 @@ exports.BotGeneral = void 0;
 var discord_js_1 = require("discord.js");
 var Bot_1 = require("../Bot");
 var moment = require("moment-timezone");
+var config_1 = require("../config");
 var Application = require('../Application');
 var Mentoring = require('../Mentoring');
 var MessageThis = require('../Message');
@@ -412,9 +413,9 @@ var BotGeneral = /** @class */ (function (_super) {
     BotGeneral.prototype.ready = function () {
         var _this = this;
         setTimeout(function () {
-            _this.client.user.setAvatar('./embleme alliance.png').catch(function () { });
+            _this.client.user.setAvatar("./server/" + process.env.SERVER_FOLDER_NAME + "/icon.png").catch(function () { });
         }, 5000);
-        this.client.user.setActivity('connecter la guilde');
+        this.client.user.setActivity(config_1.default.server.info.activity);
     };
     BotGeneral.prototype.startRuntime = function () {
         this.application.start();

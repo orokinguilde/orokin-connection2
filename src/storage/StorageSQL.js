@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StorageSQL = void 0;
-var mysql = require("mysql");
+var mysql = undefined;
 var StorageSQL = /** @class */ (function () {
     function StorageSQL(name) {
         this.defaultNbRetries = Infinity;

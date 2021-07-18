@@ -1,6 +1,7 @@
 import { TextChannel, Message, RichEmbed, Attachment } from "discord.js";
 import { IBot } from "../Bot";
 import * as moment from 'moment-timezone'
+import config from '../config'
 
 const Application = require('../Application');
 const Mentoring = require('../Mentoring');
@@ -530,10 +531,10 @@ export class BotGeneral extends IBot {
 
     protected ready() {
         setTimeout(() => {
-            this.client.user.setAvatar('./embleme alliance.png').catch(() => {});
+            this.client.user.setAvatar(`./server/${process.env.SERVER_FOLDER_NAME}/icon.png`).catch(() => {});
         }, 5000);
 
-        this.client.user.setActivity('connecter la guilde');
+        this.client.user.setActivity(config.server.info.activity);
     }
 
     protected startRuntime() {

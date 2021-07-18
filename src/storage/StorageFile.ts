@@ -43,8 +43,15 @@ export class StorageFile {
             console.error(`fn: [${debugName}] success`);
             cb();
         } catch(ex) {
-            console.error(`fn: [${debugName}] error => retry (${nbTries})`);
-            setTimeout(() => this.retryCallback(debugName, fn, cb, nbTries - 1), 5000);
+            const notFound = ex?.error?.error_summary?.includes('not_found');
+
+            if(notFound) {
+                console.error(`fn: [${debugName}] error but skip because the file doesn't exist`);
+                cb();
+            } else {
+                console.error(`fn: [${debugName}] error => retry (${nbTries})`);
+                setTimeout(() => this.retryCallback(debugName, fn, cb, nbTries - 1), 5000);
+            }
         }
     }
     protected retry(debugName: string, fn: () => Promise<any>, nbTries: number = Infinity) {
@@ -103,34 +110,48 @@ export class StorageFile {
             process.nextTick(() => callback(undefined, data));
         }
 
+        let notFound = true;
+
         try {
             onData(await StorageFile.dbx().filesDownload({
                 path: this.fileIdTemp
             }))
             console.log('Loaded from temp');
         } catch(ex) {
+            notFound = notFound && ex && typeof ex.error === 'string' && JSON.parse(ex.error)?.error_summary?.includes('not_found');
+
             try {
                 onData(await StorageFile.dbx().filesDownload({
                     path: this.fileId
                 }))
                 console.log('Loaded from file');
             } catch(ex) {
+                notFound = notFound && ex && typeof ex.error === 'string' && JSON.parse(ex.error)?.error_summary?.includes('not_found');
+                
                 try {
                     onData(await StorageFile.dbx().filesDownload({
                         path: this.fileIdSave1
                     }))
                     console.log('Loaded from save1');
                 } catch(ex) {
+                    notFound = notFound && ex && typeof ex.error === 'string' && JSON.parse(ex.error)?.error_summary?.includes('not_found');
+                    
                     try {
                         onData(await StorageFile.dbx().filesDownload({
                             path: this.fileIdSave2
                         }))
                         console.log('Loaded from save2');
                     } catch(ex) {
-                        console.error(`Could not read files`, this.fileId, this.fileIdTemp, this.fileIdSave1, this.fileIdSave2);
-                        console.error(`Restart in 5 sec`);
-            
-                        setTimeout(() => this.getContent(callback), 5000);
+                        notFound = notFound && ex && typeof ex.error === 'string' && JSON.parse(ex.error)?.error_summary?.includes('not_found');
+
+                        if(notFound) {
+                            callback && process.nextTick(() => callback(undefined, undefined));
+                        } else {
+                            console.error(`Could not read files`, this.fileId, this.fileIdTemp, this.fileIdSave1, this.fileIdSave2);
+                            console.error(`Restart in 5 sec`);
+                
+                            setTimeout(() => this.getContent(callback), 5000);
+                        }
                     }
                 }
             }

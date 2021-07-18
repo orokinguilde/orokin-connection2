@@ -57,30 +57,38 @@ var StorageFile = /** @class */ (function () {
         return StorageFile._dbx;
     };
     StorageFile.prototype.retryCallback = function (debugName, fn, cb, nbTries) {
+        var _a, _b;
         if (nbTries === void 0) { nbTries = Infinity; }
         return __awaiter(this, void 0, void 0, function () {
-            var ex_1;
+            var ex_1, notFound;
             var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         if (nbTries <= 0) {
                             console.error("fn: [" + debugName + "] timeout");
                             return [2 /*return*/, cb()];
                         }
-                        _a.label = 1;
+                        _c.label = 1;
                     case 1:
-                        _a.trys.push([1, 3, , 4]);
+                        _c.trys.push([1, 3, , 4]);
                         return [4 /*yield*/, fn()];
                     case 2:
-                        _a.sent();
+                        _c.sent();
                         console.error("fn: [" + debugName + "] success");
                         cb();
                         return [3 /*break*/, 4];
                     case 3:
-                        ex_1 = _a.sent();
-                        console.error("fn: [" + debugName + "] error => retry (" + nbTries + ")");
-                        setTimeout(function () { return _this.retryCallback(debugName, fn, cb, nbTries - 1); }, 5000);
+                        ex_1 = _c.sent();
+                        notFound = (_b = (_a = ex_1 === null || ex_1 === void 0 ? void 0 : ex_1.error) === null || _a === void 0 ? void 0 : _a.error_summary) === null || _b === void 0 ? void 0 : _b.includes('not_found');
+                        if (notFound) {
+                            console.error("fn: [" + debugName + "] error but skip because the file doesn't exist");
+                            cb();
+                        }
+                        else {
+                            console.error("fn: [" + debugName + "] error => retry (" + nbTries + ")");
+                            setTimeout(function () { return _this.retryCallback(debugName, fn, cb, nbTries - 1); }, 5000);
+                        }
                         return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];
                 }
@@ -151,11 +159,12 @@ var StorageFile = /** @class */ (function () {
         });
     };
     StorageFile.prototype.getContent = function (callback) {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         return __awaiter(this, void 0, void 0, function () {
-            var onData, _a, ex_3, _b, ex_4, _c, ex_5, _d, ex_6;
+            var onData, notFound, _j, ex_3, _k, ex_4, _l, ex_5, _m, ex_6;
             var _this = this;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
+            return __generator(this, function (_o) {
+                switch (_o.label) {
                     case 0:
                         onData = function (r) {
                             var fileBinary = r.fileBinary;
@@ -164,61 +173,71 @@ var StorageFile = /** @class */ (function () {
                             console.log('StorageFile has been read with ' + fileStr.length + ' chars');
                             process.nextTick(function () { return callback(undefined, data); });
                         };
-                        _e.label = 1;
+                        notFound = true;
+                        _o.label = 1;
                     case 1:
-                        _e.trys.push([1, 3, , 16]);
-                        _a = onData;
+                        _o.trys.push([1, 3, , 16]);
+                        _j = onData;
                         return [4 /*yield*/, StorageFile.dbx().filesDownload({
                                 path: this.fileIdTemp
                             })];
                     case 2:
-                        _a.apply(void 0, [_e.sent()]);
+                        _j.apply(void 0, [_o.sent()]);
                         console.log('Loaded from temp');
                         return [3 /*break*/, 16];
                     case 3:
-                        ex_3 = _e.sent();
-                        _e.label = 4;
+                        ex_3 = _o.sent();
+                        notFound = notFound && ex_3 && typeof ex_3.error === 'string' && ((_b = (_a = JSON.parse(ex_3.error)) === null || _a === void 0 ? void 0 : _a.error_summary) === null || _b === void 0 ? void 0 : _b.includes('not_found'));
+                        _o.label = 4;
                     case 4:
-                        _e.trys.push([4, 6, , 15]);
-                        _b = onData;
+                        _o.trys.push([4, 6, , 15]);
+                        _k = onData;
                         return [4 /*yield*/, StorageFile.dbx().filesDownload({
                                 path: this.fileId
                             })];
                     case 5:
-                        _b.apply(void 0, [_e.sent()]);
+                        _k.apply(void 0, [_o.sent()]);
                         console.log('Loaded from file');
                         return [3 /*break*/, 15];
                     case 6:
-                        ex_4 = _e.sent();
-                        _e.label = 7;
+                        ex_4 = _o.sent();
+                        notFound = notFound && ex_4 && typeof ex_4.error === 'string' && ((_d = (_c = JSON.parse(ex_4.error)) === null || _c === void 0 ? void 0 : _c.error_summary) === null || _d === void 0 ? void 0 : _d.includes('not_found'));
+                        _o.label = 7;
                     case 7:
-                        _e.trys.push([7, 9, , 14]);
-                        _c = onData;
+                        _o.trys.push([7, 9, , 14]);
+                        _l = onData;
                         return [4 /*yield*/, StorageFile.dbx().filesDownload({
                                 path: this.fileIdSave1
                             })];
                     case 8:
-                        _c.apply(void 0, [_e.sent()]);
+                        _l.apply(void 0, [_o.sent()]);
                         console.log('Loaded from save1');
                         return [3 /*break*/, 14];
                     case 9:
-                        ex_5 = _e.sent();
-                        _e.label = 10;
+                        ex_5 = _o.sent();
+                        notFound = notFound && ex_5 && typeof ex_5.error === 'string' && ((_f = (_e = JSON.parse(ex_5.error)) === null || _e === void 0 ? void 0 : _e.error_summary) === null || _f === void 0 ? void 0 : _f.includes('not_found'));
+                        _o.label = 10;
                     case 10:
-                        _e.trys.push([10, 12, , 13]);
-                        _d = onData;
+                        _o.trys.push([10, 12, , 13]);
+                        _m = onData;
                         return [4 /*yield*/, StorageFile.dbx().filesDownload({
                                 path: this.fileIdSave2
                             })];
                     case 11:
-                        _d.apply(void 0, [_e.sent()]);
+                        _m.apply(void 0, [_o.sent()]);
                         console.log('Loaded from save2');
                         return [3 /*break*/, 13];
                     case 12:
-                        ex_6 = _e.sent();
-                        console.error("Could not read files", this.fileId, this.fileIdTemp, this.fileIdSave1, this.fileIdSave2);
-                        console.error("Restart in 5 sec");
-                        setTimeout(function () { return _this.getContent(callback); }, 5000);
+                        ex_6 = _o.sent();
+                        notFound = notFound && ex_6 && typeof ex_6.error === 'string' && ((_h = (_g = JSON.parse(ex_6.error)) === null || _g === void 0 ? void 0 : _g.error_summary) === null || _h === void 0 ? void 0 : _h.includes('not_found'));
+                        if (notFound) {
+                            callback && process.nextTick(function () { return callback(undefined, undefined); });
+                        }
+                        else {
+                            console.error("Could not read files", this.fileId, this.fileIdTemp, this.fileIdSave1, this.fileIdSave2);
+                            console.error("Restart in 5 sec");
+                            setTimeout(function () { return _this.getContent(callback); }, 5000);
+                        }
                         return [3 /*break*/, 13];
                     case 13: return [3 /*break*/, 14];
                     case 14: return [3 /*break*/, 15];

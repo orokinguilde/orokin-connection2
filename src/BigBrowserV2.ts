@@ -1562,6 +1562,10 @@ export class BigBrowserV2 {
             value = Math.floor(value);
             return value.toString();
         });
+        
+        formatter.asSeconds = formatter.asSeconds || ((value) => {
+            return formatter.asInteger((value || 0) / 1000).toString();
+        });
 
         formatter.asFloat = formatter.asFloat || ((value) => {
             value = value || 0;
@@ -1603,7 +1607,7 @@ export class BigBrowserV2 {
                 formatter.asString('Expérience restante avant prochain rang (%)'),
 
                 formatter.asString('Expérience vocale (exp)'),
-                formatter.asString('Temps total en vocal (ms)'),
+                formatter.asString('Temps total en vocal (sec)'),
                 formatter.asString('Dernière mise à jour exp vocale'),
 
                 formatter.asString('Expérience écrite (exp)'),
@@ -1616,13 +1620,13 @@ export class BigBrowserV2 {
                 
                 formatter.asString('Temps total sur Warframe (%)'),
 
-                formatter.asString('Temps total sur Warframe (ms)'),
+                formatter.asString('Temps total sur Warframe (sec)'),
                 formatter.asString('Dernière connection à Warframe'),
 
-                formatter.asString('Temps total sur autre chose que Warframe (ms)'),
+                formatter.asString('Temps total sur autre chose que Warframe (sec)'),
                 formatter.asString('Dernier jeu autre que Warframe'),
 
-                formatter.asString('Temps total sur aucune application (ms)'),
+                formatter.asString('Temps total sur aucune application (sec)'),
                 formatter.asString('Dernière connection à aucune application'),
 
                 formatter.asString('Date de join'),
@@ -1655,7 +1659,7 @@ export class BigBrowserV2 {
                     formatter.asPercent(rank.expLeftToNextRankPercent),
 
                     formatter.asFloat(user.stats.voiceXp),
-                    formatter.asInteger(user.stats.totalVoiceTimeMs),
+                    formatter.asSeconds(user.stats.totalVoiceTimeMs),
                     formatter.asDate(user.stats.lastVocalDate),
 
                     formatter.asFloat(user.stats.textXp),
@@ -1670,13 +1674,13 @@ export class BigBrowserV2 {
                         ? formatter.asString('N/A')
                         : formatter.asPercent(user.stats.totalWarframeDiscordTimeMs / (user.stats.totalWarframeDiscordTimeMs + user.stats.totalWarframeDiscordTimeMsNot + user.stats.totalWarframeDiscordTimeMsUndefined)),
 
-                    formatter.asInteger(user.stats.totalWarframeDiscordTimeMs),
+                    formatter.asSeconds(user.stats.totalWarframeDiscordTimeMs),
                     formatter.asDate(user.stats.lastWarframeDiscordDate),
 
-                    formatter.asInteger(user.stats.totalWarframeDiscordTimeMsNot),
+                    formatter.asSeconds(user.stats.totalWarframeDiscordTimeMsNot),
                     formatter.asDate(user.stats.lastWarframeDiscordDateNot),
 
-                    formatter.asInteger(user.stats.totalWarframeDiscordTimeMsUndefined),
+                    formatter.asSeconds(user.stats.totalWarframeDiscordTimeMsUndefined),
                     formatter.asDate(user.stats.lastWarframeDiscordDateUndefined),
 
                     formatter.asDate(user.joinedTimestamp),

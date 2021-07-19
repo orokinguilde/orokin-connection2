@@ -1021,8 +1021,8 @@ var BigBrowserV2 = /** @class */ (function () {
                     return;*/
                 var user = _this.getUser(member);
                 var isInWarframe = undefined;
-                if (member.user.presence && member.user.presence.game && member.user.presence.game.name) {
-                    isInWarframe = member.user.presence.game.name.toLowerCase() === 'warframe';
+                if (config_1.default.server.info.game && member.user.presence && member.user.presence.game && member.user.presence.game.name) {
+                    isInWarframe = member.user.presence.game.name.toLowerCase() === config_1.default.server.info.game.processName;
                 }
                 var updateStats = function (stats, updateData) {
                     if (updateData === void 0) { updateData = true; }
@@ -1246,11 +1246,13 @@ var BigBrowserV2 = /** @class */ (function () {
     };
     BigBrowserV2.prototype.getServerCSV = function (server, withBOM) {
         var formatter = {
+            SKIP: {},
             row: function () {
                 var argss = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
                     argss[_i] = arguments[_i];
                 }
+                argss = argss.filter(function (a) { return a !== formatter.SKIP; });
                 var args = [];
                 for (var _a = 0, argss_1 = argss; _a < argss_1.length; _a++) {
                     var arg = argss_1[_a];
@@ -1270,6 +1272,7 @@ var BigBrowserV2 = /** @class */ (function () {
     BigBrowserV2.prototype.getServerMarkDown = function (server) {
         var nbCols = undefined;
         var formatter = {
+            SKIP: {},
             headerEnd: function () {
                 var text = '';
                 for (var i = 0; i < nbCols; ++i)
@@ -1281,6 +1284,7 @@ var BigBrowserV2 = /** @class */ (function () {
                 for (var _i = 0; _i < arguments.length; _i++) {
                     argss[_i] = arguments[_i];
                 }
+                argss = argss.filter(function (a) { return a !== formatter.SKIP; });
                 if (nbCols === undefined)
                     nbCols = argss.length;
                 var args = [];
@@ -1298,6 +1302,7 @@ var BigBrowserV2 = /** @class */ (function () {
                 for (var _i = 0; _i < arguments.length; _i++) {
                     argss[_i] = arguments[_i];
                 }
+                argss = argss.filter(function (a) { return a !== formatter.SKIP; });
                 var args = [];
                 for (var _a = 0, argss_3 = argss; _a < argss_3.length; _a++) {
                     var arg = argss_3[_a];
@@ -1331,6 +1336,7 @@ var BigBrowserV2 = /** @class */ (function () {
         ];
         var isFirstRow = true;
         var formatter = {
+            SKIP: {},
             headerEnd: function () {
                 var str = '';
                 for (var _i = 0, pads_1 = pads; _i < pads_1.length; _i++) {
@@ -1346,6 +1352,7 @@ var BigBrowserV2 = /** @class */ (function () {
                 for (var _i = 0; _i < arguments.length; _i++) {
                     argss[_i] = arguments[_i];
                 }
+                argss = argss.filter(function (a) { return a !== formatter.SKIP; });
                 var args = [];
                 var index = 0;
                 for (var _a = 0, argss_4 = argss; _a < argss_4.length; _a++) {
@@ -1373,6 +1380,7 @@ var BigBrowserV2 = /** @class */ (function () {
                 for (var _i = 0; _i < arguments.length; _i++) {
                     argss[_i] = arguments[_i];
                 }
+                argss = argss.filter(function (a) { return a !== formatter.SKIP; });
                 var args = [];
                 for (var _a = 0, argss_5 = argss; _a < argss_5.length; _a++) {
                     var arg = argss_5[_a];
@@ -1455,7 +1463,7 @@ var BigBrowserV2 = /** @class */ (function () {
         else {
             if (formatter.headerStart)
                 text += formatter.headerStart();
-            text += formatter.row(formatter.asString('Utilisateur (nom affiché)'), formatter.asString('Utilisateur (compte)'), formatter.asString('Est un bot ?'), formatter.asString('Expérience totale (exp)'), formatter.asString('Rang'), formatter.asString('Prochain rang'), formatter.asString('Progression vers le prochain rang (%)'), formatter.asString('Expérience restante avant prochain rang (exp)'), formatter.asString('Expérience restante avant prochain rang (%)'), formatter.asString('Expérience vocale (exp)'), formatter.asString('Temps total en vocal (sec)'), formatter.asString('Dernière mise à jour exp vocale'), formatter.asString('Expérience écrite (exp)'), formatter.asString('Dernière mise à jour exp écrite'), formatter.asString('Nb messages textes'), formatter.asString('Taille totale des messages textes'), formatter.asString('Nb messages textes (avec duplicatas)'), formatter.asString('Taille totale des messages textes (avec duplicatas)'), formatter.asString('Temps total sur Warframe (%)'), formatter.asString('Temps total sur Warframe (sec)'), formatter.asString('Dernière connection à Warframe'), formatter.asString('Temps total sur autre chose que Warframe (sec)'), formatter.asString('Dernier jeu autre que Warframe'), formatter.asString('Temps total sur aucune application (sec)'), formatter.asString('Dernière connection à aucune application'), formatter.asString('Date de join'), formatter.asString('Roles'), formatter.asString('Inactif ?'));
+            text += formatter.row(formatter.asString('Utilisateur (nom affiché)'), formatter.asString('Utilisateur (compte)'), formatter.asString('Est un bot ?'), formatter.asString('Expérience totale (exp)'), formatter.asString('Rang'), formatter.asString('Prochain rang'), formatter.asString('Progression vers le prochain rang (%)'), formatter.asString('Expérience restante avant prochain rang (exp)'), formatter.asString('Expérience restante avant prochain rang (%)'), formatter.asString('Expérience vocale (exp)'), formatter.asString('Temps total en vocal (sec)'), formatter.asString('Dernière mise à jour exp vocale'), formatter.asString('Expérience écrite (exp)'), formatter.asString('Dernière mise à jour exp écrite'), formatter.asString('Nb messages textes'), formatter.asString('Taille totale des messages textes'), formatter.asString('Nb messages textes (avec duplicatas)'), formatter.asString('Taille totale des messages textes (avec duplicatas)'), config_1.default.server.info.game ? formatter.asString("Temps total sur " + config_1.default.server.info.game.name + " (%)") : formatter.SKIP, config_1.default.server.info.game ? formatter.asString("Temps total sur " + config_1.default.server.info.game.name + " (sec)") : formatter.SKIP, config_1.default.server.info.game ? formatter.asString("Derni\u00E8re connection \u00E0 " + config_1.default.server.info.game.name) : formatter.SKIP, config_1.default.server.info.game ? formatter.asString("Temps total sur autre chose que " + config_1.default.server.info.game.name + " (sec)") : formatter.SKIP, config_1.default.server.info.game ? formatter.asString("Dernier jeu autre que " + config_1.default.server.info.game.name) : formatter.SKIP, config_1.default.server.info.game ? formatter.asString('Temps total sur aucune application (sec)') : formatter.SKIP, config_1.default.server.info.game ? formatter.asString('Dernière connection à aucune application') : formatter.SKIP, formatter.asString('Date de join'), formatter.asString('Roles'), formatter.asString('Inactif ?'));
             if (formatter.headerEnd)
                 text += formatter.headerEnd();
             if (formatter.bodyStart)
@@ -1464,9 +1472,9 @@ var BigBrowserV2 = /** @class */ (function () {
                 var user = users_1[_i];
                 var exp = user.stats.xp;
                 var rank = user.stats.rank;
-                text += formatter.row(formatter.asString(user.displayName), formatter.asString(user.name), formatter.asBool(user.isBot), formatter.asFloat(exp), formatter.asString(rank.currentRank ? rank.currentRank.name : undefined), formatter.asString(rank.nextRank ? rank.nextRank.name : undefined), formatter.asPercent(rank.currentExpPercentToNextRank), formatter.asFloat(rank.expLeftToNextRank), formatter.asPercent(rank.expLeftToNextRankPercent), formatter.asFloat(user.stats.voiceXp), formatter.asSeconds(user.stats.totalVoiceTimeMs), formatter.asDate(user.stats.lastVocalDate), formatter.asFloat(user.stats.textXp), formatter.asDate(user.stats.lastTextDate), formatter.asInteger(user.stats.nbTextMessages), formatter.asInteger(user.stats.totalTextSize), formatter.asInteger(user.stats.nbTextMessagesWithDuplicates), formatter.asInteger(user.stats.totalTextSizeWithDuplicates), !user.stats.lastWarframeDiscordDate && !user.stats.lastWarframeDiscordDateNot
+                text += formatter.row(formatter.asString(user.displayName), formatter.asString(user.name), formatter.asBool(user.isBot), formatter.asFloat(exp), formatter.asString(rank.currentRank ? rank.currentRank.name : undefined), formatter.asString(rank.nextRank ? rank.nextRank.name : undefined), formatter.asPercent(rank.currentExpPercentToNextRank), formatter.asFloat(rank.expLeftToNextRank), formatter.asPercent(rank.expLeftToNextRankPercent), formatter.asFloat(user.stats.voiceXp), formatter.asSeconds(user.stats.totalVoiceTimeMs), formatter.asDate(user.stats.lastVocalDate), formatter.asFloat(user.stats.textXp), formatter.asDate(user.stats.lastTextDate), formatter.asInteger(user.stats.nbTextMessages), formatter.asInteger(user.stats.totalTextSize), formatter.asInteger(user.stats.nbTextMessagesWithDuplicates), formatter.asInteger(user.stats.totalTextSizeWithDuplicates), config_1.default.server.info.game ? (!user.stats.lastWarframeDiscordDate && !user.stats.lastWarframeDiscordDateNot
                     ? formatter.asString('N/A')
-                    : formatter.asPercent(user.stats.totalWarframeDiscordTimeMs / (user.stats.totalWarframeDiscordTimeMs + user.stats.totalWarframeDiscordTimeMsNot + user.stats.totalWarframeDiscordTimeMsUndefined)), formatter.asSeconds(user.stats.totalWarframeDiscordTimeMs), formatter.asDate(user.stats.lastWarframeDiscordDate), formatter.asSeconds(user.stats.totalWarframeDiscordTimeMsNot), formatter.asDate(user.stats.lastWarframeDiscordDateNot), formatter.asSeconds(user.stats.totalWarframeDiscordTimeMsUndefined), formatter.asDate(user.stats.lastWarframeDiscordDateUndefined), formatter.asDate(user.joinedTimestamp), formatter.asString((user.roles || []).join(' / ')), formatter.asBool(user.isWeird || false));
+                    : formatter.asPercent(user.stats.totalWarframeDiscordTimeMs / (user.stats.totalWarframeDiscordTimeMs + user.stats.totalWarframeDiscordTimeMsNot + user.stats.totalWarframeDiscordTimeMsUndefined))) : formatter.SKIP, config_1.default.server.info.game ? formatter.asSeconds(user.stats.totalWarframeDiscordTimeMs) : formatter.SKIP, config_1.default.server.info.game ? formatter.asDate(user.stats.lastWarframeDiscordDate) : formatter.SKIP, config_1.default.server.info.game ? formatter.asSeconds(user.stats.totalWarframeDiscordTimeMsNot) : formatter.SKIP, config_1.default.server.info.game ? formatter.asDate(user.stats.lastWarframeDiscordDateNot) : formatter.SKIP, config_1.default.server.info.game ? formatter.asSeconds(user.stats.totalWarframeDiscordTimeMsUndefined) : formatter.SKIP, config_1.default.server.info.game ? formatter.asDate(user.stats.lastWarframeDiscordDateUndefined) : formatter.SKIP, formatter.asDate(user.joinedTimestamp), formatter.asString((user.roles || []).join(' / ')), formatter.asBool(user.isWeird || false));
             }
             if (formatter.bodyEnd)
                 text += formatter.bodyEnd();

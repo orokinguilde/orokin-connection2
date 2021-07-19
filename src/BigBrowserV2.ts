@@ -1051,8 +1051,8 @@ export class BigBrowserV2 {
                 const user = this.getUser(member);
 
                 let isInWarframe = undefined;
-                if(member.user.presence && member.user.presence.game && member.user.presence.game.name) {
-                    isInWarframe = member.user.presence.game.name.toLowerCase() === 'warframe';
+                if(config.server.info.game && member.user.presence && member.user.presence.game && member.user.presence.game.name) {
+                    isInWarframe = member.user.presence.game.name.toLowerCase() === config.server.info.game.processName;
                 }
 
                 const updateStats = (stats: BigBrowserV2UserStats, updateData = true) => {
@@ -1345,7 +1345,9 @@ export class BigBrowserV2 {
     getServerCSV(server, withBOM) {
         
         const formatter = {
+            SKIP: {},
             row: function(...argss: any[]) {
+                argss = argss.filter(a => a !== formatter.SKIP);
                 const args = [];
         
                 for(const arg of argss)
@@ -1373,6 +1375,7 @@ export class BigBrowserV2 {
         let nbCols = undefined;
 
         const formatter = {
+            SKIP: {},
             headerEnd: function() {
                 let text = '';
 
@@ -1382,6 +1385,7 @@ export class BigBrowserV2 {
                 return `${text}|\r\n`;
             },
             row: function(...argss: any[]) {
+                argss = argss.filter(a => a !== formatter.SKIP);
                 if(nbCols === undefined)
                     nbCols = argss.length;
                 
@@ -1398,6 +1402,7 @@ export class BigBrowserV2 {
                 return `| ${args.join(' | ')} |\r\n`;
             },
             noRow: function(...argss: any[]) {
+                argss = argss.filter(a => a !== formatter.SKIP);
                 const args = [];
         
                 for(const arg of argss)
@@ -1441,6 +1446,7 @@ export class BigBrowserV2 {
         let isFirstRow = true;
         
         const formatter = {
+            SKIP: {},
             headerEnd: function() {
                 let str = '';
 
@@ -1455,6 +1461,7 @@ export class BigBrowserV2 {
                 return str.substring(0, str.length - 3) + '\r\n';
             },
             row: function(...argss: any[]) {
+                argss = argss.filter(a => a !== formatter.SKIP);
                 const args = [];
                 let index = 0;
         
@@ -1484,6 +1491,7 @@ export class BigBrowserV2 {
                 return `${args.join(' | ')}\r\n`;
             },
             noRow: function(...argss: any[]) {
+                argss = argss.filter(a => a !== formatter.SKIP);
                 const args = [];
         
                 for(const arg of argss)
@@ -1618,16 +1626,16 @@ export class BigBrowserV2 {
                 formatter.asString('Nb messages textes (avec duplicatas)'),
                 formatter.asString('Taille totale des messages textes (avec duplicatas)'),
                 
-                formatter.asString('Temps total sur Warframe (%)'),
+                config.server.info.game ? formatter.asString(`Temps total sur ${config.server.info.game.name} (%)`) : formatter.SKIP,
 
-                formatter.asString('Temps total sur Warframe (sec)'),
-                formatter.asString('Dernière connection à Warframe'),
+                config.server.info.game ? formatter.asString(`Temps total sur ${config.server.info.game.name} (sec)`) : formatter.SKIP,
+                config.server.info.game ? formatter.asString(`Dernière connection à ${config.server.info.game.name}`) : formatter.SKIP,
 
-                formatter.asString('Temps total sur autre chose que Warframe (sec)'),
-                formatter.asString('Dernier jeu autre que Warframe'),
+                config.server.info.game ? formatter.asString(`Temps total sur autre chose que ${config.server.info.game.name} (sec)`) : formatter.SKIP,
+                config.server.info.game ? formatter.asString(`Dernier jeu autre que ${config.server.info.game.name}`) : formatter.SKIP,
 
-                formatter.asString('Temps total sur aucune application (sec)'),
-                formatter.asString('Dernière connection à aucune application'),
+                config.server.info.game ? formatter.asString('Temps total sur aucune application (sec)') : formatter.SKIP,
+                config.server.info.game ? formatter.asString('Dernière connection à aucune application') : formatter.SKIP,
 
                 formatter.asString('Date de join'),
                 formatter.asString('Roles'),
@@ -1670,18 +1678,20 @@ export class BigBrowserV2 {
                     formatter.asInteger(user.stats.nbTextMessagesWithDuplicates),
                     formatter.asInteger(user.stats.totalTextSizeWithDuplicates),
 
-                    !user.stats.lastWarframeDiscordDate && !user.stats.lastWarframeDiscordDateNot
-                        ? formatter.asString('N/A')
-                        : formatter.asPercent(user.stats.totalWarframeDiscordTimeMs / (user.stats.totalWarframeDiscordTimeMs + user.stats.totalWarframeDiscordTimeMsNot + user.stats.totalWarframeDiscordTimeMsUndefined)),
+                    config.server.info.game ? (
+                        !user.stats.lastWarframeDiscordDate && !user.stats.lastWarframeDiscordDateNot
+                            ? formatter.asString('N/A')
+                            : formatter.asPercent(user.stats.totalWarframeDiscordTimeMs / (user.stats.totalWarframeDiscordTimeMs + user.stats.totalWarframeDiscordTimeMsNot + user.stats.totalWarframeDiscordTimeMsUndefined))
+                    ) : formatter.SKIP,
 
-                    formatter.asSeconds(user.stats.totalWarframeDiscordTimeMs),
-                    formatter.asDate(user.stats.lastWarframeDiscordDate),
+                    config.server.info.game ? formatter.asSeconds(user.stats.totalWarframeDiscordTimeMs) : formatter.SKIP,
+                    config.server.info.game ? formatter.asDate(user.stats.lastWarframeDiscordDate) : formatter.SKIP,
 
-                    formatter.asSeconds(user.stats.totalWarframeDiscordTimeMsNot),
-                    formatter.asDate(user.stats.lastWarframeDiscordDateNot),
+                    config.server.info.game ? formatter.asSeconds(user.stats.totalWarframeDiscordTimeMsNot) : formatter.SKIP,
+                    config.server.info.game ? formatter.asDate(user.stats.lastWarframeDiscordDateNot) : formatter.SKIP,
 
-                    formatter.asSeconds(user.stats.totalWarframeDiscordTimeMsUndefined),
-                    formatter.asDate(user.stats.lastWarframeDiscordDateUndefined),
+                    config.server.info.game ? formatter.asSeconds(user.stats.totalWarframeDiscordTimeMsUndefined) : formatter.SKIP,
+                    config.server.info.game ? formatter.asDate(user.stats.lastWarframeDiscordDateUndefined) : formatter.SKIP,
 
                     formatter.asDate(user.joinedTimestamp),
                     formatter.asString((user.roles || []).join(' / ')),

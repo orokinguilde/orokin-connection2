@@ -9,6 +9,10 @@ export default {
         info: require(path.join(__dirname, '..', 'server', process.env.SERVER_FOLDER_NAME, `info.json`)) as {
             name?: string
             activity: string
+            game: {
+                processName: string
+                name: string
+            }
             rankBannerImgUrl: string
             xp: {
                 voiceMs: number

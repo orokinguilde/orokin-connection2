@@ -243,9 +243,9 @@ var BotBigBrowser = /** @class */ (function (_super) {
         else if (checkForCommand(/^\s*!server\s+rank\s+ranges\s*$/img)) {
             message.reply("```" + this.bigBrowserV2.dayRange.map(function (range) { return "::: " + range.name + " :::\nJours : " + range.days.map(function (j) { return j + 1; }) + "\nD\u00E9but : " + range.start + " h\nFin : " + range.end + " h"; }).reduce(function (p, c) { return p + "\n\n" + c; }, '').trim() + "```");
         }
-        else if (checkForCommand(/^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s+(\d+)\s*$/img)) {
+        else if (checkForCommand(/^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s*h?\s+(\d+)\s*h?\s*$/img)) {
             BotBigBrowser.adminOnly(message, function () {
-                var regex = /^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s+(\d+)\s*$/img;
+                var regex = /^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s*h?\s+(\d+)\s*h?\s*$/img;
                 var _a = regex.exec(message.content), name = _a[1], startStr = _a[2], endStr = _a[3];
                 var start = parseInt(startStr);
                 var end = parseInt(endStr);
@@ -260,7 +260,6 @@ var BotBigBrowser = /** @class */ (function (_super) {
                     else {
                         range.start = start;
                         range.end = end;
-                        globals.saver.save();
                         message.reply("Plage chang\u00E9e : [" + start + " h, " + end + " h]");
                     }
                 }
@@ -420,7 +419,13 @@ var BotBigBrowser = /** @class */ (function (_super) {
                     switch (action.toLowerCase().trim()) {
                         case 'add':
                             xpBonusScheduledEvent.addChannel(channel);
-                            message.reply("Salon `" + channel.name + "` ajout\u00E9 \u00E0 la liste.");
+                            message.reply("Salon `" + channel.name + "` ajout\u00E9 \u00E0 la liste.", {
+                                embed: {
+                                    image: {
+                                        url: 'https://cdn.discordapp.com/attachments/472724867381461012/866612882669305856/tenor.gif'
+                                    }
+                                }
+                            });
                             break;
                         case 'remove':
                             xpBonusScheduledEvent.removeChannel(channel);

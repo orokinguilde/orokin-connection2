@@ -1,5 +1,5 @@
 import { BigBrowserV2, BigBrowserV2UserStats, BigBrowserV2User } from "../BigBrowserV2";
-import { TextChannel, VoiceChannel, Message, Attachment } from "discord.js";
+import { TextChannel, VoiceChannel, Message, Attachment, MessageOptions, RichEmbedOptions } from "discord.js";
 import { XPBonusScheduledEvent } from "../ScheduledEvent";
 import { IBot } from "../Bot";
 import * as moment from 'moment-timezone'
@@ -216,10 +216,10 @@ Jours : ${range.days.map(j => j + 1)}
 Début : ${range.start} h
 Fin : ${range.end} h`).reduce((p, c) => `${p}\n\n${c}`, '').trim()}\`\`\``);
 
-        } else if(checkForCommand(/^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s+(\d+)\s*$/img)) {
+        } else if(checkForCommand(/^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s*h?\s+(\d+)\s*h?\s*$/img)) {
 
             BotBigBrowser.adminOnly(message, () => {
-                const regex = /^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s+(\d+)\s*$/img;
+                const regex = /^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s*h?\s+(\d+)\s*h?\s*$/img;
                 const [, name, startStr, endStr ] = regex.exec(message.content);
                 const start = parseInt(startStr);
                 const end = parseInt(endStr);
@@ -234,7 +234,6 @@ Fin : ${range.end} h`).reduce((p, c) => `${p}\n\n${c}`, '').trim()}\`\`\``);
                     } else {
                         range.start = start;
                         range.end = end;
-                        globals.saver.save();
                         message.reply(`Plage changée : [${start} h, ${end} h]`);
                     }
                 }
@@ -451,7 +450,13 @@ ${createStrLine(result.week)}\`\`\``);
                     switch(action.toLowerCase().trim()) {
                         case 'add':
                             xpBonusScheduledEvent.addChannel(channel);
-                            message.reply(`Salon \`${channel.name}\` ajouté à la liste.`);
+                            message.reply(`Salon \`${channel.name}\` ajouté à la liste.`, {
+                                embed: {
+                                    image: {
+                                        url: 'https://cdn.discordapp.com/attachments/472724867381461012/866612882669305856/tenor.gif'
+                                    }
+                                } as RichEmbedOptions
+                            });
                             break;
 
                         case 'remove':

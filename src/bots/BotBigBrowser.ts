@@ -4,6 +4,7 @@ import { XPBonusScheduledEvent } from "../ScheduledEvent";
 import { IBot } from "../Bot";
 import * as moment from 'moment-timezone'
 import config from '../config'
+import { Help } from "../Help";
 
 const bannerTemplates = require('../BannerTemplate');
 const BigBrowser = require('../BigBrowser');
@@ -75,7 +76,9 @@ export class BotBigBrowser extends IBot {
             });
         }*/
 
-        if(checkForCommand(/^\s*!ranks$/img)) {
+        if(checkForCommand(Help.instance.regex)) {
+            Help.instance.manageMessage(message, params[1]);
+        } else if(checkForCommand(/^\s*!ranks$/img)) {
 
             const user = this.bigBrowserV2.getUser(message.member);
             const exp = user.stats.xp;

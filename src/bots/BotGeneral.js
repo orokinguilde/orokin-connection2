@@ -18,6 +18,7 @@ var discord_js_1 = require("discord.js");
 var Bot_1 = require("../Bot");
 var moment = require("moment-timezone");
 var config_1 = require("../config");
+var Help_1 = require("../Help");
 var Application = require('../Application');
 var Mentoring = require('../Mentoring');
 var MessageThis = require('../Message');
@@ -127,61 +128,6 @@ var BotGeneral = /** @class */ (function (_super) {
         message.member.removeRole(role);
         message.delete();
         message.channel.send(message.author + " a quitt\u00E9 Trio Team ! :cry: ");
-    };
-    BotGeneral.prototype.helpCommand = function (message, group) {
-        var authorIcon = 'https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50';
-        var embed = new discord_js_1.RichEmbed()
-            .setColor(BotGeneral.getRandomColor())
-            .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479491701853913095/Help.png');
-        if (!group) {
-            embed
-                .setAuthor('Help me!', authorIcon)
-                .addField('Tridolon', '`trio`, `join trio`, `leave trio`, `nonotif eidolonswarning`,\r\n`notif eidolonswarning`\r\n\r\n*Plus de détails :* `!helpme tridolon`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('Membres', '`nonotif memberadd`, `notif memberadd`, `nonotif memberleave`,\r\n`notif memberleave`\r\n\r\n*Plus de détails :* `!helpme membres`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('Twitch', '`twitch <name>`, `twitch remove <name>`\r\n\r\n*Plus de détails :* `!helpme twitch`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('XP Vocal/Textuel', '`rank`, `rank templates`, `rank template <name>`, `ranks`, `server xp`, `server xp md`, `server xp csv`, `server xp txt`,\r\n`start server xp`, `stop server xp`, `start xp`, `stop xp`\r\n\r\n*Plus de détails :* `!helpme xp`\r\n¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('Leaderboard', '`server rank <nb>`, `server last rank <nb>`, `server rank reset`, `server rank ranges`, `server rank range <name> <start> <end>`\r\n\r\n*Plus de détails :* `!helpme leaderboard`\r\n¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('XP Bonus', '`xpbonus <enable|disable>`, `xpbonus pop`, `xpbonus config <messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>`, `xpbonus config`, `xpbonus channel <add|remove|list>`\r\n\r\n*Plus de détails :* `!helpme xpbonus`\r\n¯¯¯¯¯¯¯¯¯¯¯')
-                .setDescription('**Utilisation** : `!<ma_commande>`');
-        }
-        else if (group.toLowerCase() === 'xpbonus') {
-            embed
-                .setAuthor('XP Bonus\r\n¯¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://media.discordapp.net/attachments/514178068835860498/718771841476460604/XP-bonus_1.gif')
-                .setDescription("\n    :small_orange_diamond: **!xpbonus <enable|disable>** | Active ou d\u00E9sactive l'XP Bonus\n    :small_orange_diamond: **!xpbonus config <messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>** | Modifie la configuration\n    :small_blue_diamond: **!xpbonus config** | Affiche la configuration\n    :small_orange_diamond: **!xpbonus channel <add|remove|list>** | Ajoute/supprime/liste les salons\n    :small_orange_diamond: **!xpbonus pop** | Fait apparaitre manuellement le bonus dans un salon de la liste".trim());
-        }
-        else if (group.toLowerCase() === 'leaderboard') {
-            embed
-                .setAuthor('Leaderboard\r\n¯¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://media.discordapp.net/attachments/514178068835860498/718771841476460604/XP-bonus_1.gif')
-                .setDescription("\n    :small_blue_diamond: **!server rank <nb>** | Affiche le leaderboard\n    :small_blue_diamond: **!server last rank <nb>** | Affiche le leaderboard de la derni\u00E8re fois (jour dernier et semaine derni\u00E8re)\n    :small_orange_diamond: **!server rank reset** | R\u00E9initialise le leaderboard\n    :small_blue_diamond: **!server rank ranges** | Affiche les plages horaires pour recevoir de l'exp\n    :small_orange_diamond: **!server rank range <name> <start> <end>** | Modifie une plage horaire".trim());
-        }
-        else if (group.toLowerCase() === 'tridolon') {
-            embed
-                .setAuthor('Tridolon\r\n¯¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479613651918127114/Teralyst_1.png')
-                .setDescription("\n    :small_blue_diamond: **!trio** | Affiche les informations sur le trio\n    :small_blue_diamond: **!join trio** | Rejoindre le role @Trio Team\n    :small_orange_diamond: **!leave trio** | Quitter le role @Trio Team\n    :small_orange_diamond: **!nonotif eidolonswarning** | D\u00E9sactive les notifications de l'arriv\u00E9e des Eidolons\n    :small_blue_diamond: **!notif eidolonswarning** | Active les notifications de l'arriv\u00E9e des Eidolons".trim());
-        }
-        else if (group.toLowerCase() === 'membres') {
-            embed
-                .setAuthor('Membres\r\n¯¯¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479619902161027072/unnamed3.png')
-                .setDescription("\n    :small_blue_diamond: **!notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre\n    :small_orange_diamond: **!nonotif memberadd** | D\u00E9sactive les notifications lors de l'ajout d'un nouveau membre\n    :small_blue_diamond: **!notif memberleave** | Active les notifications lorsqu'un membre quitte le clan\n    :small_orange_diamond: **!nonotif memberleave** | D\u00E9sactive les notifications lorsqu'un membre quitte le clan".trim());
-        }
-        else if (group.toLowerCase() === 'twitch') {
-            embed
-                .setAuthor('Twitch\r\n¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479614334805213185/1280px-Twitch_logo.png')
-                .setDescription("\n    :small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch\n    :small_orange_diamond: **!twitch remove** <name> | Supprime un message Twitch pr\u00E9c\u00E9dement ajout\u00E9".trim());
-        }
-        else if (group.toLowerCase() === 'xp') {
-            embed
-                .setAuthor('XP Vocal/Textuel\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479614949220548610/xp-logo.png')
-                .setDescription("\n    :small_blue_diamond: **!rank** | Affiche l'exp\u00E9rience de l'utilisateur\n    :small_blue_diamond: **!rank templates** | Affiche la liste des templates\n    :small_blue_diamond: **!rank template <name>** | S\u00E9lectionne un template\n    :small_blue_diamond: **!ranks** | Affiche la liste des rangs\n    :small_blue_diamond: **!server xp** | Affiche les statistiques du serveur\n    :small_blue_diamond: **!server xp md** | T\u00E9l\u00E9charge les stats du serveur au format [MD](https://www.commentcamarche.net/download/telecharger-34055333-notepad)\n    :small_blue_diamond: **!server xp csv** | T\u00E9l\u00E9charge les stats du serveur au format [CSV](https://www.commentcamarche.net/download/telecharger-209-excel-viewer)\n    :small_blue_diamond: **!server xp txt** | T\u00E9l\u00E9charge les stats du serveur au format TXT\n    :small_blue_diamond: **!start server xp** | D\u00E9marre le stockage de l'exp du serveur\n    :small_orange_diamond: **!stop server xp** | Arr\u00EAte le stockage de l'exp du serveur\n    :small_blue_diamond: **!start xp** | D\u00E9marre le stockage de l'exp\u00E9rience\n    :small_orange_diamond: **!stop xp** | Arr\u00EAte le stockage de l'exp\u00E9rience".trim());
-        }
-        message.delete();
-        message.channel.send(embed);
     };
     BotGeneral.prototype.onMessage = function (message, checkForCommand, params) {
         var _this = this;
@@ -321,9 +267,8 @@ var BotGeneral = /** @class */ (function (_super) {
                 message.reply(':small_blue_diamond: Activation des notifications pour les Eidolons');
             });
         }
-        else if (checkForCommand(/^\s*!(?:help|aide)\s*(?:me|moi)\s*(.*)/img)) {
-            var match = /^\s*!(?:help|aide)\s*(?:me|moi)\s*(.*)/img.exec(message.content);
-            this.helpCommand(message, match[1]);
+        else if (checkForCommand(Help_1.Help.instance.regex)) {
+            Help_1.Help.instance.manageMessage(message, params[1]);
         }
         else if (checkForCommand(/^\s*!(?:join|rejoindre)\s+trio\s*$/img)) {
             this.joinTrioCommand(message);

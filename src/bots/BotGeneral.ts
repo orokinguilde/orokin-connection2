@@ -2,6 +2,7 @@ import { TextChannel, Message, RichEmbed, Attachment } from "discord.js";
 import { IBot } from "../Bot";
 import * as moment from 'moment-timezone'
 import config from '../config'
+import { Help } from "../Help";
 
 const Application = require('../Application');
 const Mentoring = require('../Mentoring');
@@ -140,106 +141,7 @@ export class BotGeneral extends IBot {
         message.delete();
         message.channel.send(`${message.author} a quitté Trio Team ! :cry: `);
     }
-    public helpCommand(message, group) {
-
-        const authorIcon = 'https://media.discordapp.net/attachments/473609056163201024/475758769402544128/embleme_alliance.png?width=50&height=50';
-        
-        const embed = new RichEmbed()
-            .setColor(BotGeneral.getRandomColor())
-            .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479491701853913095/Help.png');
-
-        if(!group)
-        {
-            embed
-                .setAuthor('Help me!', authorIcon)
-                .addField('Tridolon', '`trio`, `join trio`, `leave trio`, `nonotif eidolonswarning`,\r\n`notif eidolonswarning`\r\n\r\n*Plus de détails :* `!helpme tridolon`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('Membres', '`nonotif memberadd`, `notif memberadd`, `nonotif memberleave`,\r\n`notif memberleave`\r\n\r\n*Plus de détails :* `!helpme membres`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('Twitch', '`twitch <name>`, `twitch remove <name>`\r\n\r\n*Plus de détails :* `!helpme twitch`\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('XP Vocal/Textuel', '`rank`, `rank templates`, `rank template <name>`, `ranks`, `server xp`, `server xp md`, `server xp csv`, `server xp txt`,\r\n`start server xp`, `stop server xp`, `start xp`, `stop xp`\r\n\r\n*Plus de détails :* `!helpme xp`\r\n¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('Leaderboard', '`server rank <nb>`, `server last rank <nb>`, `server rank reset`, `server rank ranges`, `server rank range <name> <start> <end>`\r\n\r\n*Plus de détails :* `!helpme leaderboard`\r\n¯¯¯¯¯¯¯¯¯¯¯')
-                .addField('XP Bonus', '`xpbonus <enable|disable>`, `xpbonus pop`, `xpbonus config <messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>`, `xpbonus config`, `xpbonus channel <add|remove|list>`\r\n\r\n*Plus de détails :* `!helpme xpbonus`\r\n¯¯¯¯¯¯¯¯¯¯¯')
-                .setDescription('**Utilisation** : `!<ma_commande>`');
-        }
-        else if(group.toLowerCase() === 'xpbonus')
-        {
-            embed
-                .setAuthor('XP Bonus\r\n¯¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://media.discordapp.net/attachments/514178068835860498/718771841476460604/XP-bonus_1.gif')
-                .setDescription(`
-    :small_orange_diamond: **!xpbonus <enable|disable>** | Active ou désactive l'XP Bonus
-    :small_orange_diamond: **!xpbonus config <messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>** | Modifie la configuration
-    :small_blue_diamond: **!xpbonus config** | Affiche la configuration
-    :small_orange_diamond: **!xpbonus channel <add|remove|list>** | Ajoute/supprime/liste les salons
-    :small_orange_diamond: **!xpbonus pop** | Fait apparaitre manuellement le bonus dans un salon de la liste`.trim());
-        }
-        else if(group.toLowerCase() === 'leaderboard')
-        {
-            embed
-                .setAuthor('Leaderboard\r\n¯¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://media.discordapp.net/attachments/514178068835860498/718771841476460604/XP-bonus_1.gif')
-                .setDescription(`
-    :small_blue_diamond: **!server rank <nb>** | Affiche le leaderboard
-    :small_blue_diamond: **!server last rank <nb>** | Affiche le leaderboard de la dernière fois (jour dernier et semaine dernière)
-    :small_orange_diamond: **!server rank reset** | Réinitialise le leaderboard
-    :small_blue_diamond: **!server rank ranges** | Affiche les plages horaires pour recevoir de l'exp
-    :small_orange_diamond: **!server rank range <name> <start> <end>** | Modifie une plage horaire`.trim());
-        }
-        else if(group.toLowerCase() === 'tridolon')
-        {
-            embed
-                .setAuthor('Tridolon\r\n¯¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479613651918127114/Teralyst_1.png')
-                .setDescription(`
-    :small_blue_diamond: **!trio** | Affiche les informations sur le trio
-    :small_blue_diamond: **!join trio** | Rejoindre le role @Trio Team
-    :small_orange_diamond: **!leave trio** | Quitter le role @Trio Team
-    :small_orange_diamond: **!nonotif eidolonswarning** | Désactive les notifications de l'arrivée des Eidolons
-    :small_blue_diamond: **!notif eidolonswarning** | Active les notifications de l'arrivée des Eidolons`.trim());
-        }
-        else if(group.toLowerCase() === 'membres')
-        {
-            embed
-                .setAuthor('Membres\r\n¯¯¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479619902161027072/unnamed3.png')
-                .setDescription(`
-    :small_blue_diamond: **!notif memberadd** | Active les notifications lors de l'ajout d'un nouveau membre
-    :small_orange_diamond: **!nonotif memberadd** | Désactive les notifications lors de l'ajout d'un nouveau membre
-    :small_blue_diamond: **!notif memberleave** | Active les notifications lorsqu'un membre quitte le clan
-    :small_orange_diamond: **!nonotif memberleave** | Désactive les notifications lorsqu'un membre quitte le clan`.trim());
-        }
-        else if(group.toLowerCase() === 'twitch')
-        {
-            embed
-                .setAuthor('Twitch\r\n¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479614334805213185/1280px-Twitch_logo.png')
-                .setDescription(`
-    :small_blue_diamond: **!twitch** <name> | Obtenir des informations sur une chaine Twitch
-    :small_orange_diamond: **!twitch remove** <name> | Supprime un message Twitch précédement ajouté`.trim());
-        }
-        else if(group.toLowerCase() === 'xp')
-        {
-            embed
-                .setAuthor('XP Vocal/Textuel\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯', authorIcon)
-                .setThumbnail('https://cdn.discordapp.com/attachments/473609056163201024/479614949220548610/xp-logo.png')
-                .setDescription(`
-    :small_blue_diamond: **!rank** | Affiche l'expérience de l'utilisateur
-    :small_blue_diamond: **!rank templates** | Affiche la liste des templates
-    :small_blue_diamond: **!rank template <name>** | Sélectionne un template
-    :small_blue_diamond: **!ranks** | Affiche la liste des rangs
-    :small_blue_diamond: **!server xp** | Affiche les statistiques du serveur
-    :small_blue_diamond: **!server xp md** | Télécharge les stats du serveur au format [MD](https://www.commentcamarche.net/download/telecharger-34055333-notepad)
-    :small_blue_diamond: **!server xp csv** | Télécharge les stats du serveur au format [CSV](https://www.commentcamarche.net/download/telecharger-209-excel-viewer)
-    :small_blue_diamond: **!server xp txt** | Télécharge les stats du serveur au format TXT
-    :small_blue_diamond: **!start server xp** | Démarre le stockage de l'exp du serveur
-    :small_orange_diamond: **!stop server xp** | Arrête le stockage de l'exp du serveur
-    :small_blue_diamond: **!start xp** | Démarre le stockage de l'expérience
-    :small_orange_diamond: **!stop xp** | Arrête le stockage de l'expérience`.trim());
-        }
-
-        message.delete();
-        message.channel.send(embed);
-    }
-
+    
     public onMessage(message: Message, checkForCommand: (regex: RegExp) => boolean, params: string[]) {
 
         const setCommonSetting = (message, callback) => {
@@ -414,11 +316,9 @@ export class BotGeneral extends IBot {
                 message.reply(':small_blue_diamond: Activation des notifications pour les Eidolons')
             });
         }
-        else if(checkForCommand(/^\s*!(?:help|aide)\s*(?:me|moi)\s*(.*)/img))
+        else if(checkForCommand(Help.instance.regex))
         {
-            const match = /^\s*!(?:help|aide)\s*(?:me|moi)\s*(.*)/img.exec(message.content);
-
-            this.helpCommand(message, match[1]);
+            Help.instance.manageMessage(message, params[1]);
         }
         else if(checkForCommand(/^\s*!(?:join|rejoindre)\s+trio\s*$/img))
         {

@@ -8,7 +8,16 @@ export default {
         ranks: require(path.join(__dirname, '..', 'server', process.env.SERVER_FOLDER_NAME, `ranks.json`)) as IBigBrowserV2Rangs,
         info: require(path.join(__dirname, '..', 'server', process.env.SERVER_FOLDER_NAME, `info.json`)) as {
             activity: string,
-            rankBannerImgUrl: string
-        },
+            rankBannerImgUrl: string,
+            help?: {
+                command: string
+                displayIn: 'BigBrowser' | string
+                data: {
+                    _default: any
+                    "": any
+                    [key: string]: any
+                }
+            }
+        }
     }
 };

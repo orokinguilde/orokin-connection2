@@ -56,6 +56,7 @@ var ScheduledEvent_1 = require("../ScheduledEvent");
 var Bot_1 = require("../Bot");
 var moment = require("moment-timezone");
 var config_1 = require("../config");
+var Help_1 = require("../Help");
 var bannerTemplates = require('../BannerTemplate');
 var BigBrowser = require('../BigBrowser');
 var globals = require('../globals');
@@ -117,7 +118,10 @@ var BotBigBrowser = /** @class */ (function (_super) {
                 globals.saver.save();
             });
         }*/
-        if (checkForCommand(/^\s*!ranks$/img)) {
+        if (checkForCommand(Help_1.Help.instance.regex)) {
+            Help_1.Help.instance.manageMessage(message, params[1]);
+        }
+        else if (checkForCommand(/^\s*!ranks$/img)) {
             var user = this.bigBrowserV2.getUser(message.member);
             var exp_1 = user.stats.xp;
             var userRank_1 = user.stats.rank;

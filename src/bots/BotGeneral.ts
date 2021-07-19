@@ -149,7 +149,6 @@ export class BotGeneral extends IBot {
                 callback();
 
                 message.delete();
-                globals.saver.save();
             });
         }
 
@@ -157,7 +156,6 @@ export class BotGeneral extends IBot {
         {
             this.application.addServerChannel(message.channel);
             message.delete();
-            globals.saver.save();
         }
         else if(checkForCommand(/^\s*!mentor .+$/img))
         {
@@ -171,7 +169,6 @@ export class BotGeneral extends IBot {
                 if(this.mentoring.setMentor(message.member, disciple))
                 {
                     message.reply(`recrutement enregistré !`);
-                    globals.saver.save();
                 }
                 else
                 {
@@ -361,8 +358,6 @@ export class BotGeneral extends IBot {
                     message.channel.send(`Le twitch existe deja sur le channel \`${twitch.message.channel.name}\` ! (\`${twitch.streamer}\` ${isLive ? 'est en live' : 'n\'est pas en live'})`);
                 })
             }
-
-            globals.saver.save();
         }/*
         else if(checkForCommand(/^\s*![twitch]+\s*.+$/img))
         {

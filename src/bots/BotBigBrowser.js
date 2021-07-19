@@ -175,7 +175,6 @@ var BotBigBrowser = /** @class */ (function (_super) {
                 user.bannerTemplateKey = template.key;
                 message.channel.send(message.member + ", le template \"" + name_1 + "\" t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
                 message.delete();
-                globals.saver.save();
             }
         }
         else if (checkForCommand(/^\s*!rank\s*$/img)) {

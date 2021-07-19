@@ -135,13 +135,11 @@ var BotGeneral = /** @class */ (function (_super) {
             BotGeneral.adminOnly(message, function () {
                 callback();
                 message.delete();
-                globals.saver.save();
             });
         };
         if (checkForCommand(/^\s*!trio\s*$/img)) {
             this.application.addServerChannel(message.channel);
             message.delete();
-            globals.saver.save();
         }
         else if (checkForCommand(/^\s*!mentor .+$/img)) {
             console.log('MENTOR');
@@ -150,7 +148,6 @@ var BotGeneral = /** @class */ (function (_super) {
                 var disciple = mentions[0];
                 if (this.mentoring.setMentor(message.member, disciple)) {
                     message.reply("recrutement enregistr\u00E9 !");
-                    globals.saver.save();
                 }
                 else {
                     message.reply("recrutement refus\u00E9 !");
@@ -302,7 +299,6 @@ var BotGeneral = /** @class */ (function (_super) {
                     message.channel.send("Le twitch existe deja sur le channel `" + twitch_1.message.channel.name + "` ! (`" + twitch_1.streamer + "` " + (isLive ? 'est en live' : 'n\'est pas en live') + ")");
                 });
             }
-            globals.saver.save();
         } /*
         else if(checkForCommand(/^\s*![twitch]+\s*.+$/img))
         {

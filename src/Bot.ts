@@ -1,4 +1,5 @@
 import { Client, TextChannel, GuildChannel, Collection, Message } from "discord.js";
+import config from "./config";
 
 export abstract class IBot {
     public constructor(options) {
@@ -185,6 +186,12 @@ export abstract class IBot {
 
         client.on('ready', () => {
             console.log('READY');
+
+            const botName = config.server.info.name;
+
+            if(botName) {
+                client.user.setUsername(botName);
+            }
 
             this.ready();
 

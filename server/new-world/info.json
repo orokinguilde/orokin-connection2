@@ -1,6 +1,10 @@
 {
     "activity": "New World avant tout le monde",
     "rankBannerImgUrl": "https://cdn.discordapp.com/attachments/472724867381461012/866361229677297704/embleme_alliance.png",
+    "xp": {
+        "voiceMs": 1800000,
+        "textChars": 500
+    },
     "help": {
         "command": "!helpme",
         "displayIn": "BigBrowser",

@@ -7,8 +7,13 @@ export default {
         fsFriendlyName: process.env.SERVER_FOLDER_NAME.replace(/[^a-zA-Z0-9_-]/, '_'),
         ranks: require(path.join(__dirname, '..', 'server', process.env.SERVER_FOLDER_NAME, `ranks.json`)) as IBigBrowserV2Rangs,
         info: require(path.join(__dirname, '..', 'server', process.env.SERVER_FOLDER_NAME, `info.json`)) as {
-            activity: string,
-            rankBannerImgUrl: string,
+            name?: string
+            activity: string
+            rankBannerImgUrl: string
+            xp: {
+                voiceMs: number
+                textChars: number
+            },
             help?: {
                 command: string
                 displayIn: 'BigBrowser' | string

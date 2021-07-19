@@ -149,11 +149,11 @@ export class BigBrowserV2UserStats {
     }
 
     public get voiceXp() {
-        return this.stats.tvt / (1000 * 60 * 30);
+        return this.stats.tvt / config.server.info.xp.voiceMs;
     }
 
     public get textXp() {
-        return this.stats.tts / 500;
+        return this.stats.tts / config.server.info.xp.textChars;
     }
 
     public get xpBonus() {

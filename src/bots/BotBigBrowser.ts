@@ -137,7 +137,6 @@ export class BotBigBrowser extends IBot {
                 user.bannerTemplateKey = template.key;
                 message.channel.send(`${message.member}, le template "${name}" t'a été assigné 👍`);
                 message.delete();
-                globals.saver.save();
             }
         }
         else if(checkForCommand(/^\s*!rank\s*$/img))

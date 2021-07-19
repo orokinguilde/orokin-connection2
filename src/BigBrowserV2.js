@@ -61,14 +61,14 @@ var BigBrowserV2UserStats = /** @class */ (function () {
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "voiceXp", {
         get: function () {
-            return this.stats.tvt / (1000 * 60 * 30);
+            return this.stats.tvt / config_1.default.server.info.xp.voiceMs;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "textXp", {
         get: function () {
-            return this.stats.tts / 500;
+            return this.stats.tts / config_1.default.server.info.xp.textChars;
         },
         enumerable: false,
         configurable: true

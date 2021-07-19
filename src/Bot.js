@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IBot = void 0;
 var discord_js_1 = require("discord.js");
+var config_1 = require("./config");
 var IBot = /** @class */ (function () {
     function IBot(options) {
         this.debug = false;
@@ -156,6 +157,10 @@ var IBot = /** @class */ (function () {
         });
         client.on('ready', function () {
             console.log('READY');
+            var botName = config_1.default.server.info.name;
+            if (botName) {
+                client.user.setUsername(botName);
+            }
             _this.ready();
             if (_this._onReady)
                 _this._onReady(function () { return _this.startRuntime(); });

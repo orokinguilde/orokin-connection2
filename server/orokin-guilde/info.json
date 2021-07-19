@@ -1,6 +1,10 @@
 {
     "activity": "connecter la guilde",
     "rankBannerImgUrl": "https://cdn.discordapp.com/attachments/514178068835860498/718529978018562089/473257182591451147.png?size=128",
+    "xp": {
+        "voiceMs": 1800000,
+        "textChars": 500
+    },
     "help": {
         "command": "!helpme",
         "displayIn": "General",

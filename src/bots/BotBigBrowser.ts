@@ -5,11 +5,11 @@ import { IBot } from "../Bot";
 import * as moment from 'moment-timezone'
 import config from '../config'
 import { Help } from "../Help";
+import bannerTemplates, { IBannerTemplateData } from "../BannerTemplate";
+import { Banner } from "../Banner"
 
-const bannerTemplates = require('../BannerTemplate');
 const BigBrowser = require('../BigBrowser');
 const globals = require('../globals');
-const Banner = require('../Banner');
 
 export class BotBigBrowser extends IBot {
     public constructor(options) {
@@ -100,41 +100,30 @@ export class BotBigBrowser extends IBot {
 
             message.delete();
             message.channel.send(msg);
+        } else if(checkForCommand(/^\s*!rank template custom\s+\{(.+)\}\s*$/imgs)) {
+            const json = /^\s*!rank template custom\s+(.+)\s*$/imgs.exec(message.content)[1].trim();
+            const templateInfo = JSON.parse(json) as IBannerTemplateData;
+
+            const user = this.bigBrowserV2.getUser(message.member);
+
+            user.customBannerTemplate = templateInfo;
+            message.channel.send(`${message.member}, le template personnalisé t'a été assigné 👍`);
+
         } else if(checkForCommand(/^\s*!rank template (.+)$/img)) {
             const name = /^\s*!rank template (.+)$/img.exec(message.content)[1].trim().toLowerCase();
 
             const user = this.bigBrowserV2.getUser(message.member);
-            let template = undefined;
-
-            for(const templateItem of bannerTemplates.list) {
-                if(templateItem.key.toString().toLowerCase() == name) {
-                    template = templateItem;
-                    break;
-                }
-            }
-
-            if(!template) {
-                for(const templateItem of bannerTemplates.list) {
-                    if(templateItem.name.toString().toLowerCase().indexOf(name) > -1) {
-                        template = templateItem;
-                        break;
-                    }
-                }
-            }
-
-            if(!template) {
-                for(const templateItem of bannerTemplates.list) {
-                    if(`${templateItem.key}. ${templateItem.name}`.toLowerCase().indexOf(name) > -1) {
-                        template = templateItem;
-                        break;
-                    }
-                }
-            }
+            
+            const template =
+                bannerTemplates.list.find(templateItem => templateItem.key.toString().toLowerCase() == name)
+                ?? bannerTemplates.list.find(templateItem => templateItem.name.toString().toLowerCase().indexOf(name) > -1)
+                ?? bannerTemplates.list.find(templateItem => `${templateItem.key}. ${templateItem.name}`.toLowerCase().indexOf(name) > -1);
 
             if(!template) {
                 message.channel.send(`${message.member}, le template "${name}" n'a pas été trouvé 😢`);
             } else {
                 user.bannerTemplateKey = template.key;
+                user.customBannerTemplate = undefined;
                 message.channel.send(`${message.member}, le template "${name}" t'a été assigné 👍`);
                 message.delete();
             }
@@ -148,7 +137,7 @@ export class BotBigBrowser extends IBot {
             const rank = this.bigBrowserV2.getUserRanking(user, message.guild);
             
             const banner = new Banner({
-                avatarUrl: message.member.user.avatarURL.replace('?size=2048', '?size=128'),
+                avatarUrl: (message.member.user.avatarURL || config.server.info.defaultAvatarURL).replace('?size=2048', '?size=128'),
                 nickname: message.member.displayName,
                 rankIndex: rank.index,
                 rankTotal: rank.total,
@@ -159,15 +148,8 @@ export class BotBigBrowser extends IBot {
                 expVocal: voiceExp,
                 maxExp: ranking.expFromCurrentToNextRank
             });
-
-            let template = undefined;
             
-            if(user.bannerTemplateKey) {
-                template = bannerTemplates.indexed[user.bannerTemplateKey];
-            }
-            if(!template) {
-                template = bannerTemplates.default;
-            }
+            const template = user.bannerTemplate;
 
             message.react('🐰');
             

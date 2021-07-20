@@ -16,6 +16,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BigBrowserV2 = exports.BigBrowserV2User = exports.BigBrowserV2UserStatsTimedWeek = exports.BigBrowserV2UserStatsTimedDay = exports.BigBrowserV2UserStatsTimed = exports.BigBrowserV2UserStats = void 0;
 var moment = require("moment-timezone");
 var config_1 = require("./config");
+var BannerTemplate_1 = require("./BannerTemplate");
 var BigBrowserV2UserStats = /** @class */ (function () {
     function BigBrowserV2UserStats(stats) {
         this._stats = stats;
@@ -476,6 +477,27 @@ var BigBrowserV2User = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(BigBrowserV2User.prototype, "bannerTemplate", {
+        get: function () {
+            var template;
+            if (this.customBannerTemplate) {
+                template = {
+                    key: 0,
+                    name: 'custom',
+                    template: this.customBannerTemplate
+                };
+            }
+            if (!template && this.bannerTemplateKey) {
+                template = BannerTemplate_1.default.indexed[this.bannerTemplateKey];
+            }
+            if (!template) {
+                template = BannerTemplate_1.default.default;
+            }
+            return template;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(BigBrowserV2User.prototype, "stats", {
         get: function () {
             if (!this._stats) {
@@ -596,6 +618,16 @@ var BigBrowserV2User = /** @class */ (function () {
         },
         set: function (value) {
             this.userData.bannerTemplateKey = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(BigBrowserV2User.prototype, "customBannerTemplate", {
+        get: function () {
+            return this.userData.customBannerTemplate;
+        },
+        set: function (value) {
+            this.userData.customBannerTemplate = value;
         },
         enumerable: false,
         configurable: true

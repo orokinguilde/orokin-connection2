@@ -57,10 +57,10 @@ var Bot_1 = require("../Bot");
 var moment = require("moment-timezone");
 var config_1 = require("../config");
 var Help_1 = require("../Help");
-var bannerTemplates = require('../BannerTemplate');
+var BannerTemplate_1 = require("../BannerTemplate");
+var Banner_1 = require("../Banner");
 var BigBrowser = require('../BigBrowser');
 var globals = require('../globals');
-var Banner = require('../Banner');
 var BotBigBrowser = /** @class */ (function (_super) {
     __extends(BotBigBrowser, _super);
     function BotBigBrowser(options) {
@@ -106,6 +106,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
     };
     BotBigBrowser.prototype.onMessage = function (message, checkForCommand, params) {
         var _this = this;
+        var _a, _b;
         if (!message.author.bot)
             this.bigBrowser.increaseTextActivity(message.guild, message.author, 0.5);
         this.bigBrowserV2.updateUserText(message);
@@ -133,46 +134,29 @@ var BotBigBrowser = /** @class */ (function (_super) {
             message.channel.send(msg);
         }
         else if (checkForCommand(/^\s*!rank templates$/img)) {
-            var msg = message.member + ", voici la liste des templates disponibles (`!rank template ...`) :\r\n" + bannerTemplates.list.map(function (bannerTemplate) {
+            var msg = message.member + ", voici la liste des templates disponibles (`!rank template ...`) :\r\n" + BannerTemplate_1.default.list.map(function (bannerTemplate) {
                 return "**" + bannerTemplate.key + ".** " + bannerTemplate.name;
             }).join('\r\n');
             message.delete();
             message.channel.send(msg);
         }
+        else if (checkForCommand(/^\s*!rank template custom\s+\{(.+)\}\s*$/imgs)) {
+            var json = /^\s*!rank template custom\s+(.+)\s*$/imgs.exec(message.content)[1].trim();
+            var templateInfo = JSON.parse(json);
+            var user = this.bigBrowserV2.getUser(message.member);
+            user.customBannerTemplate = templateInfo;
+            message.channel.send(message.member + ", le template personnalis\u00E9 t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
+        }
         else if (checkForCommand(/^\s*!rank template (.+)$/img)) {
             var name_1 = /^\s*!rank template (.+)$/img.exec(message.content)[1].trim().toLowerCase();
             var user = this.bigBrowserV2.getUser(message.member);
-            var template = undefined;
-            for (var _i = 0, _a = bannerTemplates.list; _i < _a.length; _i++) {
-                var templateItem = _a[_i];
-                if (templateItem.key.toString().toLowerCase() == name_1) {
-                    template = templateItem;
-                    break;
-                }
-            }
-            if (!template) {
-                for (var _b = 0, _c = bannerTemplates.list; _b < _c.length; _b++) {
-                    var templateItem = _c[_b];
-                    if (templateItem.name.toString().toLowerCase().indexOf(name_1) > -1) {
-                        template = templateItem;
-                        break;
-                    }
-                }
-            }
-            if (!template) {
-                for (var _d = 0, _e = bannerTemplates.list; _d < _e.length; _d++) {
-                    var templateItem = _e[_d];
-                    if ((templateItem.key + ". " + templateItem.name).toLowerCase().indexOf(name_1) > -1) {
-                        template = templateItem;
-                        break;
-                    }
-                }
-            }
+            var template = (_b = (_a = BannerTemplate_1.default.list.find(function (templateItem) { return templateItem.key.toString().toLowerCase() == name_1; })) !== null && _a !== void 0 ? _a : BannerTemplate_1.default.list.find(function (templateItem) { return templateItem.name.toString().toLowerCase().indexOf(name_1) > -1; })) !== null && _b !== void 0 ? _b : BannerTemplate_1.default.list.find(function (templateItem) { return (templateItem.key + ". " + templateItem.name).toLowerCase().indexOf(name_1) > -1; });
             if (!template) {
                 message.channel.send(message.member + ", le template \"" + name_1 + "\" n'a pas \u00E9t\u00E9 trouv\u00E9 \uD83D\uDE22");
             }
             else {
                 user.bannerTemplateKey = template.key;
+                user.customBannerTemplate = undefined;
                 message.channel.send(message.member + ", le template \"" + name_1 + "\" t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
                 message.delete();
             }
@@ -183,8 +167,8 @@ var BotBigBrowser = /** @class */ (function (_super) {
             var textExp = user.stats.textXp;
             var ranking = user.stats.rank;
             var rank = this.bigBrowserV2.getUserRanking(user, message.guild);
-            var banner = new Banner({
-                avatarUrl: message.member.user.avatarURL.replace('?size=2048', '?size=128'),
+            var banner = new Banner_1.Banner({
+                avatarUrl: (message.member.user.avatarURL || config_1.default.server.info.defaultAvatarURL).replace('?size=2048', '?size=128'),
                 nickname: message.member.displayName,
                 rankIndex: rank.index,
                 rankTotal: rank.total,
@@ -195,13 +179,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                 expVocal: voiceExp,
                 maxExp: ranking.expFromCurrentToNextRank
             });
-            var template = undefined;
-            if (user.bannerTemplateKey) {
-                template = bannerTemplates.indexed[user.bannerTemplateKey];
-            }
-            if (!template) {
-                template = bannerTemplates.default;
-            }
+            var template = user.bannerTemplate;
             message.react('🐰');
             banner.createBuffer(template, function (e, buffer) {
                 if (e) {
@@ -266,7 +244,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
         }
         else if (checkForCommand(/^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img)) {
             console.log('SERVER RANK');
-            var _f = /^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img.exec(message.content), getLast = _f[1], nbRosterStr = _f[2];
+            var _c = /^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img.exec(message.content), getLast = _c[1], nbRosterStr = _c[2];
             var nbRoster = nbRosterStr && parseInt(nbRosterStr);
             var result = this.bigBrowserV2.getRosterRanks(message.guild, nbRoster, !!getLast);
             var createStrLine = function (entries) { return entries

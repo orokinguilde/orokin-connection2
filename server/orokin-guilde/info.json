@@ -1,6 +1,7 @@
 {
     "activity": "connecter la guilde",
     "rankBannerImgUrl": "https://cdn.discordapp.com/attachments/514178068835860498/718529978018562089/473257182591451147.png?size=128",
+    "defaultAvatarURL": "https://cdn.discordapp.com/attachments/696363238878740541/867030077182836756/images.jpg",
     "game": {
         "processName": "warframe",
         "name": "Warframe"

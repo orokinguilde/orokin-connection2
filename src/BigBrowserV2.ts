@@ -1,6 +1,7 @@
 import * as moment from 'moment-timezone'
 import { Guild, GuildMember } from 'discord.js'
 import config from './config'
+import bannerTemplates, { IBannerTemplate, IBannerTemplateData } from "./BannerTemplate";
 
 export interface IBigBrowserV2Rang {
     name: string
@@ -60,7 +61,8 @@ export interface IBigBrowserV2User {
     isWeird: boolean
     removedDate: number
     tracking?: boolean
-    bannerTemplateKey?: string
+    bannerTemplateKey?: string | number
+    customBannerTemplate?: IBannerTemplateData
 
     //v1: IBigBrowserV2UserV1
 
@@ -468,6 +470,27 @@ export class BigBrowserV2User {
         return this._userData;
     }
 
+    public get bannerTemplate() {
+        let template: IBannerTemplate;
+
+        if(this.customBannerTemplate) {
+            template = {
+                key: 0,
+                name: 'custom',
+                template: this.customBannerTemplate
+            };
+        }
+            
+        if(!template && this.bannerTemplateKey) {
+            template = bannerTemplates.indexed[this.bannerTemplateKey];
+        }
+        if(!template) {
+            template = bannerTemplates.default;
+        }
+
+        return template;
+    }
+
     private _stats: BigBrowserV2UserStats;
     public get stats() {
         if(!this._stats) {
@@ -551,6 +574,13 @@ export class BigBrowserV2User {
     }
     public set bannerTemplateKey(value) {
         this.userData.bannerTemplateKey = value;
+    }
+
+    public get customBannerTemplate() {
+        return this.userData.customBannerTemplate;
+    }
+    public set customBannerTemplate(value) {
+        this.userData.customBannerTemplate = value;
     }
 
     public resetDayWeekStats() {

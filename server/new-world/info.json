@@ -2,10 +2,11 @@
     "name": "Bot corrompu",
     "activity": "New World avant tout le monde",
     "rankBannerImgUrl": "https://cdn.discordapp.com/attachments/472724867381461012/866361229677297704/embleme_alliance.png",
-   "game": {
+    "defaultAvatarURL": "https://cdn.discordapp.com/attachments/696363238878740541/867030077182836756/images.jpg",
+    "game": {
         "processName": "newworld",
-        "name": "NewWorld"
- },
+        "name": "New World"
+    },
      "xp": {
         "voiceMs": 1800000,
         "textChars": 500

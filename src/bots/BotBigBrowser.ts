@@ -100,6 +100,12 @@ export class BotBigBrowser extends IBot {
 
             message.delete();
             message.channel.send(msg);
+        } else if(checkForCommand(/^\s*!rank\s*template\s*show$/imgs)) {
+            const user = this.bigBrowserV2.getUser(message.member);
+
+            const json = JSON.stringify(user.bannerTemplate?.template, null, 4);
+
+            message.reply("```json\n" + json + "\n```");
         } else if(checkForCommand(/^\s*!rank template custom\s+\{(.+)\}\s*$/imgs)) {
             try {
                 const json = /^\s*!rank template custom\s+(.+)\s*$/imgs.exec(message.content)[1].trim();

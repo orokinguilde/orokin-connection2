@@ -106,7 +106,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
     };
     BotBigBrowser.prototype.onMessage = function (message, checkForCommand, params) {
         var _this = this;
-        var _a, _b;
+        var _a, _b, _c;
         if (!message.author.bot)
             this.bigBrowser.increaseTextActivity(message.guild, message.author, 0.5);
         this.bigBrowserV2.updateUserText(message);
@@ -140,6 +140,11 @@ var BotBigBrowser = /** @class */ (function (_super) {
             message.delete();
             message.channel.send(msg);
         }
+        else if (checkForCommand(/^\s*!rank\s*template\s*show$/imgs)) {
+            var user = this.bigBrowserV2.getUser(message.member);
+            var json = JSON.stringify((_a = user.bannerTemplate) === null || _a === void 0 ? void 0 : _a.template, null, 4);
+            message.reply("```json\n" + json + "\n```");
+        }
         else if (checkForCommand(/^\s*!rank template custom\s+\{(.+)\}\s*$/imgs)) {
             try {
                 var json = /^\s*!rank template custom\s+(.+)\s*$/imgs.exec(message.content)[1].trim();
@@ -155,7 +160,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
         else if (checkForCommand(/^\s*!rank template (.+)$/img)) {
             var name_1 = /^\s*!rank template (.+)$/img.exec(message.content)[1].trim().toLowerCase();
             var user = this.bigBrowserV2.getUser(message.member);
-            var template = (_b = (_a = BannerTemplate_1.default.list.find(function (templateItem) { return templateItem.key.toString().toLowerCase() == name_1; })) !== null && _a !== void 0 ? _a : BannerTemplate_1.default.list.find(function (templateItem) { return templateItem.name.toString().toLowerCase().indexOf(name_1) > -1; })) !== null && _b !== void 0 ? _b : BannerTemplate_1.default.list.find(function (templateItem) { return (templateItem.key + ". " + templateItem.name).toLowerCase().indexOf(name_1) > -1; });
+            var template = (_c = (_b = BannerTemplate_1.default.list.find(function (templateItem) { return templateItem.key.toString().toLowerCase() == name_1; })) !== null && _b !== void 0 ? _b : BannerTemplate_1.default.list.find(function (templateItem) { return templateItem.name.toString().toLowerCase().indexOf(name_1) > -1; })) !== null && _c !== void 0 ? _c : BannerTemplate_1.default.list.find(function (templateItem) { return (templateItem.key + ". " + templateItem.name).toLowerCase().indexOf(name_1) > -1; });
             if (!template) {
                 message.channel.send(message.member + ", le template \"" + name_1 + "\" n'a pas \u00E9t\u00E9 trouv\u00E9 \uD83D\uDE22");
             }
@@ -249,7 +254,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
         }
         else if (checkForCommand(/^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img)) {
             console.log('SERVER RANK');
-            var _c = /^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img.exec(message.content), getLast = _c[1], nbRosterStr = _c[2];
+            var _d = /^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img.exec(message.content), getLast = _d[1], nbRosterStr = _d[2];
             var nbRoster = nbRosterStr && parseInt(nbRosterStr);
             var result = this.bigBrowserV2.getRosterRanks(message.guild, nbRoster, !!getLast);
             var createStrLine = function (entries) { return entries

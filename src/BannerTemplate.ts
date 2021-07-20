@@ -156,23 +156,7 @@ const templates: IBannerTemplate[] = [{
         "avatarAroundColor": "rgb(130,97,54)",
         "bgImg": "https://cdn.discordapp.com/attachments/483003722830577671/867007080760868864/112609-P969sQ0jIU6S.jpg"
     }
-, {
-    key: 4,
-    name: "gentleman",
-    template: {
- "fore": {
-        "color": "rgb(255,255,255)",
-        "borderColor": "rgb(255,255,255)",
-        "borderSize": 0.5
-    },
-    "bgLeftColor": "rgb(0,0,0)",
-    "progressBar": {
-        "fore": "rgb(94,201,238)",
-        "back": "rgb(215,222,225)"
-    },
-    "avatarAroundColor": "rgb(94,201,238)",
-    "bgImg": "https://cdn.discordapp.com/attachments/696363238878740541/867049181884317716/Sans_titre-2.png"
-}
+
 }];
 
 const result = {

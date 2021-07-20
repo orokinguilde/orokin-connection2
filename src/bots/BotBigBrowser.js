@@ -141,11 +141,16 @@ var BotBigBrowser = /** @class */ (function (_super) {
             message.channel.send(msg);
         }
         else if (checkForCommand(/^\s*!rank template custom\s+\{(.+)\}\s*$/imgs)) {
-            var json = /^\s*!rank template custom\s+(.+)\s*$/imgs.exec(message.content)[1].trim();
-            var templateInfo = JSON.parse(json);
-            var user = this.bigBrowserV2.getUser(message.member);
-            user.customBannerTemplate = templateInfo;
-            message.channel.send(message.member + ", le template personnalis\u00E9 t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
+            try {
+                var json = /^\s*!rank template custom\s+(.+)\s*$/imgs.exec(message.content)[1].trim();
+                var templateInfo = JSON.parse(json);
+                var user = this.bigBrowserV2.getUser(message.member);
+                user.customBannerTemplate = templateInfo;
+                message.channel.send(message.member + ", le template personnalis\u00E9 t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
+            }
+            catch (ex) {
+                message.reply("Le JSON n'est pas valide \uD83D\uDE22");
+            }
         }
         else if (checkForCommand(/^\s*!rank template (.+)$/img)) {
             var name_1 = /^\s*!rank template (.+)$/img.exec(message.content)[1].trim().toLowerCase();

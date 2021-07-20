@@ -101,13 +101,17 @@ export class BotBigBrowser extends IBot {
             message.delete();
             message.channel.send(msg);
         } else if(checkForCommand(/^\s*!rank template custom\s+\{(.+)\}\s*$/imgs)) {
-            const json = /^\s*!rank template custom\s+(.+)\s*$/imgs.exec(message.content)[1].trim();
-            const templateInfo = JSON.parse(json) as IBannerTemplateData;
+            try {
+                const json = /^\s*!rank template custom\s+(.+)\s*$/imgs.exec(message.content)[1].trim();
+                const templateInfo = JSON.parse(json) as IBannerTemplateData;
 
-            const user = this.bigBrowserV2.getUser(message.member);
+                const user = this.bigBrowserV2.getUser(message.member);
 
-            user.customBannerTemplate = templateInfo;
-            message.channel.send(`${message.member}, le template personnalisé t'a été assigné 👍`);
+                user.customBannerTemplate = templateInfo;
+                message.channel.send(`${message.member}, le template personnalisé t'a été assigné 👍`);
+            } catch(ex) {
+                message.reply(`Le JSON n'est pas valide 😢`);
+            }
 
         } else if(checkForCommand(/^\s*!rank template (.+)$/img)) {
             const name = /^\s*!rank template (.+)$/img.exec(message.content)[1].trim().toLowerCase();

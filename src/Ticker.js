@@ -42,7 +42,7 @@ var Ticker = /** @class */ (function () {
     }
     Ticker.start = function (delayTime, fn) {
         var _this = this;
-        setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
+        setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, fn()];

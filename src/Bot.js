@@ -258,7 +258,7 @@ var IBot = /** @class */ (function () {
             var _loop_1 = function (i) {
                 var action = actions[i];
                 Ticker_1.Ticker.start((action.periodSec || 60) * 1000, function () { return __awaiter(_this, void 0, void 0, function () {
-                    var logText, guilds, _i, _a, item, _b, _c, guilds_2, guild, threadIds, _d, threadIds_1, threadId, channel;
+                    var logText, guilds, _i, _a, item, _b, threadIds, _c, threadIds_1, threadId, found, _d, guilds_2, guild, channel;
                     return __generator(this, function (_e) {
                         switch (_e.label) {
                             case 0:
@@ -268,25 +268,26 @@ var IBot = /** @class */ (function () {
                                 _i = 0, _a = action.list;
                                 _e.label = 1;
                             case 1:
-                                if (!(_i < _a.length)) return [3 /*break*/, 11];
+                                if (!(_i < _a.length)) return [3 /*break*/, 12];
                                 item = _a[_i];
                                 _b = item.type;
                                 switch (_b) {
                                     case 'thread': return [3 /*break*/, 2];
                                 }
-                                return [3 /*break*/, 10];
+                                return [3 /*break*/, 11];
                             case 2:
-                                _c = 0, guilds_2 = guilds;
+                                threadIds = Array.isArray(item.threadId) ? item.threadId : [item.threadId];
+                                _c = 0, threadIds_1 = threadIds;
                                 _e.label = 3;
                             case 3:
-                                if (!(_c < guilds_2.length)) return [3 /*break*/, 10];
-                                guild = guilds_2[_c];
-                                threadIds = Array.isArray(item.threadId) ? item.threadId : [item.threadId];
-                                _d = 0, threadIds_1 = threadIds;
+                                if (!(_c < threadIds_1.length)) return [3 /*break*/, 11];
+                                threadId = threadIds_1[_c];
+                                found = false;
+                                _d = 0, guilds_2 = guilds;
                                 _e.label = 4;
                             case 4:
-                                if (!(_d < threadIds_1.length)) return [3 /*break*/, 9];
-                                threadId = threadIds_1[_d];
+                                if (!(_d < guilds_2.length)) return [3 /*break*/, 9];
+                                guild = guilds_2[_d];
                                 return [4 /*yield*/, guild.channels.fetch(threadId)];
                             case 5:
                                 channel = _e.sent();
@@ -296,17 +297,24 @@ var IBot = /** @class */ (function () {
                             case 6:
                                 _e.sent();
                                 _e.label = 7;
-                            case 7: return [3 /*break*/, 9];
+                            case 7:
+                                found = true;
+                                return [3 /*break*/, 9];
                             case 8:
                                 _d++;
                                 return [3 /*break*/, 4];
                             case 9:
+                                if (!found) {
+                                    console.log("Thread " + threadId + " introuvable");
+                                }
+                                _e.label = 10;
+                            case 10:
                                 _c++;
                                 return [3 /*break*/, 3];
-                            case 10:
+                            case 11:
                                 _i++;
                                 return [3 /*break*/, 1];
-                            case 11:
+                            case 12:
                                 console.log(logText + " [success]");
                                 return [2 /*return*/];
                         }

@@ -243,10 +243,11 @@ export abstract class IBot {
                     for(const item of action.list) {
                         switch(item.type) {
                             case 'thread': {
-                                for(const guild of guilds) {
-                                    const threadIds = Array.isArray(item.threadId) ? item.threadId : [ item.threadId ];
+                                const threadIds = Array.isArray(item.threadId) ? item.threadId : [ item.threadId ];
 
-                                    for(const threadId of threadIds) {
+                                for(const threadId of threadIds) {
+                                    let found = false;
+                                    for(const guild of guilds) {
                                         const channel: ThreadChannel = await guild.channels.fetch(threadId) as any;
                                         
                                         if(channel) {
@@ -254,8 +255,13 @@ export abstract class IBot {
                                                 await channel.setArchived(false);
                                             }
 
+                                            found = true;
                                             break;
                                         }
+                                    }
+
+                                    if(!found) {
+                                        console.log(`Thread ${threadId} introuvable`);
                                     }
                                 }
                             }

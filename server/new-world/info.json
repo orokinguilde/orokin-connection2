@@ -14,7 +14,7 @@
     "actions": [{
         "on": "BigBrowser",
         "name": "Keep threads alive",
-        "periodSec": 60,
+        "periodSec": 5,
         "list": [
             { "type": "thread", "threadId": [
                 "885471214368325693",

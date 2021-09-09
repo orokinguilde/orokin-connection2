@@ -144,6 +144,33 @@ var BotBigBrowser = /** @class */ (function (_super) {
         if (checkForCommand(Help_1.Help.instance.regex)) {
             Help_1.Help.instance.manageMessage(message, params[1]);
         }
+        else if (checkForCommand(/^\s*!mp\s+(<@[^@>]+>\s*)+\s*(.+)$/img)) {
+            BotBigBrowser.adminOnly(message, function () {
+                var roles = message.mentions.roles.map(function (r) { return r.id; }).reduce(function (p, c) { return p.includes(c) ? p : p.concat(c); }, []);
+                var membres = message.guild.members.valueOf()
+                    .map(function (m) { return m; })
+                    .filter(function (m) {
+                    var memberRoles = m.roles.valueOf().map(function (r) { return r.id; });
+                    return roles.some(function (r) { return memberRoles.includes(r); });
+                });
+                var msg = params[2].trim();
+                if (msg) {
+                    if (membres.length > 0) {
+                        for (var _i = 0, membres_1 = membres; _i < membres_1.length; _i++) {
+                            var member = membres_1[_i];
+                            member.send(msg);
+                        }
+                        message.reply('[ ' + membres.map(function (m) { var _a; return (_a = m.nickname) !== null && _a !== void 0 ? _a : m.displayName; }).join(', ') + ' ] a/ont reçu le message');
+                    }
+                    else {
+                        message.reply('Personne ne possède ce(s) rôle(s)');
+                    }
+                }
+                else {
+                    message.reply('Message vide');
+                }
+            });
+        }
         else if (checkForCommand(/^\s*!ranks$/img)) {
             var user = this.bigBrowserV2.getUser(message.member);
             var exp_1 = user.stats.xp;

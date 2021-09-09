@@ -79,6 +79,33 @@ export class BotBigBrowser extends IBot {
 
         if(checkForCommand(Help.instance.regex)) {
             Help.instance.manageMessage(message, params[1]);
+        } else if(checkForCommand(/^\s*!mp\s+(<@[^@>]+>\s*)+\s*(.+)$/img)) {
+
+            BotBigBrowser.adminOnly(message, () => {
+                const roles = message.mentions.roles.map(r => r.id).reduce((p, c) => p.includes(c) ? p : p.concat(c), []);
+                const membres = message.guild.members.valueOf()
+                    .map(m => m)
+                    .filter(m => {
+                        const memberRoles = m.roles.valueOf().map(r => r.id);
+                        return roles.some(r => memberRoles.includes(r));
+                    });
+                const msg = params[2].trim();
+
+                if(msg) {
+                    if(membres.length > 0) {
+                        for(const member of membres) {
+                            member.send(msg);
+                        }
+                        
+                        message.reply('[ ' + membres.map(m => m.nickname ?? m.displayName).join(', ') + ' ] a/ont reçu le message');
+                    } else {
+                        message.reply('Personne ne possède ce(s) rôle(s)');
+                    }
+                } else {
+                    message.reply('Message vide');
+                }
+            })
+
         } else if(checkForCommand(/^\s*!ranks$/img)) {
 
             const user = this.bigBrowserV2.getUser(message.member);

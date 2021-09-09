@@ -94,7 +94,11 @@ export class BotBigBrowser extends IBot {
                 if(msg) {
                     if(membres.length > 0) {
                         for(const member of membres) {
-                            member.send(msg);
+                            member.send({
+                                content: msg,
+                                embeds: message.embeds,
+                                files: message.attachments?.map(a => a)
+                            });
                         }
                         
                         message.reply('[ ' + membres.map(m => m.nickname ?? m.displayName).join(', ') + ' ] a/ont reçu le message');

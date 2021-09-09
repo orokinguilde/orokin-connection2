@@ -146,6 +146,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
         }
         else if (checkForCommand(/^\s*!mp\s+(<@[^@>]+>\s*)+\s*(.+)$/img)) {
             BotBigBrowser.adminOnly(message, function () {
+                var _a;
                 var roles = message.mentions.roles.map(function (r) { return r.id; }).reduce(function (p, c) { return p.includes(c) ? p : p.concat(c); }, []);
                 var membres = message.guild.members.valueOf()
                     .map(function (m) { return m; })
@@ -158,7 +159,11 @@ var BotBigBrowser = /** @class */ (function (_super) {
                     if (membres.length > 0) {
                         for (var _i = 0, membres_1 = membres; _i < membres_1.length; _i++) {
                             var member = membres_1[_i];
-                            member.send(msg);
+                            member.send({
+                                content: msg,
+                                embeds: message.embeds,
+                                files: (_a = message.attachments) === null || _a === void 0 ? void 0 : _a.map(function (a) { return a; })
+                            });
                         }
                         message.reply('[ ' + membres.map(function (m) { var _a; return (_a = m.nickname) !== null && _a !== void 0 ? _a : m.displayName; }).join(', ') + ' ] a/ont reçu le message');
                     }

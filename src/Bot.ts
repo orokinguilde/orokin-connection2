@@ -120,8 +120,8 @@ export abstract class IBot {
         });
 
         const managerRoleByMessage = (message: MessageReaction | PartialMessageReaction, user: User | PartialUser, callback) => {
-            const channel = message.message.channel;
-            if(channel instanceof TextChannel && (channel.name === 'éditez-vos-grades' || channel.id.toString() === '532671748059955200')) {
+            const channel = message?.message?.channel;
+            if(channel && channel instanceof TextChannel && (channel.name === 'éditez-vos-grades' || channel.id.toString() === '532671748059955200')) {
                 const guild = message.message.guild;
 
                 callback(user, message.message.mentions.roles);

@@ -139,8 +139,9 @@ var IBot = /** @class */ (function () {
             });
         }); });
         var managerRoleByMessage = function (message, user, callback) {
-            var channel = message.message.channel;
-            if (channel instanceof discord_js_1.TextChannel && (channel.name === 'éditez-vos-grades' || channel.id.toString() === '532671748059955200')) {
+            var _a;
+            var channel = (_a = message === null || message === void 0 ? void 0 : message.message) === null || _a === void 0 ? void 0 : _a.channel;
+            if (channel && channel instanceof discord_js_1.TextChannel && (channel.name === 'éditez-vos-grades' || channel.id.toString() === '532671748059955200')) {
                 var guild = message.message.guild;
                 callback(user, message.message.mentions.roles);
             }

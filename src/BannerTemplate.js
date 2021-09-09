@@ -88,6 +88,40 @@ var templates = [{
             "avatarAroundColor": "rgb(94,201,238)",
             "bgImg": "https://cdn.discordapp.com/attachments/696363238878740541/867049181884317716/Sans_titre-2.png"
         }
+    }, {
+        key: 5,
+        name: "Champion new world",
+        template: {
+            "fore": {
+                "color": "rgb(255,255,255)",
+                "borderColor": "rgb(255,255,255)",
+                "borderSize": 0.5
+            },
+            "bgLeftColor": "rgb(0,0,0)",
+            "progressBar": {
+                "fore": "rgb(50,50,50)",
+                "back": "rgb(234,69,34)"
+            },
+            "avatarAroundColor": "rgb(255,50,50)",
+            "bgImg": "https://cdn.discordapp.com/attachments/472724867381461012/867064781055852574/nw1.png"
+        }
+    }, {
+        key: 6,
+        name: "new world Basic",
+        template: {
+            "fore": {
+                "color": "rgb(255,255,255)",
+                "borderColor": "rgb(255,255,255)",
+                "borderSize": 0.5
+            },
+            "bgLeftColor": "rgb(0,0,0)",
+            "progressBar": {
+                "fore": "rgb(139,146,149)",
+                "back": "rgb(215,222,225)"
+            },
+            "avatarAroundColor": "rgb(94,201,238)",
+            "bgImg": "https://cdn.discordapp.com/attachments/472724867381461012/867064790135734282/nw3.png"
+        }
     }];
 var result = {
     list: templates,

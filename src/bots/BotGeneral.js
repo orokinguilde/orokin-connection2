@@ -3,10 +3,12 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -57,16 +59,16 @@ var BotGeneral = /** @class */ (function (_super) {
     };
     BotGeneral.getRandomColor = function () {
         var colors = [
-            '#01FEDC',
-            '#FE0101',
-            '#FE6F01',
-            '#FEF601',
-            '#6FFE01',
-            '#1201FE',
-            '#7F01FE',
-            '#FE01C3',
-            '#0166FE',
-            '#FE0177'
+            [0x01, 0xFE, 0xDC],
+            [0xFE, 0x01, 0x01],
+            [0xFE, 0x6F, 0x01],
+            [0xFE, 0xF6, 0x01],
+            [0x6F, 0xFE, 0x01],
+            [0x12, 0x01, 0xFE],
+            [0x7F, 0x01, 0xFE],
+            [0xFE, 0x01, 0xC3],
+            [0x01, 0x66, 0xFE],
+            [0xFE, 0x01, 0x77]
         ];
         return colors[Math.floor(Math.random() * colors.length)];
     };
@@ -86,7 +88,7 @@ var BotGeneral = /** @class */ (function (_super) {
         var match = regex.exec(messageContent);
         while (match && match.length > 1) {
             var nameAndText = match[1];
-            for (var _i = 0, _a = this.client.users.array(); _i < _a.length; _i++) {
+            for (var _i = 0, _a = this.client.users.valueOf().map(function (u) { return u; }); _i < _a.length; _i++) {
                 var user = _a[_i];
                 var nameFound = void 0;
                 if (nameAndText.indexOf(user.tag) === 0) {
@@ -105,7 +107,7 @@ var BotGeneral = /** @class */ (function (_super) {
             match = regex.exec(messageContent);
         }
         messageContent = newText;
-        var embed = new discord_js_1.RichEmbed()
+        var embed = new discord_js_1.MessageEmbed()
             .setColor(BotGeneral.getRandomColor())
             .setAuthor(message.guild.name + ' / ' + message.author.username, message.guild.iconURL)
             .setThumbnail('https://media.discordapp.net/attachments/473609056163201024/475828867979018240/Capturecc2.PNG');
@@ -143,7 +145,7 @@ var BotGeneral = /** @class */ (function (_super) {
         }
         else if (checkForCommand(/^\s*!mentor .+$/img)) {
             console.log('MENTOR');
-            var mentions = message.mentions.members.array();
+            var mentions = message.mentions.members.map(function (m) { return m; });
             if (mentions.length === 1) {
                 var disciple = mentions[0];
                 if (this.mentoring.setMentor(message.member, disciple)) {
@@ -314,27 +316,10 @@ var BotGeneral = /** @class */ (function (_super) {
     };
     BotGeneral.prototype._initialize = function () {
         var _this = this;
-        var managerRoleByMessage = function (message, user, callback) {
-            if (message.message.channel.name === 'éditez-vos-grades' || message.message.channel.id.toString() === '532671748059955200') {
-                var guild = message.message.guild;
-                guild.fetchMember(user).then(function (member) {
-                    callback(member, message.message.mentions.roles);
-                }).catch(function () { });
-            }
-        };
-        this.client.on('messageReactionAdd', function (message, user) {
-            managerRoleByMessage(message, user, function (member, roles) {
-                member.addRoles(roles);
-            });
-        });
-        this.client.on('messageReactionRemove', function (message, user) {
-            managerRoleByMessage(message, user, function (member, roles) {
-                member.removeRoles(roles);
-            });
-        });
         this.client.on('guildMemberAdd', function (member) {
+            console.log('GA');
             if (!_this.stops.memberRemove[member.guild.id]) {
-                var channelGeneral = BotGeneral.findGeneralChannel(member.guild.channels);
+                var channelGeneral = BotGeneral.findGeneralChannel(member.guild.channels.valueOf().map(function (g) { return g; }));
                 if (channelGeneral) {
                     console.log('SENDING WELCOME');
                     channelGeneral.send(" Bienvenue " + member + " ! have fun :wink: !");
@@ -358,7 +343,7 @@ var BotGeneral = /** @class */ (function (_super) {
         }, 5000);
         this.client.user.setActivity(config_1.default.server.info.activity);
     };
-    BotGeneral.prototype.startRuntime = function () {
+    BotGeneral.prototype._startRuntime = function () {
         this.application.start();
     };
     return BotGeneral;

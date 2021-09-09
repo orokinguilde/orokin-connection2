@@ -1,4 +1,4 @@
-import { RichEmbed } from "discord.js";
+import { MessageEmbed } from "discord.js";
 import config from "./config";
 
 export class Help {
@@ -76,7 +76,7 @@ export class Help {
         const info = this.getInformationAbout(key);
 
         if(info) {
-            const embed = new RichEmbed();
+            const embed = new MessageEmbed();
 
             embed.setColor(info.color ?? Help.getRandomColor());
 

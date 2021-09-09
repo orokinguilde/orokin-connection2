@@ -83,7 +83,7 @@ var Help = /** @class */ (function () {
         var _a;
         var info = this.getInformationAbout(key);
         if (info) {
-            var embed = new discord_js_1.RichEmbed();
+            var embed = new discord_js_1.MessageEmbed();
             embed.setColor((_a = info.color) !== null && _a !== void 0 ? _a : Help.getRandomColor());
             if (info.thumbnail) {
                 embed.setThumbnail(info.thumbnail);

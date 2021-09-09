@@ -3,10 +3,12 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -51,7 +53,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.XPBonusScheduledEvent = exports.ScheduledEvent = void 0;
 var moment = require("moment");
-var discord_js_1 = require("discord.js");
 var ScheduledEvent = /** @class */ (function () {
     function ScheduledEvent() {
         this.nbErrors = 0;
@@ -225,7 +226,7 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
     Object.defineProperty(XPBonusScheduledEvent.prototype, "channels", {
         get: function () {
             var _this = this;
-            return Object.keys(this.channelIds).map(function (id) { return _this.guild.channels.find(function (c) { return c.id === id; }); });
+            return Object.keys(this.channelIds).map(function (id) { return _this.guild.channels.valueOf().find(function (c) { return c.id === id; }); });
         },
         enumerable: false,
         configurable: true
@@ -246,7 +247,7 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
             return [
                 'beaugoss',
                 '🐰'
-            ].map(function (name) { return _this.guild.emojis.find(function (emoji) { return emoji.name === name; }) || "" + name; });
+            ].map(function (name) { return _this.guild.emojis.valueOf().find(function (emoji) { return emoji.name === name; }) || "" + name; });
         },
         enumerable: false,
         configurable: true
@@ -261,27 +262,29 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
                         channel = this.pickRandomChannel();
                         if (!channel) return [3 /*break*/, 2];
                         vocalUserIds_1 = {};
-                        for (_i = 0, _a = this.guild.members.array(); _i < _a.length; _i++) {
+                        for (_i = 0, _a = this.guild.members.valueOf().map(function (m) { return m; }); _i < _a.length; _i++) {
                             m = _a[_i];
-                            if (m.voiceChannelID) {
+                            if (m.voice.channelId) {
                                 user = this.bigBrowser.getUser(m);
                                 vocalUserIds_1[user.id] = user;
                             }
                         }
-                        return [4 /*yield*/, channel.send(new discord_js_1.RichEmbed({
-                                description: "@here, " + this.xpBonusOnPopUp + " points pour ceux en vocal, " + this.xpBonusOnReact + " en plus pour les r\u00E9actions \u00E0 ce message ! :rabbit:",
-                                image: {
-                                    url: 'https://media.discordapp.net/attachments/514178068835860498/718771722307764314/XP-bonus.gif'
-                                }
-                            }))];
+                        return [4 /*yield*/, channel.send({
+                                embeds: [{
+                                        description: "@here, " + this.xpBonusOnPopUp + " points pour ceux en vocal, " + this.xpBonusOnReact + " en plus pour les r\u00E9actions \u00E0 ce message ! :rabbit:",
+                                        image: {
+                                            url: 'https://media.discordapp.net/attachments/514178068835860498/718771722307764314/XP-bonus.gif'
+                                        }
+                                    }]
+                            })];
                     case 1:
                         message_1 = _b.sent();
                         this.emojis.forEach(function (emoji) { return message_1.react(emoji).catch(function () { }); });
                         tm_1 = setTimeout(function () {
                             clearTimeout(tm_1);
-                            for (var _i = 0, _a = _this.guild.members.array(); _i < _a.length; _i++) {
+                            for (var _i = 0, _a = _this.guild.members.valueOf().map(function (_) { return _; }); _i < _a.length; _i++) {
                                 var m = _a[_i];
-                                if (m.voiceChannelID) {
+                                if (m.voice.channelId) {
                                     var user = _this.bigBrowser.getUser(m);
                                     vocalUserIds_1[user.id] = user;
                                 }
@@ -291,9 +294,9 @@ var XPBonusScheduledEvent = /** @class */ (function (_super) {
                                 user.addXPBonus(_this.xpBonusOnPopUp);
                             }
                             var userIds = {};
-                            for (var _b = 0, _c = message_1.reactions.array(); _b < _c.length; _b++) {
+                            for (var _b = 0, _c = message_1.reactions.valueOf().map(function (_) { return _; }); _b < _c.length; _b++) {
                                 var reaction = _c[_b];
-                                for (var _d = 0, _e = reaction.users.array(); _d < _e.length; _d++) {
+                                for (var _d = 0, _e = reaction.users.valueOf().map(function (_) { return _; }); _d < _e.length; _d++) {
                                     var user = _e[_d];
                                     userIds[user.id] = true;
                                 }

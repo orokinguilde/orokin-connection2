@@ -1,5 +1,5 @@
 import { BigBrowserV2, BigBrowserV2UserStats, BigBrowserV2User } from "../BigBrowserV2";
-import { TextChannel, VoiceChannel, Message, Attachment, MessageOptions, RichEmbedOptions } from "discord.js";
+import { TextChannel, VoiceChannel, Message, MessageAttachment, StageChannel } from "discord.js";
 import { XPBonusScheduledEvent } from "../ScheduledEvent";
 import { IBot } from "../Bot";
 import * as moment from 'moment-timezone'
@@ -31,7 +31,7 @@ export class BotBigBrowser extends IBot {
         };
     }
 
-    public _load(obj, ctx) {
+    public async _load(obj, ctx) {
         if(obj.bigBrowser) {
             this.bigBrowser.load(obj.bigBrowser, ctx);
         }
@@ -39,7 +39,7 @@ export class BotBigBrowser extends IBot {
             this.bigBrowserV2.load(obj.bigBrowserV2, ctx);
         }
         if(obj.xpBonusScheduledEvents) {
-            this.xpBonusScheduledEvents = obj.xpBonusScheduledEvents.map(item => new XPBonusScheduledEvent(this.client.guilds.find((c) => c.id === item.guildId), this.bigBrowserV2, item));
+            this.xpBonusScheduledEvents = await Promise.all(obj.xpBonusScheduledEvents.map(async item => new XPBonusScheduledEvent(await this.client.guilds.fetch(item.guildId), this.bigBrowserV2, item)));
         }
     }
 
@@ -61,8 +61,9 @@ export class BotBigBrowser extends IBot {
     }
     
     public onMessage(message: Message, checkForCommand: (regex: RegExp) => boolean, params: string[]) {
-        if(!message.author.bot)
+        if(!message.author.bot) {
             this.bigBrowser.increaseTextActivity(message.guild, message.author, 0.5);
+        }
 
         this.bigBrowserV2.updateUserText(message);
 
@@ -147,7 +148,7 @@ export class BotBigBrowser extends IBot {
             const rank = this.bigBrowserV2.getUserRanking(user, message.guild);
             
             const banner = new Banner({
-                avatarUrl: (message.member.user.avatarURL || config.server.info.defaultAvatarURL).replace('?size=2048', '?size=128'),
+                avatarUrl: (message.member.user.avatarURL({ dynamic: false, format: 'png' }) || config.server.info.defaultAvatarURL).replace('?size=2048', '?size=128'),
                 nickname: message.member.displayName,
                 rankIndex: rank.index,
                 rankTotal: rank.total,
@@ -168,9 +169,11 @@ export class BotBigBrowser extends IBot {
                     console.log(e);
                     message.channel.send(`Désolé, une erreur s'est produite lors de la génération de l'image.`);
                 } else {
-                    const attachment = new Attachment(buffer, 'banner.png');
+                    const attachment = new MessageAttachment(buffer, 'banner.png');
                     message.delete();
-                    message.channel.send('', attachment);
+                    message.channel.send({
+                        files: [attachment]
+                    });
                 }
             })
             /*
@@ -275,7 +278,9 @@ ${createStrLine(result.week)}\`\`\``);
             const result = this.bigBrowserV2.getServerCSV(message.guild, true);
 
             message.delete();
-            message.channel.send(new Attachment(new Buffer(result), 'stats.csv'));
+            message.channel.send({
+                files: [new MessageAttachment(new Buffer(result), 'stats.csv')]
+            });
         }
         else if(checkForCommand(/^\s*!server\s+xp\s+md\s*$/img))
         {
@@ -285,7 +290,9 @@ ${createStrLine(result.week)}\`\`\``);
             const result = this.bigBrowserV2.getServerMarkDown(message.guild);
 
             message.delete();
-            message.channel.send(new Attachment(new Buffer(result), 'stats.md'));
+            message.channel.send({
+                files: [new MessageAttachment(new Buffer(result), 'stats.md')]
+            });
         }
         else if(checkForCommand(/^\s*!server\s+xp\s+txt\s*$/img))
         {
@@ -295,14 +302,16 @@ ${createStrLine(result.week)}\`\`\``);
             const result = this.bigBrowserV2.getServerText(message.guild);
 
             message.delete();
-            message.channel.send(new Attachment(new Buffer(result), 'stats.txt'));
+            message.channel.send({
+                files: [new MessageAttachment(new Buffer(result), 'stats.txt')]
+            });
         }
         else if(checkForCommand(/^\s*!global\s+xp\s*$/img))
         {
             console.log('GLOBAL STATS');
 
             //const result = this.bigBrowser.getTextSummaryByServer();
-            const result = this.bigBrowserV2.getServersText(this.client.guilds.map((guild) => guild));
+            const result = this.bigBrowserV2.getServersText(this.client.guilds.valueOf().map(g => g));
 
             message.delete();
             message.reply('\r\n' + result);
@@ -312,30 +321,36 @@ ${createStrLine(result.week)}\`\`\``);
             console.log('GLOBAL STATS DL');
 
             //const result = this.bigBrowser.getTextSummaryByServerCSV(undefined, true);
-            const result = this.bigBrowserV2.getServersCSV(this.client.guilds.map((guild) => guild), true);
+            const result = this.bigBrowserV2.getServersCSV(this.client.guilds.valueOf().map(g => g), true);
 
             message.delete();
-            message.channel.send(new Attachment(new Buffer(result), 'stats.csv'));
+            message.channel.send({
+                files: [new MessageAttachment(new Buffer(result), 'stats.csv')]
+            });
         }
         else if(checkForCommand(/^\s*!global\s+xp\s+md\s*$/img))
         {
             console.log('GLOBAL STATS DL');
 
             //const result = this.bigBrowser.getTextSummaryByServer();
-            const result = this.bigBrowserV2.getServersMarkDown(this.client.guilds.map((guild) => guild));
+            const result = this.bigBrowserV2.getServersMarkDown(this.client.guilds.valueOf().map(g => g));
 
             message.delete();
-            message.channel.send(new Attachment(new Buffer(result), 'stats.md'));
+            message.channel.send({
+                files: [new MessageAttachment(new Buffer(result), 'stats.md')]
+            });
         }
         else if(checkForCommand(/^\s*!global\s+xp\s+txt\s*$/img))
         {
             console.log('GLOBAL STATS DL');
 
             //const result = this.bigBrowser.getTextSummaryByServer(undefined, false);
-            const result = this.bigBrowserV2.getServersText(this.client.guilds.map((guild) => guild));
+            const result = this.bigBrowserV2.getServersText(this.client.guilds.valueOf().map(g => g));
 
             message.delete();
-            message.channel.send(new Attachment(new Buffer(result), 'stats.txt'));
+            message.channel.send({
+                files: [new MessageAttachment(new Buffer(result), 'stats.txt')]
+            });
         }
         else if(checkForCommand(/^\s*!stop\s+server\s+xp\s*$/img))
         {
@@ -441,12 +456,13 @@ ${createStrLine(result.week)}\`\`\``);
                     switch(action.toLowerCase().trim()) {
                         case 'add':
                             xpBonusScheduledEvent.addChannel(channel);
-                            message.reply(`Salon \`${channel.name}\` ajouté à la liste.`, {
-                                embed: {
+                            message.reply({
+                                content: `Salon \`${channel.name}\` ajouté à la liste.`,
+                                embeds: [{
                                     image: {
                                         url: 'https://cdn.discordapp.com/attachments/472724867381461012/866612882669305856/tenor.gif'
                                     }
-                                } as RichEmbedOptions
+                                }]
                             });
                             break;
 
@@ -484,18 +500,19 @@ ${createStrLine(result.week)}\`\`\``);
         this.client.user.setActivity(config.server.info.activity);
     }
 
-    protected startRuntime() {
+    protected _startRuntime() {
         const updateVoices = () => {
-            const voiceChannels = this.client.channels.filter(channel => channel.type === 'voice').array() as VoiceChannel[];
+            const voiceChannels = this.client.channels.valueOf().filter(channel => channel.isVoice()).map(g => g as (VoiceChannel | StageChannel));
 
             for(const voiceChannel of voiceChannels) {
                 if(!/([^a-zA-Z]|^)[aA][fF][kK]([^a-zA-Z]|$)/img.test(voiceChannel.name)) {
-                    for(const member of voiceChannel.members.array()) {
-                        if(!member.user.bot && !member.deaf) {
+                    for(const member of voiceChannel.members.map(g => g)) {
+                        if(!member.user.bot && !member.voice.deaf) {
                             this.bigBrowser.increaseVocalActivity(voiceChannel.guild, member.user, 1 / (30 * 60 * 2));
 
-                            if(member.user.presence && member.user.presence.game && member.user.presence.game.name) {
-                                this.bigBrowser.pingWarframeActivity(voiceChannel.guild, member.user, member.user.presence.game.name.toLowerCase() === 'warframe');
+                            if(member.presence) {
+                                const waframe = member.presence.activities.filter(a => a.type === 'PLAYING' && a.applicationId === config.server.info.game.processName);
+                                this.bigBrowser.pingWarframeActivity(voiceChannel.guild, member.user, waframe);
                             }
                         }
                     }
@@ -507,7 +524,7 @@ ${createStrLine(result.week)}\`\`\``);
 
         setTimeout(updateVoices, 500);
 
-        for(const guild of this.client.guilds.array()) {
+        for(const guild of this.client.guilds.valueOf().map(g => g)) {
             if(!this.xpBonusScheduledEvents.some(item => item.guild.id === guild.id)) {
                 this.xpBonusScheduledEvents.push(new XPBonusScheduledEvent(guild, this.bigBrowserV2));
             }
@@ -520,7 +537,7 @@ ${createStrLine(result.week)}\`\`\``);
 
         const updateServersTimeout = 10000;
         const updateServers = async () => {
-            await Promise.all(this.client.guilds.array().map(guild => this.bigBrowserV2.updateServer(guild)));
+            await Promise.all(this.client.guilds.valueOf().map(guild => this.bigBrowserV2.updateServer(guild)));
 
             setTimeout(updateServers, updateServersTimeout);
         }

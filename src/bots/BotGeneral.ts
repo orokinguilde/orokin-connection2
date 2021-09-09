@@ -1,4 +1,4 @@
-import { TextChannel, Message, RichEmbed, Attachment } from "discord.js";
+import { TextChannel, Message, MessageEmbed, GuildChannel } from "discord.js";
 import { IBot } from "../Bot";
 import * as moment from 'moment-timezone'
 import config from '../config'
@@ -56,17 +56,17 @@ export class BotGeneral extends IBot {
     }
 
     public static getRandomColor() {
-        const colors = [
-            '#01FEDC',
-            '#FE0101',
-            '#FE6F01',
-            '#FEF601',
-            '#6FFE01',
-            '#1201FE',
-            '#7F01FE',
-            '#FE01C3',
-            '#0166FE',
-            '#FE0177'
+        const colors: [number, number, number][] = [
+            [ 0x01, 0xFE, 0xDC ],
+            [ 0xFE, 0x01, 0x01 ],
+            [ 0xFE, 0x6F, 0x01 ],
+            [ 0xFE, 0xF6, 0x01 ],
+            [ 0x6F, 0xFE, 0x01 ],
+            [ 0x12, 0x01, 0xFE ],
+            [ 0x7F, 0x01, 0xFE ],
+            [ 0xFE, 0x01, 0xC3 ],
+            [ 0x01, 0x66, 0xFE ],
+            [ 0xFE, 0x01, 0x77 ]
         ];
 
         return colors[Math.floor(Math.random() * colors.length)];
@@ -92,7 +92,7 @@ export class BotGeneral extends IBot {
         while(match && match.length > 1) {
             const nameAndText = match[1];
 
-            for(const user of this.client.users.array()) {
+            for(const user of this.client.users.valueOf().map(u => u)) {
                 let nameFound;
                 if(nameAndText.indexOf(user.tag) === 0) {
                     nameFound = user.tag;
@@ -113,7 +113,7 @@ export class BotGeneral extends IBot {
 
         messageContent = newText;
         
-        var embed = new RichEmbed()
+        var embed = new MessageEmbed()
             .setColor(BotGeneral.getRandomColor())
             .setAuthor(message.guild.name + ' / ' + message.author.username, message.guild.iconURL)
             .setThumbnail('https://media.discordapp.net/attachments/473609056163201024/475828867979018240/Capturecc2.PNG');
@@ -160,7 +160,7 @@ export class BotGeneral extends IBot {
         else if(checkForCommand(/^\s*!mentor .+$/img))
         {
             console.log('MENTOR');
-            const mentions = message.mentions.members.array();
+            const mentions = message.mentions.members.map(m => m);
 
             if(mentions.length === 1)
             {
@@ -374,34 +374,12 @@ export class BotGeneral extends IBot {
     }
     
     public _initialize() {
-        const managerRoleByMessage = (message, user, callback) => {
-            if(message.message.channel.name === 'éditez-vos-grades' || message.message.channel.id.toString() === '532671748059955200')
-            {
-                const guild = message.message.guild;
-
-                guild.fetchMember(user).then((member) => {
-                    callback(member, message.message.mentions.roles);
-                }).catch(() => {});
-            }
-        }
-
-        this.client.on('messageReactionAdd', (message, user) => {
-            managerRoleByMessage(message, user, (member, roles) => {
-                member.addRoles(roles);
-            })
-        })
-
-        this.client.on('messageReactionRemove', (message, user) => {
-            managerRoleByMessage(message, user, (member, roles) => {
-                member.removeRoles(roles);
-            })
-        })
-        
         this.client.on('guildMemberAdd', member => {
+            console.log('GA');
             
             if(!this.stops.memberRemove[member.guild.id])
             {
-                const channelGeneral = BotGeneral.findGeneralChannel(member.guild.channels);
+                const channelGeneral = BotGeneral.findGeneralChannel(member.guild.channels.valueOf().map(g => g as GuildChannel));
                 
                 if(channelGeneral)
                 {
@@ -432,7 +410,7 @@ export class BotGeneral extends IBot {
         this.client.user.setActivity(config.server.info.activity);
     }
 
-    protected startRuntime() {
+    protected _startRuntime() {
         
         this.application.start();
 

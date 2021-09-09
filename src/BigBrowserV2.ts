@@ -858,10 +858,10 @@ export class BigBrowserV2 {
             user.joinedTimestamp = member.joinedTimestamp;
 
         if(member.roles)
-            user.roles = member.roles.array().map((role) => role.name);
+            user.roles = member.roles.valueOf().map((role) => role.name);
 
         if(member.roles)
-            user.isWeird = member.roles.array().some((role) => role.name === 'EN phase de test' || role.name === 'Tenno') && !user.stats.tvt;
+            user.isWeird = member.roles.valueOf().some((role) => role.name === 'EN phase de test' || role.name === 'Tenno') && !user.stats.tvt;
 
         const zero = (name) => {
             if(user.stats[name] === undefined)
@@ -1060,7 +1060,7 @@ export class BigBrowserV2 {
         return new Promise<void>((resolve) => {
             const server = this.getServer(guild);
 
-            const members = guild.members.array();
+            const members = guild.members.valueOf().map(m => m);
 
             for(const userId in server.users) {
                 const user = server.users[userId];
@@ -1081,8 +1081,12 @@ export class BigBrowserV2 {
                 const user = this.getUser(member);
 
                 let isInWarframe = undefined;
-                if(config.server.info.game && member.user.presence && member.user.presence.game && member.user.presence.game.name) {
-                    isInWarframe = member.user.presence.game.name.toLowerCase() === config.server.info.game.processName;
+                if(config.server.info.game && member.presence) {
+                    for(const activity of member.presence.activities) {
+                        if(activity.type === 'PLAYING') {
+                            isInWarframe = activity.name.toLowerCase() === config.server.info.game.processName.toLowerCase();
+                        }
+                    }
                 }
 
                 const updateStats = (stats: BigBrowserV2UserStats, updateData = true) => {
@@ -1141,7 +1145,7 @@ export class BigBrowserV2 {
                         stats.wasWarframeDiscordLastTick = false;
                     }
                     
-                    if(member.voiceChannelID && !member.deaf && member.voiceChannelID !== guild.afkChannelID)
+                    if(member.voice && member.voice.channelId && !member.voice.deaf && member.voice.channelId !== guild.afkChannelId)
                     {
                         if(!stats.wasVoicingLastTick)
                         {
@@ -1278,19 +1282,23 @@ export class BigBrowserV2 {
         }
     }
 
-    getServersText(servers, withBOM = false) {
+    getServersText(servers: (Guild | IBigBrowserV2Server)[], withBOM = false) {
         let result = '';
         let isFirst = true;
 
-        for(let server of servers)
+        for(let serverGuild of servers)
         {
             if(!isFirst)
                 result += '\r\n';
 
             isFirst = false;
 
-            if(server.constructor && server.constructor.name === 'Guild')
-                server = this.getServer(server);
+            let server: IBigBrowserV2Server;
+            if(serverGuild.constructor && serverGuild.constructor.name === 'Guild') {
+                server = this.getServer(serverGuild);
+            } else {
+                server = serverGuild as IBigBrowserV2Server;
+            }
 
             if(server.tracking !== false)
             {
@@ -1324,19 +1332,23 @@ export class BigBrowserV2 {
         return result;
     }
 
-    getServersCSV(servers, withBOM) {
+    getServersCSV(servers: (Guild | IBigBrowserV2Server)[], withBOM: boolean) {
         let result = withBOM ? decodeURIComponent('%EF%BB%BF') : '';
         let isFirst = true;
 
-        for(let server of servers)
+        for(let serverGuild of servers)
         {
             if(!isFirst)
                 result += '\r\n\r\n';
 
             isFirst = false;
 
-            if(server.constructor && server.constructor.name === 'Guild')
-                server = this.getServer(server);
+            let server: IBigBrowserV2Server;
+            if(serverGuild.constructor && serverGuild.constructor.name === 'Guild') {
+                server = this.getServer(serverGuild);
+            } else {
+                server = serverGuild as IBigBrowserV2Server;
+            }
 
             if(server.tracking !== false)
             {
@@ -1348,19 +1360,23 @@ export class BigBrowserV2 {
         return result;
     }
 
-    getServersMarkDown(servers) {
+    getServersMarkDown(servers: (Guild | IBigBrowserV2Server)[]) {
         let result = '';
         let isFirst = true;
 
-        for(let server of servers)
+        for(let serverGuild of servers)
         {
             if(!isFirst)
                 result += '\r\n\r\n';
 
             isFirst = false;
 
-            if(server.constructor && server.constructor.name === 'Guild')
-                server = this.getServer(server);
+            let server: IBigBrowserV2Server;
+            if(serverGuild.constructor && serverGuild.constructor.name === 'Guild') {
+                server = this.getServer(serverGuild);
+            } else {
+                server = serverGuild as IBigBrowserV2Server;
+            }
 
             if(server.tracking !== false)
             {
@@ -1372,7 +1388,7 @@ export class BigBrowserV2 {
         return result;
     }
 
-    getServerCSV(server, withBOM) {
+    getServerCSV(server: Guild | IBigBrowserV2Server, withBOM: boolean) {
         
         const formatter = {
             SKIP: {},
@@ -1400,7 +1416,7 @@ export class BigBrowserV2 {
         return (withBOM ? decodeURIComponent('%EF%BB%BF') : '') + text;
     }
 
-    getServerMarkDown(server) {
+    getServerMarkDown(server: Guild | IBigBrowserV2Server) {
 
         let nbCols = undefined;
 
@@ -1450,7 +1466,7 @@ export class BigBrowserV2 {
         return this.getServerFormatted(server, formatter);
     }
 
-    getServerText(server) {
+    getServerText(server: Guild | IBigBrowserV2Server) {
 
         const pad = (value, nb: number = 0, char?: string) => {
             value = value === undefined || value === null ? '' : value.toString();

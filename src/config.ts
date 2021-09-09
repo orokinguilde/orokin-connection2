@@ -21,13 +21,23 @@ export default {
             },
             help?: {
                 command: string
-                displayIn: 'BigBrowser' | string
+                displayIn: 'BigBrowser' | 'General' | string
                 data: {
                     _default: any
                     "": any
                     [key: string]: any
                 }
-            }
+            },
+            actions: {
+                on: 'BigBrowser' | 'General' | string,
+                name?: string,
+                periodSec?: number,
+                list: {
+                    type: 'thread',
+                    threadId: string,
+                    keepUnarchived?: boolean
+                }[]
+            }[]
         }
     }
 };

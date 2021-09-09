@@ -21,5 +21,5 @@ var bot = new botClass({
 });
 bot.debug = fs.existsSync('./env.json');
 console.log('Debug mode:', bot.debug ? 'on' : 'off');
-globals_1.initialize(bot);
+(0, globals_1.initialize)(bot);
 bot.start();

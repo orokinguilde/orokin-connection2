@@ -11,6 +11,15 @@
         "voiceMs": 1800000,
         "textChars": 500
     },
+    "actions": [{
+        "on": "BigBrowser",
+        "name": "Keep threads alive",
+        "periodSec": 5,
+        "list": [
+            { "type": "thread", "threadId": "871399855585636393", "keepUnarchived": true },
+            { "type": "thread", "threadId": "871433866311782431", "keepUnarchived": true }
+        ]
+    }],
     "help": {
         "command": "!helpme",
         "displayIn": "BigBrowser",

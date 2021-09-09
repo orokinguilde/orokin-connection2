@@ -3,10 +3,12 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -853,9 +855,9 @@ var BigBrowserV2 = /** @class */ (function () {
         if (!user.joinedTimestamp)
             user.joinedTimestamp = member.joinedTimestamp;
         if (member.roles)
-            user.roles = member.roles.array().map(function (role) { return role.name; });
+            user.roles = member.roles.valueOf().map(function (role) { return role.name; });
         if (member.roles)
-            user.isWeird = member.roles.array().some(function (role) { return role.name === 'EN phase de test' || role.name === 'Tenno'; }) && !user.stats.tvt;
+            user.isWeird = member.roles.valueOf().some(function (role) { return role.name === 'EN phase de test' || role.name === 'Tenno'; }) && !user.stats.tvt;
         var zero = function (name) {
             if (user.stats[name] === undefined)
                 user.stats[name] = 0;
@@ -1033,7 +1035,7 @@ var BigBrowserV2 = /** @class */ (function () {
         var _this = this;
         return new Promise(function (resolve) {
             var server = _this.getServer(guild);
-            var members = guild.members.array();
+            var members = guild.members.valueOf().map(function (m) { return m; });
             var _loop_1 = function (userId) {
                 var user = server.users[userId];
                 if (members.some(function (m) { return m.id === userId; })) {
@@ -1053,8 +1055,13 @@ var BigBrowserV2 = /** @class */ (function () {
                     return;*/
                 var user = _this.getUser(member);
                 var isInWarframe = undefined;
-                if (config_1.default.server.info.game && member.user.presence && member.user.presence.game && member.user.presence.game.name) {
-                    isInWarframe = member.user.presence.game.name.toLowerCase() === config_1.default.server.info.game.processName;
+                if (config_1.default.server.info.game && member.presence) {
+                    for (var _a = 0, _b = member.presence.activities; _a < _b.length; _a++) {
+                        var activity = _b[_a];
+                        if (activity.type === 'PLAYING') {
+                            isInWarframe = activity.name.toLowerCase() === config_1.default.server.info.game.processName.toLowerCase();
+                        }
+                    }
                 }
                 var updateStats = function (stats, updateData) {
                     if (updateData === void 0) { updateData = true; }
@@ -1098,7 +1105,7 @@ var BigBrowserV2 = /** @class */ (function () {
                         stats.wasWarframeDiscordLastTickNot = false;
                         stats.wasWarframeDiscordLastTick = false;
                     }
-                    if (member.voiceChannelID && !member.deaf && member.voiceChannelID !== guild.afkChannelID) {
+                    if (member.voice && member.voice.channelId && !member.voice.deaf && member.voice.channelId !== guild.afkChannelId) {
                         if (!stats.wasVoicingLastTick) {
                             stats.wasVoicingLastTick = true;
                         }
@@ -1210,12 +1217,17 @@ var BigBrowserV2 = /** @class */ (function () {
         var result = '';
         var isFirst = true;
         for (var _i = 0, servers_1 = servers; _i < servers_1.length; _i++) {
-            var server = servers_1[_i];
+            var serverGuild = servers_1[_i];
             if (!isFirst)
                 result += '\r\n';
             isFirst = false;
-            if (server.constructor && server.constructor.name === 'Guild')
-                server = this.getServer(server);
+            var server = void 0;
+            if (serverGuild.constructor && serverGuild.constructor.name === 'Guild') {
+                server = this.getServer(serverGuild);
+            }
+            else {
+                server = serverGuild;
+            }
             if (server.tracking !== false) {
                 var body = this.getServerText(server);
                 var firstLine = body.split(/\r?\n/img, 2)[1];
@@ -1246,12 +1258,17 @@ var BigBrowserV2 = /** @class */ (function () {
         var result = withBOM ? decodeURIComponent('%EF%BB%BF') : '';
         var isFirst = true;
         for (var _i = 0, servers_2 = servers; _i < servers_2.length; _i++) {
-            var server = servers_2[_i];
+            var serverGuild = servers_2[_i];
             if (!isFirst)
                 result += '\r\n\r\n';
             isFirst = false;
-            if (server.constructor && server.constructor.name === 'Guild')
-                server = this.getServer(server);
+            var server = void 0;
+            if (serverGuild.constructor && serverGuild.constructor.name === 'Guild') {
+                server = this.getServer(serverGuild);
+            }
+            else {
+                server = serverGuild;
+            }
             if (server.tracking !== false) {
                 result += "================================;" + server.name + "\r\n";
                 result += this.getServerCSV(server, false);
@@ -1263,12 +1280,17 @@ var BigBrowserV2 = /** @class */ (function () {
         var result = '';
         var isFirst = true;
         for (var _i = 0, servers_3 = servers; _i < servers_3.length; _i++) {
-            var server = servers_3[_i];
+            var serverGuild = servers_3[_i];
             if (!isFirst)
                 result += '\r\n\r\n';
             isFirst = false;
-            if (server.constructor && server.constructor.name === 'Guild')
-                server = this.getServer(server);
+            var server = void 0;
+            if (serverGuild.constructor && serverGuild.constructor.name === 'Guild') {
+                server = this.getServer(serverGuild);
+            }
+            else {
+                server = serverGuild;
+            }
             if (server.tracking !== false) {
                 result += "**" + server.name + "**\r\n";
                 result += this.getServerMarkDown(server);

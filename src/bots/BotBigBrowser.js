@@ -3,10 +3,12 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -78,16 +80,35 @@ var BotBigBrowser = /** @class */ (function (_super) {
         };
     };
     BotBigBrowser.prototype._load = function (obj, ctx) {
-        var _this = this;
-        if (obj.bigBrowser) {
-            this.bigBrowser.load(obj.bigBrowser, ctx);
-        }
-        if (obj.bigBrowserV2) {
-            this.bigBrowserV2.load(obj.bigBrowserV2, ctx);
-        }
-        if (obj.xpBonusScheduledEvents) {
-            this.xpBonusScheduledEvents = obj.xpBonusScheduledEvents.map(function (item) { return new ScheduledEvent_1.XPBonusScheduledEvent(_this.client.guilds.find(function (c) { return c.id === item.guildId; }), _this.bigBrowserV2, item); });
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            var _this = this;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (obj.bigBrowser) {
+                            this.bigBrowser.load(obj.bigBrowser, ctx);
+                        }
+                        if (obj.bigBrowserV2) {
+                            this.bigBrowserV2.load(obj.bigBrowserV2, ctx);
+                        }
+                        if (!obj.xpBonusScheduledEvents) return [3 /*break*/, 2];
+                        _a = this;
+                        return [4 /*yield*/, Promise.all(obj.xpBonusScheduledEvents.map(function (item) { return __awaiter(_this, void 0, void 0, function () { var _a; return __generator(this, function (_b) {
+                                switch (_b.label) {
+                                    case 0:
+                                        _a = ScheduledEvent_1.XPBonusScheduledEvent.bind;
+                                        return [4 /*yield*/, this.client.guilds.fetch(item.guildId)];
+                                    case 1: return [2 /*return*/, new (_a.apply(ScheduledEvent_1.XPBonusScheduledEvent, [void 0, _b.sent(), this.bigBrowserV2, item]))()];
+                                }
+                            }); }); }))];
+                    case 1:
+                        _a.xpBonusScheduledEvents = _b.sent();
+                        _b.label = 2;
+                    case 2: return [2 /*return*/];
+                }
+            });
+        });
     };
     BotBigBrowser.getRandomColor = function () {
         var colors = [
@@ -107,8 +128,9 @@ var BotBigBrowser = /** @class */ (function (_super) {
     BotBigBrowser.prototype.onMessage = function (message, checkForCommand, params) {
         var _this = this;
         var _a, _b, _c;
-        if (!message.author.bot)
+        if (!message.author.bot) {
             this.bigBrowser.increaseTextActivity(message.guild, message.author, 0.5);
+        }
         this.bigBrowserV2.updateUserText(message);
         /*
         const setCommonSetting = (message, callback) => {
@@ -178,7 +200,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
             var ranking = user.stats.rank;
             var rank = this.bigBrowserV2.getUserRanking(user, message.guild);
             var banner = new Banner_1.Banner({
-                avatarUrl: (message.member.user.avatarURL || config_1.default.server.info.defaultAvatarURL).replace('?size=2048', '?size=128'),
+                avatarUrl: (message.member.user.avatarURL({ dynamic: false, format: 'png' }) || config_1.default.server.info.defaultAvatarURL).replace('?size=2048', '?size=128'),
                 nickname: message.member.displayName,
                 rankIndex: rank.index,
                 rankTotal: rank.total,
@@ -197,9 +219,11 @@ var BotBigBrowser = /** @class */ (function (_super) {
                     message.channel.send("D\u00E9sol\u00E9, une erreur s'est produite lors de la g\u00E9n\u00E9ration de l'image.");
                 }
                 else {
-                    var attachment = new discord_js_1.Attachment(buffer, 'banner.png');
+                    var attachment = new discord_js_1.MessageAttachment(buffer, 'banner.png');
                     message.delete();
-                    message.channel.send('', attachment);
+                    message.channel.send({
+                        files: [attachment]
+                    });
                 }
             });
             /*
@@ -281,49 +305,61 @@ var BotBigBrowser = /** @class */ (function (_super) {
             //const result = this.bigBrowser.getTextSummaryByServerCSV(message.guild, true);
             var result = this.bigBrowserV2.getServerCSV(message.guild, true);
             message.delete();
-            message.channel.send(new discord_js_1.Attachment(new Buffer(result), 'stats.csv'));
+            message.channel.send({
+                files: [new discord_js_1.MessageAttachment(new Buffer(result), 'stats.csv')]
+            });
         }
         else if (checkForCommand(/^\s*!server\s+xp\s+md\s*$/img)) {
             console.log('SERVER STATS');
             //const result = this.bigBrowser.getTextSummaryByServer(message.guild);
             var result = this.bigBrowserV2.getServerMarkDown(message.guild);
             message.delete();
-            message.channel.send(new discord_js_1.Attachment(new Buffer(result), 'stats.md'));
+            message.channel.send({
+                files: [new discord_js_1.MessageAttachment(new Buffer(result), 'stats.md')]
+            });
         }
         else if (checkForCommand(/^\s*!server\s+xp\s+txt\s*$/img)) {
             console.log('SERVER STATS');
             //const result = this.bigBrowser.getTextSummaryByServer(message.guild, false);
             var result = this.bigBrowserV2.getServerText(message.guild);
             message.delete();
-            message.channel.send(new discord_js_1.Attachment(new Buffer(result), 'stats.txt'));
+            message.channel.send({
+                files: [new discord_js_1.MessageAttachment(new Buffer(result), 'stats.txt')]
+            });
         }
         else if (checkForCommand(/^\s*!global\s+xp\s*$/img)) {
             console.log('GLOBAL STATS');
             //const result = this.bigBrowser.getTextSummaryByServer();
-            var result = this.bigBrowserV2.getServersText(this.client.guilds.map(function (guild) { return guild; }));
+            var result = this.bigBrowserV2.getServersText(this.client.guilds.valueOf().map(function (g) { return g; }));
             message.delete();
             message.reply('\r\n' + result);
         }
         else if (checkForCommand(/^\s*!global\s+xp\s+csv\s*$/img)) {
             console.log('GLOBAL STATS DL');
             //const result = this.bigBrowser.getTextSummaryByServerCSV(undefined, true);
-            var result = this.bigBrowserV2.getServersCSV(this.client.guilds.map(function (guild) { return guild; }), true);
+            var result = this.bigBrowserV2.getServersCSV(this.client.guilds.valueOf().map(function (g) { return g; }), true);
             message.delete();
-            message.channel.send(new discord_js_1.Attachment(new Buffer(result), 'stats.csv'));
+            message.channel.send({
+                files: [new discord_js_1.MessageAttachment(new Buffer(result), 'stats.csv')]
+            });
         }
         else if (checkForCommand(/^\s*!global\s+xp\s+md\s*$/img)) {
             console.log('GLOBAL STATS DL');
             //const result = this.bigBrowser.getTextSummaryByServer();
-            var result = this.bigBrowserV2.getServersMarkDown(this.client.guilds.map(function (guild) { return guild; }));
+            var result = this.bigBrowserV2.getServersMarkDown(this.client.guilds.valueOf().map(function (g) { return g; }));
             message.delete();
-            message.channel.send(new discord_js_1.Attachment(new Buffer(result), 'stats.md'));
+            message.channel.send({
+                files: [new discord_js_1.MessageAttachment(new Buffer(result), 'stats.md')]
+            });
         }
         else if (checkForCommand(/^\s*!global\s+xp\s+txt\s*$/img)) {
             console.log('GLOBAL STATS DL');
             //const result = this.bigBrowser.getTextSummaryByServer(undefined, false);
-            var result = this.bigBrowserV2.getServersText(this.client.guilds.map(function (guild) { return guild; }));
+            var result = this.bigBrowserV2.getServersText(this.client.guilds.valueOf().map(function (g) { return g; }));
             message.delete();
-            message.channel.send(new discord_js_1.Attachment(new Buffer(result), 'stats.txt'));
+            message.channel.send({
+                files: [new discord_js_1.MessageAttachment(new Buffer(result), 'stats.txt')]
+            });
         }
         else if (checkForCommand(/^\s*!stop\s+server\s+xp\s*$/img)) {
             console.log('STOP SERVER XP');
@@ -406,12 +442,13 @@ var BotBigBrowser = /** @class */ (function (_super) {
                     switch (action.toLowerCase().trim()) {
                         case 'add':
                             xpBonusScheduledEvent.addChannel(channel);
-                            message.reply("Salon `" + channel.name + "` ajout\u00E9 \u00E0 la liste.", {
-                                embed: {
-                                    image: {
-                                        url: 'https://cdn.discordapp.com/attachments/472724867381461012/866612882669305856/tenor.gif'
-                                    }
-                                }
+                            message.reply({
+                                content: "Salon `" + channel.name + "` ajout\u00E9 \u00E0 la liste.",
+                                embeds: [{
+                                        image: {
+                                            url: 'https://cdn.discordapp.com/attachments/472724867381461012/866612882669305856/tenor.gif'
+                                        }
+                                    }]
                             });
                             break;
                         case 'remove':
@@ -441,19 +478,20 @@ var BotBigBrowser = /** @class */ (function (_super) {
         }, 5000);
         this.client.user.setActivity(config_1.default.server.info.activity);
     };
-    BotBigBrowser.prototype.startRuntime = function () {
+    BotBigBrowser.prototype._startRuntime = function () {
         var _this = this;
         var updateVoices = function () {
-            var voiceChannels = _this.client.channels.filter(function (channel) { return channel.type === 'voice'; }).array();
+            var voiceChannels = _this.client.channels.valueOf().filter(function (channel) { return channel.isVoice(); }).map(function (g) { return g; });
             for (var _i = 0, voiceChannels_1 = voiceChannels; _i < voiceChannels_1.length; _i++) {
                 var voiceChannel = voiceChannels_1[_i];
                 if (!/([^a-zA-Z]|^)[aA][fF][kK]([^a-zA-Z]|$)/img.test(voiceChannel.name)) {
-                    for (var _a = 0, _b = voiceChannel.members.array(); _a < _b.length; _a++) {
+                    for (var _a = 0, _b = voiceChannel.members.map(function (g) { return g; }); _a < _b.length; _a++) {
                         var member = _b[_a];
-                        if (!member.user.bot && !member.deaf) {
+                        if (!member.user.bot && !member.voice.deaf) {
                             _this.bigBrowser.increaseVocalActivity(voiceChannel.guild, member.user, 1 / (30 * 60 * 2));
-                            if (member.user.presence && member.user.presence.game && member.user.presence.game.name) {
-                                _this.bigBrowser.pingWarframeActivity(voiceChannel.guild, member.user, member.user.presence.game.name.toLowerCase() === 'warframe');
+                            if (member.presence) {
+                                var waframe = member.presence.activities.filter(function (a) { return a.type === 'PLAYING' && a.applicationId === config_1.default.server.info.game.processName; });
+                                _this.bigBrowser.pingWarframeActivity(voiceChannel.guild, member.user, waframe);
                             }
                         }
                     }
@@ -468,7 +506,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
             }
         };
         var this_1 = this;
-        for (var _i = 0, _a = this.client.guilds.array(); _i < _a.length; _i++) {
+        for (var _i = 0, _a = this.client.guilds.valueOf().map(function (g) { return g; }); _i < _a.length; _i++) {
             var guild = _a[_i];
             _loop_1(guild);
         }
@@ -480,7 +518,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, Promise.all(this.client.guilds.array().map(function (guild) { return _this.bigBrowserV2.updateServer(guild); }))];
+                    case 0: return [4 /*yield*/, Promise.all(this.client.guilds.valueOf().map(function (guild) { return _this.bigBrowserV2.updateServer(guild); }))];
                     case 1:
                         _a.sent();
                         setTimeout(updateServers, updateServersTimeout);

@@ -1,5 +1,5 @@
 import * as moment from 'moment'
-import { Guild, TextChannel, RichEmbed, Channel } from 'discord.js';
+import { Guild, TextChannel, Channel } from 'discord.js';
 import { BigBrowserV2, BigBrowserV2User } from './BigBrowserV2';
 
 export interface ScheduledEventContext {
@@ -152,7 +152,7 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
     public channelIds: { [id: string]: true } = {};
 
     public get channels(): readonly TextChannel[] {
-        return Object.keys(this.channelIds).map(id => this.guild.channels.find(c => c.id === id) as TextChannel);
+        return Object.keys(this.channelIds).map(id => this.guild.channels.valueOf().find(c => c.id === id) as TextChannel);
     }
 
     public addChannel(channel: TextChannel) {
@@ -172,7 +172,7 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
         return [
             'beaugoss',
             '🐰'
-        ].map(name => this.guild.emojis.find(emoji => emoji.name === name) || `${name}`)
+        ].map(name => this.guild.emojis.valueOf().find(emoji => emoji.name === name) || `${name}`)
     }
 
     public async runtime(ctx: ScheduledEventContext) {
@@ -181,27 +181,29 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
 
             const vocalUserIds: { [id: string]: BigBrowserV2User } = {};
 
-            for(const m of this.guild.members.array()) {
-                if(m.voiceChannelID) {
+            for(const m of this.guild.members.valueOf().map(m => m)) {
+                if(m.voice.channelId) {
                     const user = this.bigBrowser.getUser(m);
                     vocalUserIds[user.id] = user;
                 }
             }
 
-            const message = await channel.send(new RichEmbed({
-                description: `@here, ${this.xpBonusOnPopUp} points pour ceux en vocal, ${this.xpBonusOnReact} en plus pour les réactions à ce message ! :rabbit:`,
-                image: {
-                    url: 'https://media.discordapp.net/attachments/514178068835860498/718771722307764314/XP-bonus.gif'
-                }
-            }));
+            const message = await channel.send({
+                embeds: [{
+                    description: `@here, ${this.xpBonusOnPopUp} points pour ceux en vocal, ${this.xpBonusOnReact} en plus pour les réactions à ce message ! :rabbit:`,
+                    image: {
+                        url: 'https://media.discordapp.net/attachments/514178068835860498/718771722307764314/XP-bonus.gif'
+                    }
+                }]
+            });
 
             this.emojis.forEach(emoji => message.react(emoji).catch(() => {}));
 
             const tm = setTimeout(() => {
                 clearTimeout(tm);
 
-                for(const m of this.guild.members.array()) {
-                    if(m.voiceChannelID) {
+                for(const m of this.guild.members.valueOf().map(_ => _)) {
+                    if(m.voice.channelId) {
                         const user = this.bigBrowser.getUser(m);
                         vocalUserIds[user.id] = user;
                     }
@@ -213,8 +215,8 @@ export class XPBonusScheduledEvent extends ScheduledEvent {
                 }
                 
                 const userIds: { [id: string]: true } = {};
-                for(const reaction of message.reactions.array()) {
-                    for(const user of reaction.users.array()) {
+                for(const reaction of message.reactions.valueOf().map(_ => _)) {
+                    for(const user of reaction.users.valueOf().map(_ => _)) {
                         userIds[user.id] = true;
                     }
                 }

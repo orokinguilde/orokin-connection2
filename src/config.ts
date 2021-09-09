@@ -2,6 +2,8 @@ import { MessageEmbedOptions } from 'discord.js';
 import * as path from 'path'
 import { IBigBrowserV2Rangs } from './BigBrowserV2';
 
+export type APP_SELECTOR = 'BigBrowser' | 'General' | string
+
 export interface IConfigMemberChange {
     channelId?: string
     message: string
@@ -28,7 +30,7 @@ export default {
             },
             help?: {
                 command: string
-                displayIn: 'BigBrowser' | 'General' | string
+                displayIn: APP_SELECTOR
                 data: {
                     _default: any
                     "": any
@@ -36,11 +38,12 @@ export default {
                 }
             },
             memberChange?: {
+                on: APP_SELECTOR,
                 add?: IConfigMemberChange[],
                 remove?: IConfigMemberChange[]
             },
             actions?: {
-                on: 'BigBrowser' | 'General' | string,
+                on: APP_SELECTOR,
                 name?: string,
                 periodSec?: number,
                 list: {

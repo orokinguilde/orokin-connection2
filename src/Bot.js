@@ -179,7 +179,7 @@ var IBot = /** @class */ (function () {
         client.on('warn', function (value) {
             console.log(value);
         });
-        if (config_1.default.server.info.memberChange) {
+        if (config_1.default.server.info.memberChange && config_1.default.server.info.memberChange.on === process.env.APP_SELECTOR) {
             var execMemberChange_1 = function (member, actions) { return __awaiter(_this, void 0, void 0, function () {
                 var guilds, _i, actions_1, action, messageOptions, _a, guilds_1, guild, channel;
                 return __generator(this, function (_b) {

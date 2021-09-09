@@ -171,7 +171,7 @@ export abstract class IBot {
             console.log(value);
         });
         
-        if(config.server.info.memberChange) {
+        if(config.server.info.memberChange && config.server.info.memberChange.on === process.env.APP_SELECTOR) {
             const execMemberChange = async (member: GuildMember | PartialGuildMember, actions: IConfigMemberChange[]) => {
                 const guilds = this.client.guilds.valueOf().map(g => g);
                 

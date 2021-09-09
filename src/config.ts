@@ -1,5 +1,12 @@
+import { MessageEmbedOptions } from 'discord.js';
 import * as path from 'path'
 import { IBigBrowserV2Rangs } from './BigBrowserV2';
+
+export interface IConfigMemberChange {
+    channelId?: string
+    message: string
+    embeds?: MessageEmbedOptions[]
+}
 
 export default {
     server: {
@@ -28,13 +35,17 @@ export default {
                     [key: string]: any
                 }
             },
-            actions: {
+            memberChange?: {
+                add?: IConfigMemberChange[],
+                remove?: IConfigMemberChange[]
+            },
+            actions?: {
                 on: 'BigBrowser' | 'General' | string,
                 name?: string,
                 periodSec?: number,
                 list: {
                     type: 'thread',
-                    threadId: string,
+                    threadId: string | string[],
                     keepUnarchived?: boolean
                 }[]
             }[]

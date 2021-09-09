@@ -7,7 +7,7 @@
         "processName": "newworld",
         "name": "New World"
     },
-     "xp": {
+    "xp": {
         "voiceMs": 1800000,
         "textChars": 500
     },
@@ -16,8 +16,20 @@
         "name": "Keep threads alive",
         "periodSec": 60,
         "list": [
-            { "type": "thread", "threadId": "871399855585636393", "keepUnarchived": true },
-            { "type": "thread", "threadId": "871433866311782431", "keepUnarchived": true }
+            { "type": "thread", "threadId": [
+                "885471214368325693",
+                "871433866311782431",
+                "871399855585636393",
+                "871532130616897596",
+                "871528260884910151",
+                "871512170339377193",
+                "871508052237508628",
+                "871498335301795930",
+                "871488335468711966",
+                "871479667717193759",
+                "871459386965504040",
+                "871451686751842304"
+            ], "keepUnarchived": true }
         ]
     }],
     "help": {

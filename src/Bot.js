@@ -179,6 +179,63 @@ var IBot = /** @class */ (function () {
         client.on('warn', function (value) {
             console.log(value);
         });
+        if (config_1.default.server.info.memberChange) {
+            var execMemberChange_1 = function (member, actions) { return __awaiter(_this, void 0, void 0, function () {
+                var guilds, _i, actions_1, action, messageOptions, _a, guilds_1, guild, channel;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            guilds = this.client.guilds.valueOf().map(function (g) { return g; });
+                            _i = 0, actions_1 = actions;
+                            _b.label = 1;
+                        case 1:
+                            if (!(_i < actions_1.length)) return [3 /*break*/, 8];
+                            action = actions_1[_i];
+                            messageOptions = {
+                                content: action.message,
+                                embeds: action.embeds
+                            };
+                            if (!action.channelId) return [3 /*break*/, 6];
+                            _a = 0, guilds_1 = guilds;
+                            _b.label = 2;
+                        case 2:
+                            if (!(_a < guilds_1.length)) return [3 /*break*/, 5];
+                            guild = guilds_1[_a];
+                            return [4 /*yield*/, guild.channels.fetch(action.channelId)];
+                        case 3:
+                            channel = _b.sent();
+                            if (channel) {
+                                if (channel.isText()) {
+                                    channel.send(messageOptions);
+                                }
+                                return [3 /*break*/, 5];
+                            }
+                            _b.label = 4;
+                        case 4:
+                            _a++;
+                            return [3 /*break*/, 2];
+                        case 5: return [3 /*break*/, 7];
+                        case 6:
+                            member.send(messageOptions);
+                            _b.label = 7;
+                        case 7:
+                            _i++;
+                            return [3 /*break*/, 1];
+                        case 8: return [2 /*return*/];
+                    }
+                });
+            }); };
+            if (config_1.default.server.info.memberChange.add && config_1.default.server.info.memberChange.add.length > 0) {
+                client.on('guildMemberAdd', function (member) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                    return [2 /*return*/, execMemberChange_1(member, config_1.default.server.info.memberChange.add)];
+                }); }); });
+            }
+            if (config_1.default.server.info.memberChange.remove && config_1.default.server.info.memberChange.remove.length > 0) {
+                client.on('guildMemberRemove', function (member) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                    return [2 /*return*/, execMemberChange_1(member, config_1.default.server.info.memberChange.remove)];
+                }); }); });
+            }
+        }
         client.on('ready', function () {
             console.log('READY');
             var botName = config_1.default.server.info.name;
@@ -200,45 +257,57 @@ var IBot = /** @class */ (function () {
             var _loop_1 = function (i) {
                 var action = actions[i];
                 Ticker_1.Ticker.start((action.periodSec || 60) * 1000, function () { return __awaiter(_this, void 0, void 0, function () {
-                    var guilds, _i, _a, item, _b, _c, guilds_1, guild, channel;
-                    return __generator(this, function (_d) {
-                        switch (_d.label) {
+                    var logText, guilds, _i, _a, item, _b, _c, guilds_2, guild, threadIds, _d, threadIds_1, threadId, channel;
+                    return __generator(this, function (_e) {
+                        switch (_e.label) {
                             case 0:
-                                console.log("Execution de l'action : index " + i + (action.name ? ' - ' + action.name : ''));
+                                logText = "Execution de l'action : index " + i + (action.name ? ' - ' + action.name : '');
+                                console.log(logText + " [running]");
                                 guilds = this.client.guilds.valueOf().map(function (g) { return g; });
                                 _i = 0, _a = action.list;
-                                _d.label = 1;
+                                _e.label = 1;
                             case 1:
-                                if (!(_i < _a.length)) return [3 /*break*/, 9];
+                                if (!(_i < _a.length)) return [3 /*break*/, 11];
                                 item = _a[_i];
                                 _b = item.type;
                                 switch (_b) {
                                     case 'thread': return [3 /*break*/, 2];
                                 }
-                                return [3 /*break*/, 8];
+                                return [3 /*break*/, 10];
                             case 2:
-                                _c = 0, guilds_1 = guilds;
-                                _d.label = 3;
+                                _c = 0, guilds_2 = guilds;
+                                _e.label = 3;
                             case 3:
-                                if (!(_c < guilds_1.length)) return [3 /*break*/, 8];
-                                guild = guilds_1[_c];
-                                return [4 /*yield*/, guild.channels.fetch(item.threadId)];
+                                if (!(_c < guilds_2.length)) return [3 /*break*/, 10];
+                                guild = guilds_2[_c];
+                                threadIds = Array.isArray(item.threadId) ? item.threadId : [item.threadId];
+                                _d = 0, threadIds_1 = threadIds;
+                                _e.label = 4;
                             case 4:
-                                channel = _d.sent();
-                                if (!channel) return [3 /*break*/, 7];
-                                if (!item.keepUnarchived) return [3 /*break*/, 6];
-                                return [4 /*yield*/, channel.setArchived(false)];
+                                if (!(_d < threadIds_1.length)) return [3 /*break*/, 9];
+                                threadId = threadIds_1[_d];
+                                return [4 /*yield*/, guild.channels.fetch(threadId)];
                             case 5:
-                                _d.sent();
-                                _d.label = 6;
-                            case 6: return [3 /*break*/, 8];
-                            case 7:
+                                channel = _e.sent();
+                                if (!channel) return [3 /*break*/, 8];
+                                if (!item.keepUnarchived) return [3 /*break*/, 7];
+                                return [4 /*yield*/, channel.setArchived(false)];
+                            case 6:
+                                _e.sent();
+                                _e.label = 7;
+                            case 7: return [3 /*break*/, 9];
+                            case 8:
+                                _d++;
+                                return [3 /*break*/, 4];
+                            case 9:
                                 _c++;
                                 return [3 /*break*/, 3];
-                            case 8:
+                            case 10:
                                 _i++;
                                 return [3 /*break*/, 1];
-                            case 9: return [2 /*return*/];
+                            case 11:
+                                console.log(logText + " [success]");
+                                return [2 /*return*/];
                         }
                     });
                 }); });

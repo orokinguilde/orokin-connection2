@@ -1,5 +1,5 @@
-import { Client, TextChannel, GuildChannel, Collection, Message, Intents, ThreadChannel, GuildMember, PartialMessageReaction, MessageReaction, PartialUser, User } from "discord.js";
-import config from "./config";
+import { Client, TextChannel, GuildChannel, Collection, Message, Intents, ThreadChannel, GuildMember, PartialMessageReaction, MessageReaction, PartialUser, User, MessageOptions, PartialGuildMember } from "discord.js";
+import config, { IConfigMemberChange } from "./config";
 import { Ticker } from "./Ticker";
 
 export abstract class IBot {
@@ -170,6 +170,40 @@ export abstract class IBot {
         client.on('warn', (value) => {
             console.log(value);
         });
+        
+        if(config.server.info.memberChange) {
+            const execMemberChange = async (member: GuildMember | PartialGuildMember, actions: IConfigMemberChange[]) => {
+                const guilds = this.client.guilds.valueOf().map(g => g);
+                
+                for(const action of actions) {
+                    const messageOptions: MessageOptions = {
+                        content: action.message,
+                        embeds: action.embeds
+                    };
+    
+                    if(action.channelId) {
+                        for(const guild of guilds) {
+                            const channel = await guild.channels.fetch(action.channelId);
+    
+                            if(channel) {
+                                if(channel.isText()) {
+                                    channel.send(messageOptions);
+                                }
+                                break;
+                            }
+                        }
+                    } else {
+                        member.send(messageOptions);
+                    }
+                }
+            }
+            if(config.server.info.memberChange.add && config.server.info.memberChange.add.length > 0) {
+                client.on('guildMemberAdd', async member => execMemberChange(member, config.server.info.memberChange.add));
+            }
+            if(config.server.info.memberChange.remove && config.server.info.memberChange.remove.length > 0) {
+                client.on('guildMemberRemove', async member => execMemberChange(member, config.server.info.memberChange.remove));
+            }
+        }
 
         client.on('ready', () => {
             console.log('READY');
@@ -201,25 +235,34 @@ export abstract class IBot {
                 const action = actions[i];
 
                 Ticker.start((action.periodSec || 60) * 1000, async () => {
-                    console.log(`Execution de l'action : index ${i}${action.name ? ' - ' + action.name : ''}`);
+                    const logText = `Execution de l'action : index ${i}${action.name ? ' - ' + action.name : ''}`;
+                    console.log(`${logText} [running]`);
+
                     const guilds = this.client.guilds.valueOf().map(g => g);
 
                     for(const item of action.list) {
                         switch(item.type) {
                             case 'thread': {
                                 for(const guild of guilds) {
-                                    const channel: ThreadChannel = await guild.channels.fetch(item.threadId) as any;
-                                    if(channel) {
-                                        if(item.keepUnarchived) {
-                                            await channel.setArchived(false);
-                                        }
+                                    const threadIds = Array.isArray(item.threadId) ? item.threadId : [ item.threadId ];
 
-                                        break;
+                                    for(const threadId of threadIds) {
+                                        const channel: ThreadChannel = await guild.channels.fetch(threadId) as any;
+                                        
+                                        if(channel) {
+                                            if(item.keepUnarchived) {
+                                                await channel.setArchived(false);
+                                            }
+
+                                            break;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    
+                    console.log(`${logText} [success]`);
                 });
             }
 

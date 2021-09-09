@@ -43,11 +43,20 @@ var Ticker = /** @class */ (function () {
     Ticker.start = function (delayTime, fn) {
         var _this = this;
         setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
+            var ex_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, fn()];
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, fn()];
                     case 1:
                         _a.sent();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        ex_1 = _a.sent();
+                        console.error(ex_1);
+                        return [3 /*break*/, 3];
+                    case 3:
                         process.nextTick(function () { return Ticker.start(delayTime, fn); });
                         return [2 /*return*/];
                 }

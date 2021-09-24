@@ -76,7 +76,9 @@ var Help = /** @class */ (function () {
         }
         else {
             message.delete();
-            message.channel.send(embed);
+            message.channel.send({
+                embeds: [embed]
+            });
         }
     };
     Help.prototype.createEmbed = function (key) {

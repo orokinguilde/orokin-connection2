@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { Message, MessageEmbed } from "discord.js";
 import config from "./config";
 
 export class Help {
@@ -61,14 +61,16 @@ export class Help {
         return undefined;
     }
 
-    public manageMessage(message: any, key?: string) {
+    public manageMessage(message: Message, key?: string) {
         const embed = Help.instance.createEmbed(key);
 
         if(!embed) {
             message.reply(`Option '${key}' non reconnue`);
         } else {
             message.delete();
-            message.channel.send(embed);
+            message.channel.send({
+                embeds: [ embed ]
+            });
         }
     }
 

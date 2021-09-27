@@ -472,6 +472,22 @@ var BigBrowserV2User = /** @class */ (function () {
         user.__userInst = result;
         return result;
     };
+    BigBrowserV2User.prototype.deleteCustomData = function (masterKey) {
+        if (this.userData.customData && this.userData.customData[masterKey]) {
+            delete this.userData.customData[masterKey];
+        }
+    };
+    BigBrowserV2User.prototype.getCustomData = function (masterKey, defaultValueBuilder) {
+        if (!this.userData.customData) {
+            this.userData.customData = {};
+        }
+        var data = this.userData.customData[masterKey];
+        if (data === undefined) {
+            data = defaultValueBuilder ? defaultValueBuilder() : {};
+            this.userData.customData[masterKey] = data;
+        }
+        return data;
+    };
     Object.defineProperty(BigBrowserV2User.prototype, "userData", {
         get: function () {
             return this._userData;

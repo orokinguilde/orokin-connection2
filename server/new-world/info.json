@@ -14,7 +14,7 @@
     "actions": [{
         "on": "BigBrowser",
         "name": "Keep threads alive",
-        "periodSec": 5,
+        "periodSec": 60,
         "list": [
             { "type": "thread", "threadId": [
                 "885471214368325693",
@@ -31,6 +31,81 @@
                 "871451686751842304",
                 "888722901778456576"
             ], "keepUnarchived": true }
+        ]
+    }, {
+        "on": "BigBrowser",
+        "name": "Notification de présence",
+        "periodSec": 5,
+        "list": [
+            {
+                "type": "ChannelNotification",
+                "options": {
+                    "channelsToWatch": [
+                        "871838605096681472"
+                    ],
+                    "channelsToNotify": [
+                        "696836670657527838"
+                    ],
+                    "message": "<@&696355117821329418>, quelqu'un attend dans le channel : {links}"
+                }
+            }
+        ]
+    }, {
+        "on": "BigBrowser",
+        "name": "Sélection des métiers New World",
+        "periodSec": 5,
+        "startDelaySec": 1,
+        "list": [
+            {
+                "type": "EmbedReactionRole",
+                "options": {
+                    "userDataKey": "metiers",
+                    "frequency": "week",
+                    "frequencyNb": 4,
+                    "channelId": "892034081414594610",
+                    "deadlineMode": "flush-reactions",
+                    "messageOnReset": {
+                        "channelId": "696367575805853787",
+                        "message": "Les métiers ont été réinitialisés ! <#892034081414594610> <@&696846043177812028>"
+                    },
+                    "entries": [{
+                        "id": "creation",
+                        "name": "Métiers de création",
+                        "color": "#00ff00",
+                        "infos": [
+                            { "id": "Ameublement", "name": "Ameublement", "desc": "Meubles, Espaces de rangement et Trophées.", "role": "891052471806459934", "emoji": "🪑" },
+                            { "id": "Arts obscurs", "name": "Arts obscurs", "desc": "Potions, Armes magiques et Teintures.", "role": "891054049363910727", "emoji": "⚗️" },
+                            { "id": "Cuisine", "name": "Cuisine", "desc": "Repas et Boissons.", "role": "891054145287630859", "emoji": "🍽️" },
+                            { "id": "Forge d'armes", "name": "Forge d'armes", "desc": "Épées, Rapières, Haches, Marteaux de guerre et Boucliers.", "role": "891054199587094628", "emoji": "⚔️" },
+                            { "id": "Forge d'armures", "name": "Forge d'armures", "desc": "Toutes armures et Sacs de stockage.", "role": "891054246672363540", "emoji": "🛡️" },
+                            { "id": "Ingénierie", "name": "Ingénierie", "desc": "Arcs, Mousquets, Outils de metiers et Munitions.", "role": "891054289055793162", "emoji": "🛠️" },
+                            { "id": "Joaillerie", "name": "Joaillerie", "desc": "Amulettes, Anneaux et Boucles d'oreille.", "role": "891054329891553291", "emoji": "💎" }
+                        ]
+                    }, {
+                        "id": "exploitation",
+                        "name": "Métiers d'exploitation",
+                        "color": "#00ff00",
+                        "infos": [
+                            { "id": "Mineur", "name": "Mineur", "desc": "Minerais, Huiles et Essences.", "role": "891054387634520144", "emoji": "⛏️" },
+                            { "id": "Dépeceur", "name": "Dépeceur", "desc": "Peaux et Viandes.", "role": "891054423596498945", "emoji": "🔪" },
+                            { "id": "Pêcheur", "name": "Pêcheur", "desc": "Poissons et Poissons spéciaux.", "role": "891054452591702076", "emoji": "🎣" },
+                            { "id": "Bûcheron", "name": "Bûcheron", "desc": "Bois et ressources rares liées aux arbres.", "role": "891054492743770162", "emoji": "🪓" },
+                            { "id": "Cueilleur", "name": "Cueilleur", "desc": "Plantes, Fibres et Plantes magiques.", "role": "891054537840934932", "emoji": "🌿" }
+                        ]
+                    }, {
+                        "id": "raffinerie",
+                        "name": "Métiers de raffinerie",
+                        "color": "#00ff00",
+                        "infos": [
+                            { "id": "Tailleur de pierres", "name": "Tailleur de pierres", "desc": "Gemmes taillées, Emplacements et Briques.", "role": "891054578102075432", "emoji": "🪨" },
+                            { "id": "Travail du cuir", "name": "Travail du cuir", "desc": "Cuir pour armes et armures.", "role": "891054609693565060", "emoji": "🐂" },
+                            { "id": "Fondeur", "name": "Fondeur", "desc": "Lingots pour armes et armures.", "role": "891054651720466522", "emoji": "🧱" },
+                            { "id": "Couture", "name": "Couture", "desc": "Tissus pour armures et sacs.", "role": "891054684519940116", "emoji": "🪡" },
+                            { "id": "Travail du bois", "name": "Travail du bois", "desc": "Pour Ingénierie et Projets de ville.", "role": "891054725682855996", "emoji": "🪵" }
+                        ]
+                    }]
+                }
+            }
         ]
     }],
     "help": {

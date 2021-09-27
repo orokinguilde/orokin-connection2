@@ -1,6 +1,6 @@
 
 export class Ticker {
-    public static start(delayTime: number, fn: () => Promise<void>) {
+    public static start(delayTime: number, fn: () => Promise<void>, initialDelay?: number) {
         setTimeout(async () => {
             try {
                 await fn();
@@ -9,6 +9,6 @@ export class Ticker {
             }
 
             process.nextTick(() => Ticker.start(delayTime, fn));
-        }, delayTime);
+        }, initialDelay ?? delayTime);
     }
 }

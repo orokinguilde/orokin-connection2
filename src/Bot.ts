@@ -1,6 +1,9 @@
 import { Client, TextChannel, GuildChannel, Collection, Message, Intents, ThreadChannel, GuildMember, PartialMessageReaction, MessageReaction, PartialUser, User, MessageOptions, PartialGuildMember } from "discord.js";
 import config, { IConfigMemberChange } from "./config";
+import { EmbedReactionRole, EmbedReactionRole_Config } from "./actions/EmbedReactionRole";
 import { Ticker } from "./Ticker";
+import { ChannelNotification, IChannelNotification } from "./actions/ChannelNotification";
+import { ActionsManager } from "./ActionsManager";
 
 export abstract class IBot {
     public constructor(options) {
@@ -80,14 +83,16 @@ export abstract class IBot {
         const client = new Client({
             intents: [
                 Intents.FLAGS.DIRECT_MESSAGES,
+                Intents.FLAGS.DIRECT_MESSAGE_TYPING,
                 Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
                 Intents.FLAGS.GUILDS,
                 Intents.FLAGS.GUILD_MESSAGES,
-                //Intents.FLAGS.GUILD_MEMBERS,
-                //Intents.FLAGS.GUILD_PRESENCES,
+                Intents.FLAGS.GUILD_MEMBERS,
+                Intents.FLAGS.GUILD_PRESENCES,
                 Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
                 Intents.FLAGS.GUILD_VOICE_STATES
-            ]
+            ],
+            restTimeOffset: 0
         });
         this.client = client;
 
@@ -161,7 +166,9 @@ export abstract class IBot {
                 message.content = message.content.slice(1);
             }
 
-            this.onMessage(message, checkForCommand, params);
+            if(!this.actionsManager.catchMessage(message, checkForCommand, params)) {
+                this.onMessage(message, checkForCommand, params);
+            }
         });
 
         client.on('error', (value) => {
@@ -225,57 +232,12 @@ export abstract class IBot {
 
     protected abstract ready(): void;
 
+    protected actionsManager = new ActionsManager(this);
+
     protected startRuntime(): void {
         this._startRuntime();
-
-        if(config.server.info.actions && config.server.info.actions.length > 0) {
-            const actions = config.server.info.actions.filter(a => a.on === process.env.APP_SELECTOR);
-
-            for(let i = 0; i < actions.length; ++i) {
-                const action = actions[i];
-
-                Ticker.start((action.periodSec || 60) * 1000, async () => {
-                    const logText = `Execution de l'action : index ${i}${action.name ? ' - ' + action.name : ''}`;
-                    console.log(`${logText} [running]`);
-
-                    const guilds = this.client.guilds.valueOf().map(g => g);
-
-                    for(const item of action.list) {
-                        switch(item.type) {
-                            case 'thread': {
-                                const threadIds = Array.isArray(item.threadId) ? item.threadId : [ item.threadId ];
-
-                                for(const threadId of threadIds) {
-                                    let found = false;
-                                    for(const guild of guilds) {
-                                        const channel: ThreadChannel = await guild.channels.fetch(threadId) as any;
-                                        
-                                        if(channel) {
-                                            if(item.keepUnarchived) {
-                                                await channel.setArchived(false);
-                                            }
-
-                                            found = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if(!found) {
-                                        console.log(`Thread ${threadId} introuvable`);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    console.log(`${logText} [success]`);
-                });
-            }
-
-            console.log(`${actions.length}/${config.server.info.actions.length} action(s) (info.actions) lancée(s).`);
-        } else {
-            console.log('Aucune action (info.actions) à effectuer.');
-        }
+        
+        this.actionsManager.createTickers();
     }
     protected abstract _startRuntime(): void;
 

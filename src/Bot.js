@@ -39,10 +39,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.IBot = void 0;
 var discord_js_1 = require("discord.js");
 var config_1 = require("./config");
-var Ticker_1 = require("./Ticker");
+var ActionsManager_1 = require("./ActionsManager");
 var IBot = /** @class */ (function () {
     function IBot(options) {
         this.debug = false;
+        this.actionsManager = new ActionsManager_1.ActionsManager(this);
         if (!options)
             options = {};
         this.options = options;
@@ -96,14 +97,16 @@ var IBot = /** @class */ (function () {
         var client = new discord_js_1.Client({
             intents: [
                 discord_js_1.Intents.FLAGS.DIRECT_MESSAGES,
+                discord_js_1.Intents.FLAGS.DIRECT_MESSAGE_TYPING,
                 discord_js_1.Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
                 discord_js_1.Intents.FLAGS.GUILDS,
                 discord_js_1.Intents.FLAGS.GUILD_MESSAGES,
-                //Intents.FLAGS.GUILD_MEMBERS,
-                //Intents.FLAGS.GUILD_PRESENCES,
+                discord_js_1.Intents.FLAGS.GUILD_MEMBERS,
+                discord_js_1.Intents.FLAGS.GUILD_PRESENCES,
                 discord_js_1.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
                 discord_js_1.Intents.FLAGS.GUILD_VOICE_STATES
-            ]
+            ],
+            restTimeOffset: 0
         });
         this.client = client;
         client.on('raw', function (packet) { return __awaiter(_this, void 0, void 0, function () {
@@ -172,7 +175,9 @@ var IBot = /** @class */ (function () {
                     return;
                 message.content = message.content.slice(1);
             }
-            _this.onMessage(message, checkForCommand, params);
+            if (!_this.actionsManager.catchMessage(message, checkForCommand, params)) {
+                _this.onMessage(message, checkForCommand, params);
+            }
         });
         client.on('error', function (value) {
             console.error(value);
@@ -251,84 +256,8 @@ var IBot = /** @class */ (function () {
         });
     };
     IBot.prototype.startRuntime = function () {
-        var _this = this;
         this._startRuntime();
-        if (config_1.default.server.info.actions && config_1.default.server.info.actions.length > 0) {
-            var actions = config_1.default.server.info.actions.filter(function (a) { return a.on === process.env.APP_SELECTOR; });
-            var _loop_1 = function (i) {
-                var action = actions[i];
-                Ticker_1.Ticker.start((action.periodSec || 60) * 1000, function () { return __awaiter(_this, void 0, void 0, function () {
-                    var logText, guilds, _i, _a, item, _b, threadIds, _c, threadIds_1, threadId, found, _d, guilds_2, guild, channel;
-                    return __generator(this, function (_e) {
-                        switch (_e.label) {
-                            case 0:
-                                logText = "Execution de l'action : index " + i + (action.name ? ' - ' + action.name : '');
-                                console.log(logText + " [running]");
-                                guilds = this.client.guilds.valueOf().map(function (g) { return g; });
-                                _i = 0, _a = action.list;
-                                _e.label = 1;
-                            case 1:
-                                if (!(_i < _a.length)) return [3 /*break*/, 12];
-                                item = _a[_i];
-                                _b = item.type;
-                                switch (_b) {
-                                    case 'thread': return [3 /*break*/, 2];
-                                }
-                                return [3 /*break*/, 11];
-                            case 2:
-                                threadIds = Array.isArray(item.threadId) ? item.threadId : [item.threadId];
-                                _c = 0, threadIds_1 = threadIds;
-                                _e.label = 3;
-                            case 3:
-                                if (!(_c < threadIds_1.length)) return [3 /*break*/, 11];
-                                threadId = threadIds_1[_c];
-                                found = false;
-                                _d = 0, guilds_2 = guilds;
-                                _e.label = 4;
-                            case 4:
-                                if (!(_d < guilds_2.length)) return [3 /*break*/, 9];
-                                guild = guilds_2[_d];
-                                return [4 /*yield*/, guild.channels.fetch(threadId)];
-                            case 5:
-                                channel = _e.sent();
-                                if (!channel) return [3 /*break*/, 8];
-                                if (!item.keepUnarchived) return [3 /*break*/, 7];
-                                return [4 /*yield*/, channel.setArchived(false)];
-                            case 6:
-                                _e.sent();
-                                _e.label = 7;
-                            case 7:
-                                found = true;
-                                return [3 /*break*/, 9];
-                            case 8:
-                                _d++;
-                                return [3 /*break*/, 4];
-                            case 9:
-                                if (!found) {
-                                    console.log("Thread " + threadId + " introuvable");
-                                }
-                                _e.label = 10;
-                            case 10:
-                                _c++;
-                                return [3 /*break*/, 3];
-                            case 11:
-                                _i++;
-                                return [3 /*break*/, 1];
-                            case 12:
-                                console.log(logText + " [success]");
-                                return [2 /*return*/];
-                        }
-                    });
-                }); });
-            };
-            for (var i = 0; i < actions.length; ++i) {
-                _loop_1(i);
-            }
-            console.log(actions.length + "/" + config_1.default.server.info.actions.length + " action(s) (info.actions) lanc\u00E9e(s).");
-        }
-        else {
-            console.log('Aucune action (info.actions) à effectuer.');
-        }
+        this.actionsManager.createTickers();
     };
     IBot.prototype.onReady = function (fn) {
         this._onReady = fn;

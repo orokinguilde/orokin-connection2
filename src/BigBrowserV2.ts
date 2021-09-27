@@ -19,6 +19,9 @@ export interface IBigBrowserV2Server {
     createDate: number
     users: IBigBrowserV2Users
     tracking?: boolean
+    customData?: {
+        [masterKey: string]: any
+    }
 }
 export interface IBigBrowserV2Servers {
     [id: string]: IBigBrowserV2Server
@@ -75,6 +78,8 @@ export interface IBigBrowserV2User {
 
     rangedDayStats?: IBigBrowserV2UserStatsTimed
     rangedWeekStats?: IBigBrowserV2UserStatsTimed
+
+    customData?: any
 }
 export interface IBigBrowserV2UserStatsTimed {
     date: number
@@ -463,6 +468,25 @@ export class BigBrowserV2User {
         const result = new BigBrowserV2User(user);
         user.__userInst = result;
         return result;
+    }
+
+    public deleteCustomData(masterKey: string) {
+        if(this.userData.customData && this.userData.customData[masterKey]) {
+            delete this.userData.customData[masterKey];
+        }
+    }
+    public getCustomData<T>(masterKey: string, defaultValueBuilder?: () => T): T {
+        if(!this.userData.customData) {
+            this.userData.customData = {};
+        }
+
+        let data = this.userData.customData[masterKey];
+        if(data === undefined) {
+            data = defaultValueBuilder ? defaultValueBuilder() : {};
+            this.userData.customData[masterKey] = data;
+        }
+
+        return data;
     }
 
     private _userData: IBigBrowserV2User

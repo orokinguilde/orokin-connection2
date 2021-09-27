@@ -1,6 +1,9 @@
 import { MessageEmbedOptions } from 'discord.js';
 import * as path from 'path'
 import { IBigBrowserV2Rangs } from './BigBrowserV2';
+import { EmbedReactionRole_Config } from './actions/EmbedReactionRole';
+import { IChannelNotification } from './actions/ChannelNotification';
+import { INewWorldJobCommandOptions } from './actions/NewWorldJobCommand';
 
 export type APP_SELECTOR = 'BigBrowser' | 'General' | string
 
@@ -8,6 +11,23 @@ export interface IConfigMemberChange {
     channelId?: string
     message: string
     embeds?: MessageEmbedOptions[]
+}
+
+export interface IConfigAction {
+    on: APP_SELECTOR,
+    enabled?: boolean
+    name?: string,
+    periodSec?: number,
+    startDelaySec?: number,
+    list: {
+        type: string,
+        regex?: string
+        regexFlags?: string
+        enabled?: boolean
+        threadId: string | string[],
+        keepUnarchived?: boolean,
+        options?: EmbedReactionRole_Config | IChannelNotification | INewWorldJobCommandOptions
+    }[]
 }
 
 export default {
@@ -42,16 +62,7 @@ export default {
                 add?: IConfigMemberChange[],
                 remove?: IConfigMemberChange[]
             },
-            actions?: {
-                on: APP_SELECTOR,
-                name?: string,
-                periodSec?: number,
-                list: {
-                    type: 'thread',
-                    threadId: string | string[],
-                    keepUnarchived?: boolean
-                }[]
-            }[]
+            actions?: IConfigAction[]
         }
     }
 };

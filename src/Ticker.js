@@ -40,7 +40,7 @@ exports.Ticker = void 0;
 var Ticker = /** @class */ (function () {
     function Ticker() {
     }
-    Ticker.start = function (delayTime, fn) {
+    Ticker.start = function (delayTime, fn, initialDelay) {
         var _this = this;
         setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
             var ex_1;
@@ -61,7 +61,7 @@ var Ticker = /** @class */ (function () {
                         return [2 /*return*/];
                 }
             });
-        }); }, delayTime);
+        }); }, initialDelay !== null && initialDelay !== void 0 ? initialDelay : delayTime);
     };
     return Ticker;
 }());

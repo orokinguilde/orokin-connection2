@@ -1,5 +1,6 @@
 import { MessageEmbedOptions } from 'discord.js';
 import * as path from 'path'
+import * as fs from 'fs'
 import { IBigBrowserV2Rangs } from './BigBrowserV2';
 import { EmbedReactionRole_Config } from './actions/EmbedReactionRole';
 import { IChannelNotification } from './actions/ChannelNotification';
@@ -29,6 +30,8 @@ export interface IConfigAction {
         options?: EmbedReactionRole_Config | IChannelNotification | INewWorldJobCommandOptions
     }[]
 }
+
+export const isDebug = fs.existsSync('./env.json');
 
 export default {
     server: {

@@ -59,9 +59,12 @@ export class ChannelNotification {
         }
 
         const newNotEmptyChannels: VoiceChannel[] = []
+        const users: GuildMember[] = []
         const notEmptyChannels: VoiceChannel[] = []
         for(const channel of this.channelsToWatch) {
-            if(channel.members.map(x => x).length > 0) {
+            const members = channel.members.map(x => x);
+            if(members.length > 0) {
+                users.push.apply(users, members);
                 notEmptyChannels.push(channel);
             }
         }
@@ -88,6 +91,7 @@ export class ChannelNotification {
             const msg = options.message
                 .replace(/\{links\}/img, newNotEmptyChannels.map(m => m.toString()).join(', '))
                 .replace(/\{names\}/img, newNotEmptyChannels.map(m => m.name).join(', '))
+                .replace(/\{users\}/img, users.map(m => m.toString()).join(' et '))
                 .replace(/\{nb\}/img, newNotEmptyChannels.length.toString())
 
             for(const channel of this.channelsToNotify) {

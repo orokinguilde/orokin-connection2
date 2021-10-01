@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isDebug = void 0;
 var path = require("path");
+var fs = require("fs");
+exports.isDebug = fs.existsSync('./env.json');
 exports.default = {
     server: {
         name: process.env.SERVER_FOLDER_NAME,

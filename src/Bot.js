@@ -42,7 +42,6 @@ var config_1 = require("./config");
 var ActionsManager_1 = require("./ActionsManager");
 var IBot = /** @class */ (function () {
     function IBot(options) {
-        this.debug = false;
         this.actionsManager = new ActionsManager_1.ActionsManager(this);
         if (!options)
             options = {};
@@ -50,6 +49,13 @@ var IBot = /** @class */ (function () {
         if (!this.noAutoInitialization)
             this.initialize();
     }
+    Object.defineProperty(IBot.prototype, "debug", {
+        get: function () {
+            return config_1.isDebug;
+        },
+        enumerable: false,
+        configurable: true
+    });
     IBot.prototype.load = function (obj) {
         var ctx = {
             bot: this

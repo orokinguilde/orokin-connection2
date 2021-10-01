@@ -52,17 +52,26 @@ var ActionsManager = /** @class */ (function () {
             'NewWorldJobCommand': { isMessage: true, builder: function () { return new NewWorldJobCommand_1.NewWorldJobCommand(); } },
         };
     }
+    ActionsManager.prototype.isEnabled = function (option) {
+        if (typeof (option === null || option === void 0 ? void 0 : option.enabled) === 'boolean') {
+            return option === null || option === void 0 ? void 0 : option.enabled;
+        }
+        else if (typeof (option === null || option === void 0 ? void 0 : option.enabled) === 'string') {
+            return (option === null || option === void 0 ? void 0 : option.enabled) === (config_1.isDebug ? 'dev' : 'prod');
+        }
+        return true;
+    };
     ActionsManager.prototype.catchMessage = function (message, checkForCommand, params) {
-        var _a, _b;
-        for (var _i = 0, _c = this.actions; _i < _c.length; _i++) {
-            var action = _c[_i];
-            for (var _d = 0, _e = action.list; _d < _e.length; _d++) {
-                var item = _e[_d];
+        var _a;
+        for (var _i = 0, _b = this.actions; _i < _b.length; _i++) {
+            var action = _b[_i];
+            for (var _c = 0, _d = action.list; _c < _d.length; _c++) {
+                var item = _d[_c];
                 var ttype = this.types[item.type];
-                if (!((_a = item.enabled) !== null && _a !== void 0 ? _a : true) || !(ttype === null || ttype === void 0 ? void 0 : ttype.isMessage)) {
+                if (!this.isEnabled(item) || !(ttype === null || ttype === void 0 ? void 0 : ttype.isMessage)) {
                     continue;
                 }
-                if (checkForCommand(new RegExp(item.regex, (_b = item.regexFlags) !== null && _b !== void 0 ? _b : 'img'))) {
+                if (checkForCommand(new RegExp(item.regex, (_a = item.regexFlags) !== null && _a !== void 0 ? _a : 'img'))) {
                     var instance = this.getInstance(item, ttype.builder);
                     instance.execute(item.options, {
                         message: message,
@@ -81,13 +90,12 @@ var ActionsManager = /** @class */ (function () {
     };
     Object.defineProperty(ActionsManager.prototype, "actions", {
         get: function () {
-            var _a;
             var result = [];
             if (config_1.default.server.info.actions && config_1.default.server.info.actions.length > 0) {
                 var actions = config_1.default.server.info.actions.filter(function (a) { return a.on === process.env.APP_SELECTOR; });
                 for (var i = 0; i < actions.length; ++i) {
                     var action = actions[i];
-                    if (!((_a = action.enabled) !== null && _a !== void 0 ? _a : true)) {
+                    if (!this.isEnabled(action)) {
                         continue;
                     }
                     result.push(action);
@@ -103,19 +111,19 @@ var ActionsManager = /** @class */ (function () {
         var _loop_1 = function (action) {
             Ticker_1.Ticker.start((action.periodSec || 60) * 1000, function () { return __awaiter(_this, void 0, void 0, function () {
                 var logText, guilds, _i, _a, item, _b, instance, instance, threadIds, _c, threadIds_1, threadId, found, _d, guilds_1, guild, channel;
-                var _e, _f;
-                return __generator(this, function (_g) {
-                    switch (_g.label) {
+                var _e;
+                return __generator(this, function (_f) {
+                    switch (_f.label) {
                         case 0:
                             logText = "Execution de l'action : " + action.name;
                             console.log(logText + " [running]");
                             guilds = this.bot.client.guilds.valueOf().map(function (g) { return g; });
                             _i = 0, _a = action.list;
-                            _g.label = 1;
+                            _f.label = 1;
                         case 1:
                             if (!(_i < _a.length)) return [3 /*break*/, 19];
                             item = _a[_i];
-                            if (!((_e = item.enabled) !== null && _e !== void 0 ? _e : true) || !((_f = this.types[item.type]) === null || _f === void 0 ? void 0 : _f.isTicker)) {
+                            if (!this.isEnabled(item) || !((_e = this.types[item.type]) === null || _e === void 0 ? void 0 : _e.isTicker)) {
                                 return [3 /*break*/, 18];
                             }
                             _b = item.type;
@@ -129,7 +137,7 @@ var ActionsManager = /** @class */ (function () {
                             instance = this.getInstance(item, function () { return new ChannelNotification_1.ChannelNotification(); });
                             return [4 /*yield*/, instance.check(item.options, guilds)];
                         case 3:
-                            _g.sent();
+                            _f.sent();
                             return [3 /*break*/, 18];
                         case 4:
                             if (!!this.bot.bigBrowserV2) return [3 /*break*/, 5];
@@ -139,31 +147,31 @@ var ActionsManager = /** @class */ (function () {
                             instance = this.getInstance(item, function () { return new EmbedReactionRole_1.EmbedReactionRole(); });
                             return [4 /*yield*/, instance.run(item.options, this.bot.client, this.bot.bigBrowserV2)];
                         case 6:
-                            _g.sent();
-                            _g.label = 7;
+                            _f.sent();
+                            _f.label = 7;
                         case 7: return [3 /*break*/, 18];
                         case 8:
                             threadIds = Array.isArray(item.threadId) ? item.threadId : [item.threadId];
                             _c = 0, threadIds_1 = threadIds;
-                            _g.label = 9;
+                            _f.label = 9;
                         case 9:
                             if (!(_c < threadIds_1.length)) return [3 /*break*/, 17];
                             threadId = threadIds_1[_c];
                             found = false;
                             _d = 0, guilds_1 = guilds;
-                            _g.label = 10;
+                            _f.label = 10;
                         case 10:
                             if (!(_d < guilds_1.length)) return [3 /*break*/, 15];
                             guild = guilds_1[_d];
                             return [4 /*yield*/, guild.channels.fetch(threadId)];
                         case 11:
-                            channel = _g.sent();
+                            channel = _f.sent();
                             if (!channel) return [3 /*break*/, 14];
                             if (!item.keepUnarchived) return [3 /*break*/, 13];
                             return [4 /*yield*/, channel.setArchived(false)];
                         case 12:
-                            _g.sent();
-                            _g.label = 13;
+                            _f.sent();
+                            _f.label = 13;
                         case 13:
                             found = true;
                             return [3 /*break*/, 15];
@@ -174,7 +182,7 @@ var ActionsManager = /** @class */ (function () {
                             if (!found) {
                                 console.log("Thread " + threadId + " introuvable");
                             }
-                            _g.label = 16;
+                            _f.label = 16;
                         case 16:
                             _c++;
                             return [3 /*break*/, 9];

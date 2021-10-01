@@ -1,5 +1,5 @@
 import { Client, TextChannel, GuildChannel, Collection, Message, Intents, ThreadChannel, GuildMember, PartialMessageReaction, MessageReaction, PartialUser, User, MessageOptions, PartialGuildMember } from "discord.js";
-import config, { IConfigMemberChange } from "./config";
+import config, { IConfigMemberChange, isDebug } from "./config";
 import { EmbedReactionRole, EmbedReactionRole_Config } from "./actions/EmbedReactionRole";
 import { Ticker } from "./Ticker";
 import { ChannelNotification, IChannelNotification } from "./actions/ChannelNotification";
@@ -20,7 +20,9 @@ export abstract class IBot {
     public options;
     public noAutoInitialization;
     public client: Client;
-    public debug = false;
+    public get debug() {
+        return isDebug;
+    }
 
     public abstract save(): any
     public abstract _load(obj: any, ctx: any): void

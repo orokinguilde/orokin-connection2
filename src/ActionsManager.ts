@@ -3,7 +3,7 @@ import { ChannelNotification, IChannelNotification } from "./actions/ChannelNoti
 import { EmbedReactionRole, EmbedReactionRole_Config } from "./actions/EmbedReactionRole";
 import { NewWorldJobCommand } from "./actions/NewWorldJobCommand";
 import { IBot } from "./Bot";
-import config, { IConfigAction } from "./config";
+import config, { IConfigAction, isDebug } from "./config";
 import { Ticker } from "./Ticker";
 
 export interface IActionCtx {
@@ -17,13 +17,23 @@ export interface IAction {
 export class ActionsManager {
     public constructor(protected bot: IBot) {
     }
+
+    public isEnabled(option: { enabled?: any }): boolean {
+        if(typeof option?.enabled === 'boolean') {
+            return option?.enabled
+        } else if(typeof option?.enabled === 'string') {
+            return option?.enabled === (isDebug ? 'dev' : 'prod')
+        }
+
+        return true;
+    }
     
     public catchMessage(message: Message, checkForCommand: (regexCmd: RegExp) => boolean, params: string[]): boolean {
 
         for(const action of this.actions) {
             for(const item of action.list) {
                 const ttype = this.types[item.type];
-                if(!(item.enabled ?? true) || !ttype?.isMessage) {
+                if(!this.isEnabled(item) || !ttype?.isMessage) {
                     continue;
                 }
 
@@ -63,7 +73,7 @@ export class ActionsManager {
             for(let i = 0; i < actions.length; ++i) {
                 const action = actions[i];
 
-                if(!(action.enabled ?? true)) {
+                if(!this.isEnabled(action)) {
                     continue;
                 }
 
@@ -83,7 +93,7 @@ export class ActionsManager {
                 const guilds = this.bot.client.guilds.valueOf().map(g => g);
 
                 for(const item of action.list) {
-                    if(!(item.enabled ?? true) || !this.types[item.type]?.isTicker) {
+                    if(!this.isEnabled(item) || !this.types[item.type]?.isTicker) {
                         continue;
                     }
 

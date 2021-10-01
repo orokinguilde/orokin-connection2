@@ -14,6 +14,7 @@
     "actions": [{
         "on": "BigBrowser",
         "name": "Keep threads alive",
+        "enabled": "prod",
         "periodSec": 60,
         "list": [
             { "type": "thread", "threadId": [
@@ -35,6 +36,7 @@
     }, {
         "on": "BigBrowser",
         "name": "Notification de présence",
+        "enabled": "prod",
         "periodSec": 5,
         "list": [
             {
@@ -46,13 +48,14 @@
                     "channelsToNotify": [
                         "696836670657527838"
                     ],
-                    "message": "<@&696355117821329418>, quelqu'un attend dans le channel : {links}"
+                    "message": "<@&696355117821329418>, {users} attend(ent) dans le channel : {links}"
                 }
             }
         ]
     }, {
         "on": "BigBrowser",
         "name": "Sélection des métiers New World",
+        "enabled": "prod",
         "periodSec": 5,
         "startDelaySec": 1,
         "list": [

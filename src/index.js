@@ -19,7 +19,6 @@ if (!botClass) {
 var bot = new botClass({
     token: process.env.TOKEN
 });
-bot.debug = fs.existsSync('./env.json');
 console.log('Debug mode:', bot.debug ? 'on' : 'off');
 (0, globals_1.initialize)(bot);
 bot.start();

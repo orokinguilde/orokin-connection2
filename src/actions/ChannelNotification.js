@@ -49,7 +49,7 @@ var ChannelNotification = /** @class */ (function () {
     }
     ChannelNotification.prototype.check = function (options, guilds) {
         return __awaiter(this, void 0, void 0, function () {
-            var _i, _a, id, _b, guilds_1, guild, channel, ex_1, _c, _d, id, _e, guilds_2, guild, channel, ex_2, newNotEmptyChannels, notEmptyChannels, _f, _g, channel, _h, notEmptyChannels_1, notEmptyChannel, id, index, _loop_1, this_1, _j, _k, id, msg, _l, _m, channel;
+            var _i, _a, id, _b, guilds_1, guild, channel, ex_1, _c, _d, id, _e, guilds_2, guild, channel, ex_2, newNotEmptyChannels, users, notEmptyChannels, _f, _g, channel, members, _h, notEmptyChannels_1, notEmptyChannel, id, index, _loop_1, this_1, _j, _k, id, msg, _l, _m, channel;
             return __generator(this, function (_o) {
                 switch (_o.label) {
                     case 0:
@@ -124,10 +124,13 @@ var ChannelNotification = /** @class */ (function () {
                             return [2 /*return*/];
                         }
                         newNotEmptyChannels = [];
+                        users = [];
                         notEmptyChannels = [];
                         for (_f = 0, _g = this.channelsToWatch; _f < _g.length; _f++) {
                             channel = _g[_f];
-                            if (channel.members.map(function (x) { return x; }).length > 0) {
+                            members = channel.members.map(function (x) { return x; });
+                            if (members.length > 0) {
+                                users.push.apply(users, members);
                                 notEmptyChannels.push(channel);
                             }
                         }
@@ -156,6 +159,7 @@ var ChannelNotification = /** @class */ (function () {
                             msg = options.message
                                 .replace(/\{links\}/img, newNotEmptyChannels.map(function (m) { return m.toString(); }).join(', '))
                                 .replace(/\{names\}/img, newNotEmptyChannels.map(function (m) { return m.name; }).join(', '))
+                                .replace(/\{users\}/img, users.map(function (m) { return m.toString(); }).join(' et '))
                                 .replace(/\{nb\}/img, newNotEmptyChannels.length.toString());
                             for (_l = 0, _m = this.channelsToNotify; _l < _m.length; _l++) {
                                 channel = _m[_l];

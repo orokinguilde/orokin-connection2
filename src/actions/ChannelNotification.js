@@ -129,6 +129,9 @@ var ChannelNotification = /** @class */ (function () {
                         for (_f = 0, _g = this.channelsToWatch; _f < _g.length; _f++) {
                             channel = _g[_f];
                             members = channel.members.map(function (x) { return x; });
+                            if (options.triggerOnlyOnNoRole) {
+                                members = members.filter(function (m) { return m.roles.cache.size === 0; });
+                            }
                             if (members.length > 0) {
                                 users.push.apply(users, members);
                                 notEmptyChannels.push(channel);

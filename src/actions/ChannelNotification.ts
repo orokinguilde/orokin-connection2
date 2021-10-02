@@ -3,6 +3,7 @@ import { Guild, GuildMember, TextChannel, VoiceChannel } from "discord.js";
 export class IChannelNotification {
     channelsToWatch: string[]
     channelsToNotify: string[]
+    triggerOnlyOnNoRole?: boolean
     message: string
 }
 
@@ -62,7 +63,12 @@ export class ChannelNotification {
         const users: GuildMember[] = []
         const notEmptyChannels: VoiceChannel[] = []
         for(const channel of this.channelsToWatch) {
-            const members = channel.members.map(x => x);
+            let members = channel.members.map(x => x);
+
+            if(options.triggerOnlyOnNoRole) {
+                members = members.filter(m => m.roles.cache.size === 0);
+            }
+
             if(members.length > 0) {
                 users.push.apply(users, members);
                 notEmptyChannels.push(channel);

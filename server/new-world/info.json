@@ -48,6 +48,7 @@
                     "channelsToNotify": [
                         "696836670657527838"
                     ],
+                    "triggerOnlyOnNoRole": true,
                     "message": "<@&696355117821329418>, {users} attend(ent) dans le channel : {links}"
                 }
             }

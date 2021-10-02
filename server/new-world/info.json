@@ -35,6 +35,33 @@
         ]
     }, {
         "on": "BigBrowser",
+        "name": "Events texts",
+        "enabled": "prod",
+        "periodSec": 1500,
+        "list": [
+            {
+                "type": "Texter",
+                "options": {
+                    "memberId": "338349097851289610",
+                    "date": {
+                        "day": 31,
+                        "month": 10,
+                        "hour": 8
+                    },
+                    "message": {
+                        "embeds": [{
+                            "color": "#FF6600",
+                            "description": "**🎃 Joyeux Halloween 🎃**\n\nUn long regard pensif à l'ombre qui gémit ;\nUne feuille orange danse avec profonde hystérie.\nLa marmite déborde, tout est bientôt prêt, mon chéri.\nUn succulent diner, saupoudré de douce agonie.\nCe doigt nerveux et gras sous mes dents croustille.\n« Un feu plus fort », sur ma tendre recette, j'inscris.\n\n*Akamelia*",
+                            "image": {
+                                "url": "https://cdn.discordapp.com/attachments/483003722830577671/893921849686257684/f6296739a1ba2fdcee0e66e0b9c363e1.gif"
+                            }
+                        }]
+                    }
+                }
+            }
+        ]
+    }, {
+        "on": "BigBrowser",
         "name": "Notification de présence",
         "enabled": "prod",
         "periodSec": 5,

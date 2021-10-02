@@ -40,6 +40,7 @@ exports.ActionsManager = void 0;
 var ChannelNotification_1 = require("./actions/ChannelNotification");
 var EmbedReactionRole_1 = require("./actions/EmbedReactionRole");
 var NewWorldJobCommand_1 = require("./actions/NewWorldJobCommand");
+var Texter_1 = require("./actions/Texter");
 var config_1 = require("./config");
 var Ticker_1 = require("./Ticker");
 var ActionsManager = /** @class */ (function () {
@@ -50,6 +51,7 @@ var ActionsManager = /** @class */ (function () {
             'EmbedReactionRole': { isTicker: true },
             'thread': { isTicker: true },
             'NewWorldJobCommand': { isMessage: true, builder: function () { return new NewWorldJobCommand_1.NewWorldJobCommand(); } },
+            'Texter': { isTicker: true, builder: function () { return new Texter_1.Texter(); } },
         };
     }
     ActionsManager.prototype.isEnabled = function (option) {
@@ -110,21 +112,21 @@ var ActionsManager = /** @class */ (function () {
         var _this = this;
         var _loop_1 = function (action) {
             Ticker_1.Ticker.start((action.periodSec || 60) * 1000, function () { return __awaiter(_this, void 0, void 0, function () {
-                var logText, guilds, _i, _a, item, _b, instance, instance, threadIds, _c, threadIds_1, threadId, found, _d, guilds_1, guild, channel;
-                var _e;
-                return __generator(this, function (_f) {
-                    switch (_f.label) {
+                var logText, guilds, _i, _a, item, type, _b, instance, instance, threadIds, _c, threadIds_1, threadId, found, _d, guilds_1, guild, channel, instance;
+                return __generator(this, function (_e) {
+                    switch (_e.label) {
                         case 0:
                             logText = "Execution de l'action : " + action.name;
                             console.log(logText + " [running]");
                             guilds = this.bot.client.guilds.valueOf().map(function (g) { return g; });
                             _i = 0, _a = action.list;
-                            _f.label = 1;
+                            _e.label = 1;
                         case 1:
-                            if (!(_i < _a.length)) return [3 /*break*/, 19];
+                            if (!(_i < _a.length)) return [3 /*break*/, 21];
                             item = _a[_i];
-                            if (!this.isEnabled(item) || !((_e = this.types[item.type]) === null || _e === void 0 ? void 0 : _e.isTicker)) {
-                                return [3 /*break*/, 18];
+                            type = this.types[item.type];
+                            if (!this.isEnabled(item) || !(type === null || type === void 0 ? void 0 : type.isTicker)) {
+                                return [3 /*break*/, 20];
                             }
                             _b = item.type;
                             switch (_b) {
@@ -137,8 +139,8 @@ var ActionsManager = /** @class */ (function () {
                             instance = this.getInstance(item, function () { return new ChannelNotification_1.ChannelNotification(); });
                             return [4 /*yield*/, instance.check(item.options, guilds)];
                         case 3:
-                            _f.sent();
-                            return [3 /*break*/, 18];
+                            _e.sent();
+                            return [3 /*break*/, 20];
                         case 4:
                             if (!!this.bot.bigBrowserV2) return [3 /*break*/, 5];
                             console.error("L'action " + item.type);
@@ -147,31 +149,31 @@ var ActionsManager = /** @class */ (function () {
                             instance = this.getInstance(item, function () { return new EmbedReactionRole_1.EmbedReactionRole(); });
                             return [4 /*yield*/, instance.run(item.options, this.bot.client, this.bot.bigBrowserV2)];
                         case 6:
-                            _f.sent();
-                            _f.label = 7;
-                        case 7: return [3 /*break*/, 18];
+                            _e.sent();
+                            _e.label = 7;
+                        case 7: return [3 /*break*/, 20];
                         case 8:
                             threadIds = Array.isArray(item.threadId) ? item.threadId : [item.threadId];
                             _c = 0, threadIds_1 = threadIds;
-                            _f.label = 9;
+                            _e.label = 9;
                         case 9:
                             if (!(_c < threadIds_1.length)) return [3 /*break*/, 17];
                             threadId = threadIds_1[_c];
                             found = false;
                             _d = 0, guilds_1 = guilds;
-                            _f.label = 10;
+                            _e.label = 10;
                         case 10:
                             if (!(_d < guilds_1.length)) return [3 /*break*/, 15];
                             guild = guilds_1[_d];
                             return [4 /*yield*/, guild.channels.fetch(threadId)];
                         case 11:
-                            channel = _f.sent();
+                            channel = _e.sent();
                             if (!channel) return [3 /*break*/, 14];
                             if (!item.keepUnarchived) return [3 /*break*/, 13];
                             return [4 /*yield*/, channel.setArchived(false)];
                         case 12:
-                            _f.sent();
-                            _f.label = 13;
+                            _e.sent();
+                            _e.label = 13;
                         case 13:
                             found = true;
                             return [3 /*break*/, 15];
@@ -182,15 +184,25 @@ var ActionsManager = /** @class */ (function () {
                             if (!found) {
                                 console.log("Thread " + threadId + " introuvable");
                             }
-                            _f.label = 16;
+                            _e.label = 16;
                         case 16:
                             _c++;
                             return [3 /*break*/, 9];
-                        case 17: return [3 /*break*/, 18];
+                        case 17: return [3 /*break*/, 20];
                         case 18:
+                            instance = this.getInstance(item, type.builder);
+                            if (!instance) return [3 /*break*/, 20];
+                            return [4 /*yield*/, instance.execute(item.options, {
+                                    item: item,
+                                    guilds: guilds
+                                })];
+                        case 19:
+                            _e.sent();
+                            _e.label = 20;
+                        case 20:
                             _i++;
                             return [3 /*break*/, 1];
-                        case 19:
+                        case 21:
                             console.log(logText + " [success]");
                             return [2 /*return*/];
                     }

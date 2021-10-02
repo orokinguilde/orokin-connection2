@@ -2,6 +2,7 @@ import { Client, Message, ThreadChannel } from "discord.js";
 import { ChannelNotification, IChannelNotification } from "./actions/ChannelNotification";
 import { EmbedReactionRole, EmbedReactionRole_Config } from "./actions/EmbedReactionRole";
 import { NewWorldJobCommand } from "./actions/NewWorldJobCommand";
+import { Texter } from "./actions/Texter";
 import { IBot } from "./Bot";
 import config, { IConfigAction, isDebug } from "./config";
 import { Ticker } from "./Ticker";
@@ -57,9 +58,10 @@ export class ActionsManager {
         'EmbedReactionRole': { isTicker: true },
         'thread': { isTicker: true },
         'NewWorldJobCommand': { isMessage: true, builder: () => new NewWorldJobCommand() },
+        'Texter': { isTicker: true, builder: () => new Texter() },
     }
 
-    protected getInstance<T>(item: any, builder: () => T): T {
+    protected getInstance<T = any>(item: any, builder: () => T): T {
         item.__instance = item.__instance ?? builder();
         return item.__instance as T;
     }
@@ -93,7 +95,9 @@ export class ActionsManager {
                 const guilds = this.bot.client.guilds.valueOf().map(g => g);
 
                 for(const item of action.list) {
-                    if(!this.isEnabled(item) || !this.types[item.type]?.isTicker) {
+                    const type = this.types[item.type];
+
+                    if(!this.isEnabled(item) || !type?.isTicker) {
                         continue;
                     }
 
@@ -137,6 +141,17 @@ export class ActionsManager {
                                 }
                             }
                             break;
+                        }
+
+                        default: {
+                            const instance = this.getInstance(item, type.builder);
+
+                            if(instance) {
+                                await instance.execute(item.options, {
+                                    item: item,
+                                    guilds: guilds
+                                });
+                            }
                         }
                     }
                 }

@@ -130,7 +130,7 @@ var ChannelNotification = /** @class */ (function () {
                             channel = _g[_f];
                             members = channel.members.map(function (x) { return x; });
                             if (options.triggerOnlyOnNoRole) {
-                                members = members.filter(function (m) { return m.roles.cache.size === 0; });
+                                members = members.filter(function (m) { return m.roles.cache.size === 1; }); // 1 => role @everyone
                             }
                             if (members.length > 0) {
                                 users.push.apply(users, members);

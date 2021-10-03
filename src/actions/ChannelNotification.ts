@@ -66,7 +66,7 @@ export class ChannelNotification {
             let members = channel.members.map(x => x);
 
             if(options.triggerOnlyOnNoRole) {
-                members = members.filter(m => m.roles.cache.size === 0);
+                members = members.filter(m => m.roles.cache.size === 1); // 1 => role @everyone
             }
 
             if(members.length > 0) {

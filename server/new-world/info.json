@@ -58,6 +58,26 @@
                         }]
                     }
                 }
+            }, {
+                "type": "Texter",
+                "enabled": false,
+                "options": {
+                    "channelId": "696367575805853787",
+                    "date": {
+                        "day": 25,
+                        "month": 12,
+                        "hour": 8
+                    },
+                    "message": {
+                        "embeds": [{
+                            "color": "#E7D992",
+                            "description": "**🎄 Joyeux Noël 🎄**\n\n",
+                            "image": {
+                                "url": "https://cdn.discordapp.com/attachments/483003722830577671/894132388223934504/unknown.png"
+                            }
+                        }]
+                    }
+                }
             }
         ]
     }, {

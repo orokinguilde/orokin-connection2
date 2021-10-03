@@ -52,14 +52,6 @@ var TickerAction = /** @class */ (function () {
             date.hour !== undefined && m.hour(),
             date.minute !== undefined && m.minute()
         ].filter(function (v) { return v !== false; }).join(',');
-        console.log([
-            m.year(),
-            (m.month() + 1),
-            m.date(),
-            m.week(),
-            m.hour(),
-            m.minute()
-        ]);
         if (date && (allowMultipleTriggers || this.lastTriggerDate !== values)) {
             if ((date.year === undefined || date.year === m.year())
                 && (date.month === undefined || (date.month === m.month() + 1))

@@ -35,25 +35,20 @@
         ]
     }, {
         "on": "BigBrowser",
-        "name": "Events texts",
+        "name": "Event texts",
         "enabled": "prod",
-        "periodSec": 10,
+        "periodSec": 1500,
         "list": [
             {
                 "type": "Texter",
                 "options": {
-                    "channelId": "892009960504958976",
+                    "channelId": "696367575805853787",
                     "date": {
-                        "day": 3,
+                        "day": 31,
                         "month": 10,
-                        "hour": 10
+                        "hour": 8
                     },
                     "message": {
-                        "embeds": [{
-                            "description": "test"
-                        }]
-                    },
-                    "messageXXXXXX": {
                         "embeds": [{
                             "color": "#FF6600",
                             "description": "**🎃 Joyeux Halloween 🎃**\n\nUn long regard pensif à l'ombre qui gémit ;\nUne feuille orange danse avec profonde hystérie.\nLa marmite déborde, tout est bientôt prêt, mon chéri.\nUn succulent diner, saupoudré de douce agonie.\nCe doigt nerveux et gras sous mes dents croustille.\n« Un feu plus fort », sur ma tendre recette, j'inscris.\n\n*Akamelia*",

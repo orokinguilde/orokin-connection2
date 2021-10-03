@@ -28,15 +28,6 @@ export abstract class TickerAction<T = any> {
             date.minute !== undefined && m.minute()
         ].filter(v => v as any !== false).join(',')
 
-        console.log([
-            m.year(),
-            (m.month() + 1),
-            m.date(),
-            m.week(),
-            m.hour(),
-            m.minute()
-        ]);
-
         if(date && (allowMultipleTriggers || this.lastTriggerDate !== values)) {
             if((date.year === undefined || date.year === m.year())
             && (date.month === undefined || (date.month === m.month() + 1))

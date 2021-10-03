@@ -36,17 +36,17 @@
     }, {
         "on": "BigBrowser",
         "name": "Events texts",
-        "enabled": "prod",
-        "periodSec": 1500,
+        "enabled": "dev",
+        "periodSec": 500,
         "list": [
             {
                 "type": "Texter",
                 "options": {
-                    "channelId": "696367575805853787",
+                    "channelId": "892009960504958976",
                     "date": {
                         "day": 3,
                         "month": 10,
-                        "hour": 8
+                        "hour": 10
                     },
                     "message": {
                         "embeds": [{

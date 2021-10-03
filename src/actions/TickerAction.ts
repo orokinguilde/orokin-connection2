@@ -30,7 +30,7 @@ export abstract class TickerAction<T = any> {
 
         if(date && (allowMultipleTriggers || this.lastTriggerDate !== values)) {
             if((date.year === undefined || date.year === m.year())
-            && (date.month === undefined || date.month === m.month() + 1)
+            && (date.month === undefined || (date.month === m.month() + 1))
             && (date.day === undefined || date.day === m.date())
             && (date.week === undefined || date.week === m.week())
             && (date.hour === undefined || date.hour === m.hour())

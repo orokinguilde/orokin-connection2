@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var moment = require("moment-timezone");
 var fs = require("fs");
 moment.locale('fr');
+moment.tz.setDefault('Europe/Paris');
 process.env = fs.existsSync('./env.json') ? JSON.parse(fs.readFileSync('./env.json').toString()) : process.env;
 var globals_1 = require("./globals");
 var BotBigBrowser_1 = require("./bots/BotBigBrowser");

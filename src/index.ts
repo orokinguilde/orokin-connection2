@@ -2,6 +2,7 @@ import * as moment from 'moment-timezone'
 import * as fs from 'fs'
 
 moment.locale('fr')
+moment.tz.setDefault('Europe/Paris');
 
 process.env = fs.existsSync('./env.json') ? JSON.parse(fs.readFileSync('./env.json').toString()) : process.env;
 

@@ -36,8 +36,8 @@
     }, {
         "on": "BigBrowser",
         "name": "Events texts",
-        "enabled": "dev",
-        "periodSec": 500,
+        "enabled": "prod",
+        "periodSec": 10,
         "list": [
             {
                 "type": "Texter",

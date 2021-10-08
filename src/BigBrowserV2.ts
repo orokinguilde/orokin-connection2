@@ -142,6 +142,8 @@ export class BigBrowserV2UserStats {
         });
     }
 
+    public cheatXPOffset = 0;
+
     private _stats: IBigBrowserV2UserStats;
     public get stats() {
         return this._stats;
@@ -156,11 +158,11 @@ export class BigBrowserV2UserStats {
     }
 
     public get voiceXp() {
-        return this.stats.tvt / config.server.info.xp.voiceMs;
+        return this.stats.tvt / config.server.info.xp.voiceMs + this.cheatXPOffset;
     }
 
     public get textXp() {
-        return this.stats.tts / config.server.info.xp.textChars;
+        return this.stats.tts / config.server.info.xp.textChars + this.cheatXPOffset;
     }
 
     public get xpBonus() {
@@ -519,6 +521,11 @@ export class BigBrowserV2User {
     public get stats() {
         if(!this._stats) {
             this._stats = new BigBrowserV2UserStats(this.userData.stats);
+
+            /*
+            if(this.displayName.toLowerCase().includes('akamelia')) {
+                this._stats.cheatXPOffset = 1000000;
+            }*/
         }
 
         return this._stats;

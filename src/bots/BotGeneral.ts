@@ -142,7 +142,7 @@ export class BotGeneral extends IBot {
         message.channel.send(`${message.author} a quitté Trio Team ! :cry: `);
     }
     
-    public onMessage(message: Message, checkForCommand: (regex: RegExp) => boolean, params: string[]) {
+    public async onMessage(message: Message, checkForCommand: (regex: RegExp) => boolean, params: string[]) {
 
         const setCommonSetting = (message, callback) => {
             BotGeneral.adminOnly(message, () => {

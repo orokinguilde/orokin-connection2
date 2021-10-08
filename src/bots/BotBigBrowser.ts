@@ -60,7 +60,7 @@ export class BotBigBrowser extends IBot {
         return colors[Math.floor(Math.random() * colors.length)];
     }
     
-    public onMessage(message: Message, checkForCommand: (regex: RegExp) => boolean, params: string[]) {
+    public async onMessage(message: Message, checkForCommand: (regex: RegExp) => boolean, params: string[]) {
         if(!message.author.bot) {
             this.bigBrowser.increaseTextActivity(message.guild, message.author, 0.5);
         }
@@ -116,22 +116,20 @@ export class BotBigBrowser extends IBot {
             const exp = user.stats.xp;
             const userRank = user.stats.rank;
 
-            const msg = `${message.member}, voici la liste des rangs disponibles :\r\n` + Object.keys(BigBrowserV2.ranks)
+            const msg = `Voici la liste des rangs disponibles :\r\n` + Object.keys(BigBrowserV2.ranks)
                 .map((key) => BigBrowserV2.ranks[key])
                 .map((rank) => `\`[${globals.padN(rank.start, 4)}, ${globals.padN(rank.end || '∞', 4)}[ ${rank.name}\`${rank === userRank.currentRank ? ` ⇦ **${message.member.displayName}**, tu es ici avec **${Math.floor(exp)} exp** !` : ''}`)
                 .join('\r\n');
 
-            message.delete();
-            message.channel.send(msg);
+            message.reply(msg);
 
         } else if(checkForCommand(/^\s*!rank templates$/img)) {
 
-            const msg = `${message.member}, voici la liste des templates disponibles (\`!rank template ...\`) :\r\n` + bannerTemplates.list.map((bannerTemplate) => {
+            const msg = `Voici la liste des templates disponibles (\`!rank template ...\`) :\r\n` + bannerTemplates.list.map((bannerTemplate) => {
                 return `**${bannerTemplate.key}.** ${bannerTemplate.name}`
             }).join('\r\n');
 
-            message.delete();
-            message.channel.send(msg);
+            message.reply(msg);
         } else if(checkForCommand(/^\s*!rank\s*template\s*show$/imgs)) {
             const user = this.bigBrowserV2.getUser(message.member);
 
@@ -146,7 +144,7 @@ export class BotBigBrowser extends IBot {
                 const user = this.bigBrowserV2.getUser(message.member);
 
                 user.customBannerTemplate = templateInfo;
-                message.channel.send(`${message.member}, le template personnalisé t'a été assigné 👍`);
+                message.reply(`le template personnalisé t'a été assigné 👍`);
             } catch(ex) {
                 message.reply(`Le JSON n'est pas valide 😢`);
             }
@@ -162,16 +160,13 @@ export class BotBigBrowser extends IBot {
                 ?? bannerTemplates.list.find(templateItem => `${templateItem.key}. ${templateItem.name}`.toLowerCase().indexOf(name) > -1);
 
             if(!template) {
-                message.channel.send(`${message.member}, le template "${name}" n'a pas été trouvé 😢`);
+                message.reply(`Le template "${name}" n'a pas été trouvé 😢`);
             } else {
                 user.bannerTemplateKey = template.key;
                 user.customBannerTemplate = undefined;
-                message.channel.send(`${message.member}, le template "${name}" t'a été assigné 👍`);
-                message.delete();
+                message.reply(`Le template "${name}" t'a été assigné 👍`);
             }
-        }
-        else if(checkForCommand(/^\s*!rank\s*$/img))
-        {
+        } else if(checkForCommand(/^\s*!rank\s*$/img)) {
             const user = this.bigBrowserV2.getUser(message.member);
             const voiceExp = user.stats.voiceXp;
             const textExp = user.stats.textXp;
@@ -207,25 +202,7 @@ export class BotBigBrowser extends IBot {
                     });
                 }
             })
-            /*
-            banner.createStream(template, (e, stream) => {
-                if(e)
-                {
-                    console.log(e);
-                    message.channel.send(`Désolé, une erreur s'est produite lors de la génération de l'image.`);
-                }
-                else
-                {
-                    message.delete();
-                    message.channel.send({
-                        files: [{
-                            attachment: stream,
-                            name: 'ranking.png'
-                        }]
-                    });
-                }
-            });*/
-
+            
         } else if(checkForCommand(/^\s*!server\s+rank\s+reset\s*$/img)) {
             
             BotBigBrowser.adminOnly(message, () => {
@@ -277,32 +254,26 @@ Fin : ${range.end} h`).reduce((p, c) => `${p}\n\n${c}`, '').trim()}\`\`\``);
                 .map((u, i) => u.stats.xp <= 0 ? `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} -` : `${`${i + 1}.`.padEnd(entries.length.toString().length + 1, ' ')} ${(Math.round(u.stats.xp * 100) / 100).toString().padStart(7, ' ')}${Math.round(u.stats.xpBonus * 100) / 100 > 0 ? ` BONNUS (${Math.round(u.stats.xpBonus * 100) / 100})` : ''} :: ${u.user.userData.displayName}`)
                 .reduce((p, c) => !p ? c : `${p}\n${c}`, '');
             
-            message.delete();
-            message.reply('\r\n' + `\`\`\`::: Jour :::
+            message.channel.send('\r\n' + `\`\`\`::: Jour :::
 ${createStrLine(result.day)}
 
 ::: Semaine :::
 ${createStrLine(result.week)}\`\`\``);
-        }
-        else if(checkForCommand(/^\s*!dbinfo\s*$/img))
-        {
+            message.delete();
+        } else if(checkForCommand(/^\s*!dbinfo\s*$/img)) {
             BotBigBrowser.adminOnly(message, () => {
                 const time = (this as any).saver.dataCreationDate;
                 message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
             })
-        }
-        else if(checkForCommand(/^\s*!server\s+xp\s*$/img))
-        {
+        } else if(checkForCommand(/^\s*!server\s+xp\s*$/img)) {
             console.log('SERVER STATS');
 
             //const result = this.bigBrowser.getTextSummaryByServer(message.guild);
             const result = this.bigBrowserV2.getServerText(message.guild);
             
             message.delete();
-            message.reply('\r\n' + result);
-        }
-        else if(checkForCommand(/^\s*!server\s+xp\s+csv\s*$/img))
-        {
+            message.channel.send('\r\n' + result);
+        } else if(checkForCommand(/^\s*!server\s+xp\s+csv\s*$/img)) {
             console.log('SERVER STATS');
 
             //const result = this.bigBrowser.getTextSummaryByServerCSV(message.guild, true);
@@ -310,11 +281,9 @@ ${createStrLine(result.week)}\`\`\``);
 
             message.delete();
             message.channel.send({
-                files: [new MessageAttachment(new Buffer(result), 'stats.csv')]
+                files: [new MessageAttachment(Buffer.from(result), 'stats.csv')]
             });
-        }
-        else if(checkForCommand(/^\s*!server\s+xp\s+md\s*$/img))
-        {
+        } else if(checkForCommand(/^\s*!server\s+xp\s+md\s*$/img)) {
             console.log('SERVER STATS');
 
             //const result = this.bigBrowser.getTextSummaryByServer(message.guild);
@@ -322,11 +291,9 @@ ${createStrLine(result.week)}\`\`\``);
 
             message.delete();
             message.channel.send({
-                files: [new MessageAttachment(new Buffer(result), 'stats.md')]
+                files: [new MessageAttachment(Buffer.from(result), 'stats.md')]
             });
-        }
-        else if(checkForCommand(/^\s*!server\s+xp\s+txt\s*$/img))
-        {
+        } else if(checkForCommand(/^\s*!server\s+xp\s+txt\s*$/img)) {
             console.log('SERVER STATS');
 
             //const result = this.bigBrowser.getTextSummaryByServer(message.guild, false);
@@ -334,21 +301,17 @@ ${createStrLine(result.week)}\`\`\``);
 
             message.delete();
             message.channel.send({
-                files: [new MessageAttachment(new Buffer(result), 'stats.txt')]
+                files: [new MessageAttachment(Buffer.from(result), 'stats.txt')]
             });
-        }
-        else if(checkForCommand(/^\s*!global\s+xp\s*$/img))
-        {
+        } else if(checkForCommand(/^\s*!global\s+xp\s*$/img)) {
             console.log('GLOBAL STATS');
 
             //const result = this.bigBrowser.getTextSummaryByServer();
             const result = this.bigBrowserV2.getServersText(this.client.guilds.valueOf().map(g => g));
 
             message.delete();
-            message.reply('\r\n' + result);
-        }
-        else if(checkForCommand(/^\s*!global\s+xp\s+csv\s*$/img))
-        {
+            message.channel.send('\r\n' + result);
+        } else if(checkForCommand(/^\s*!global\s+xp\s+csv\s*$/img)) {
             console.log('GLOBAL STATS DL');
 
             //const result = this.bigBrowser.getTextSummaryByServerCSV(undefined, true);
@@ -356,11 +319,9 @@ ${createStrLine(result.week)}\`\`\``);
 
             message.delete();
             message.channel.send({
-                files: [new MessageAttachment(new Buffer(result), 'stats.csv')]
+                files: [new MessageAttachment(Buffer.from(result), 'stats.csv')]
             });
-        }
-        else if(checkForCommand(/^\s*!global\s+xp\s+md\s*$/img))
-        {
+        } else if(checkForCommand(/^\s*!global\s+xp\s+md\s*$/img)) {
             console.log('GLOBAL STATS DL');
 
             //const result = this.bigBrowser.getTextSummaryByServer();
@@ -368,11 +329,9 @@ ${createStrLine(result.week)}\`\`\``);
 
             message.delete();
             message.channel.send({
-                files: [new MessageAttachment(new Buffer(result), 'stats.md')]
+                files: [new MessageAttachment(Buffer.from(result), 'stats.md')]
             });
-        }
-        else if(checkForCommand(/^\s*!global\s+xp\s+txt\s*$/img))
-        {
+        } else if(checkForCommand(/^\s*!global\s+xp\s+txt\s*$/img)) {
             console.log('GLOBAL STATS DL');
 
             //const result = this.bigBrowser.getTextSummaryByServer(undefined, false);
@@ -380,18 +339,16 @@ ${createStrLine(result.week)}\`\`\``);
 
             message.delete();
             message.channel.send({
-                files: [new MessageAttachment(new Buffer(result), 'stats.txt')]
+                files: [new MessageAttachment(Buffer.from(result), 'stats.txt')]
             });
-        }
-        else if(checkForCommand(/^\s*!stop\s+server\s+xp\s*$/img))
-        {
+        } else if(checkForCommand(/^\s*!stop\s+server\s+xp\s*$/img)) {
             console.log('STOP SERVER XP');
 
             this.bigBrowserV2.setTrackingServer(message.guild, false);
             this.bigBrowser.setServerTracking(message.guild, false);
 
             message.delete();
-            message.reply(':small_orange_diamond: arrêt du stockage de l\'expérience du serveur.');
+            message.channel.send(':small_orange_diamond: arrêt du stockage de l\'expérience du serveur.');
         }
         else if(checkForCommand(/^\s*!start\s+server\s+xp\s*$/img))
         {
@@ -401,7 +358,7 @@ ${createStrLine(result.week)}\`\`\``);
             this.bigBrowser.setServerTracking(message.guild, true);
 
             message.delete();
-            message.reply(':small_blue_diamond: démarrage du stockage de l\'expérience du serveur.');
+            message.channel.send(':small_blue_diamond: démarrage du stockage de l\'expérience du serveur.');
         }
         else if(checkForCommand(/^\s*!stop\s+xp\s*$/img))
         {
@@ -411,7 +368,7 @@ ${createStrLine(result.week)}\`\`\``);
             this.bigBrowser.setTracking(message.guild, message.author, false);
 
             message.delete();
-            message.reply(':small_orange_diamond: arrêt du stockage de ton expérience.');
+            message.channel.send(':small_orange_diamond: arrêt du stockage de ton expérience.');
         }
         else if(checkForCommand(/^\s*!start\s+xp\s*$/img))
         {
@@ -421,7 +378,7 @@ ${createStrLine(result.week)}\`\`\``);
             this.bigBrowser.setTracking(message.guild, message.author, true);
 
             message.delete();
-            message.reply(':small_blue_diamond: démarrage du stockage de ton expérience.');
+            message.channel.send(':small_blue_diamond: démarrage du stockage de ton expérience.');
 
         } else if(checkForCommand(/^\s*!xpbonus\s+pop\s*$/img)) {
 

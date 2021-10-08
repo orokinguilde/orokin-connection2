@@ -21,6 +21,7 @@ var config_1 = require("./config");
 var BannerTemplate_1 = require("./BannerTemplate");
 var BigBrowserV2UserStats = /** @class */ (function () {
     function BigBrowserV2UserStats(stats) {
+        this.cheatXPOffset = 0;
         this._stats = stats;
     }
     BigBrowserV2UserStats.create = function (user) {
@@ -64,14 +65,14 @@ var BigBrowserV2UserStats = /** @class */ (function () {
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "voiceXp", {
         get: function () {
-            return this.stats.tvt / config_1.default.server.info.xp.voiceMs;
+            return this.stats.tvt / config_1.default.server.info.xp.voiceMs + this.cheatXPOffset;
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(BigBrowserV2UserStats.prototype, "textXp", {
         get: function () {
-            return this.stats.tts / config_1.default.server.info.xp.textChars;
+            return this.stats.tts / config_1.default.server.info.xp.textChars + this.cheatXPOffset;
         },
         enumerable: false,
         configurable: true
@@ -520,6 +521,10 @@ var BigBrowserV2User = /** @class */ (function () {
         get: function () {
             if (!this._stats) {
                 this._stats = new BigBrowserV2UserStats(this.userData.stats);
+                /*
+                if(this.displayName.toLowerCase().includes('akamelia')) {
+                    this._stats.cheatXPOffset = 1000000;
+                }*/
             }
             return this._stats;
         },

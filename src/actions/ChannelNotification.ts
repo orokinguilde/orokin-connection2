@@ -1,4 +1,5 @@
 import { Guild, GuildMember, TextChannel, VoiceChannel } from "discord.js";
+import moment = require("moment");
 
 export class IChannelNotification {
     channelsToWatch: string[]
@@ -98,6 +99,14 @@ export class ChannelNotification {
                 .replace(/\{links\}/img, newNotEmptyChannels.map(m => m.toString()).join(', '))
                 .replace(/\{names\}/img, newNotEmptyChannels.map(m => m.name).join(', '))
                 .replace(/\{users\}/img, users.map(m => m.toString()).join(' et '))
+                .replace(/\{usersWithCreatedDurations\}/img, users.map(m => {
+                    try {
+                        const duration = moment.duration(Date.now() - m.user.createdTimestamp);
+                        return `${m.toString()} (créé il y a ${duration.years()} an${duration.years() > 1 ? 's' : ''} ${duration.months()} mois ${duration.days()} jour${duration.days() > 1 ? 's' : ''})`;
+                    } catch(ex) {
+                        return m.toString();
+                    }
+                }).join(' et '))
                 .replace(/\{nb\}/img, newNotEmptyChannels.length.toString())
 
             for(const channel of this.channelsToNotify) {

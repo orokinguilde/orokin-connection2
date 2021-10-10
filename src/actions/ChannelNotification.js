@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChannelNotification = exports.IChannelNotification = void 0;
+var moment = require("moment");
 var IChannelNotification = /** @class */ (function () {
     function IChannelNotification() {
     }
@@ -163,6 +164,15 @@ var ChannelNotification = /** @class */ (function () {
                                 .replace(/\{links\}/img, newNotEmptyChannels.map(function (m) { return m.toString(); }).join(', '))
                                 .replace(/\{names\}/img, newNotEmptyChannels.map(function (m) { return m.name; }).join(', '))
                                 .replace(/\{users\}/img, users.map(function (m) { return m.toString(); }).join(' et '))
+                                .replace(/\{usersWithCreatedDurations\}/img, users.map(function (m) {
+                                try {
+                                    var duration = moment.duration(Date.now() - m.user.createdTimestamp);
+                                    return m.toString() + " (cr\u00E9\u00E9 il y a " + duration.years() + " an" + (duration.years() > 1 ? 's' : '') + " " + duration.months() + " mois " + duration.days() + " jour" + (duration.days() > 1 ? 's' : '') + ")";
+                                }
+                                catch (ex) {
+                                    return m.toString();
+                                }
+                            }).join(' et '))
                                 .replace(/\{nb\}/img, newNotEmptyChannels.length.toString());
                             for (_l = 0, _m = this.channelsToNotify; _l < _m.length; _l++) {
                                 channel = _m[_l];

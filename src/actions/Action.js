@@ -80,9 +80,38 @@ var Action = /** @class */ (function () {
         }
         return false;
     };
+    Action.prototype.getBotAsMember = function (guild) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.findMemberByUserId(guild.client.user.id, guild)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    Action.prototype.findMemberByUserId = function (userId, guild) {
+        return __awaiter(this, void 0, void 0, function () {
+            var members, ex_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, guild.members.fetch()];
+                    case 1:
+                        members = _a.sent();
+                        return [2 /*return*/, members.find(function (m) { return m.user.id === userId; })];
+                    case 2:
+                        ex_1 = _a.sent();
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/, undefined];
+                }
+            });
+        });
+    };
     Action.prototype.findMemberById = function (id, ctx) {
         return __awaiter(this, void 0, void 0, function () {
-            var _i, _a, guild, member, ex_1;
+            var _i, _a, guild, member, ex_2;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -102,7 +131,7 @@ var Action = /** @class */ (function () {
                         }
                         return [3 /*break*/, 5];
                     case 4:
-                        ex_1 = _b.sent();
+                        ex_2 = _b.sent();
                         return [3 /*break*/, 5];
                     case 5:
                         _i++;
@@ -125,7 +154,7 @@ var Action = /** @class */ (function () {
     };
     Action.prototype.findChannelById = function (id, ctx) {
         return __awaiter(this, void 0, void 0, function () {
-            var _i, _a, guild, channel, ex_2;
+            var _i, _a, guild, channel, ex_3;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -145,7 +174,7 @@ var Action = /** @class */ (function () {
                         }
                         return [3 /*break*/, 5];
                     case 4:
-                        ex_2 = _b.sent();
+                        ex_3 = _b.sent();
                         return [3 /*break*/, 5];
                     case 5:
                         _i++;

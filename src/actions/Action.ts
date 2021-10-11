@@ -1,3 +1,4 @@
+import { Guild } from "discord.js";
 import moment = require("moment");
 import { IAction, IActionCtx, IActionMessage, IActionTicker, ITickerActionDate } from "./interfaces";
 
@@ -41,7 +42,21 @@ export abstract class Action<T = any> implements IAction<T> {
 
         return false;
     }
+
+    public async getBotAsMember(guild: Guild) {
+        return await this.findMemberByUserId(guild.client.user.id, guild);
+    }
     
+    public async findMemberByUserId(userId: string, guild: Guild) {
+        try {
+            const members = await guild.members.fetch();
+
+            return members.find(m => m.user.id === userId);
+        } catch(ex) {
+        }
+        
+        return undefined;
+    }
     public async findMemberById(id: string, ctx: IActionCtx<T>) {
         for(const guild of ctx.guilds) {
             try {

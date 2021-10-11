@@ -99,6 +99,28 @@
         ]
     }, {
         "on": "BigBrowser",
+        "name": "Notification de présence dans Diplomacy",
+        "enabled": "prod",
+        "periodSec": 5,
+        "list": [
+            {
+                "type": "ChannelNotification",
+                "options": {
+                    "channelsToWatch": [
+                        "897095903096225833",
+                        "897097829632331797",
+                        "897098076324507750",
+                        "897098176987791400"
+                    ],
+                    "channelsToNotify": [
+                        "897102568545726494"
+                    ],
+                    "message": "<@&696355117821329418>, {usersWithCreatedDurations} a/ont rejoint le channel : {links}"
+                }
+            }
+        ]
+    }, {
+        "on": "BigBrowser",
         "name": "Notification de présence",
         "enabled": "prod",
         "periodSec": 5,

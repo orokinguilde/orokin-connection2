@@ -60,6 +60,8 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
     }
     VoiceChannelCreator.prototype.executeMessage = function (ctx) {
         this.rename(ctx);
+        this.giveLead(ctx);
+        this.removeLead(ctx);
         return false;
     };
     VoiceChannelCreator.prototype.rename = function (ctx) {
@@ -76,10 +78,20 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                             return [4 /*yield*/, this.findByAdminId(authorId, ctx)];
                         case 1:
                             entry = _a.sent();
-                            if (entry) {
-                                entry.channel.setName(name);
-                            }
-                            return [2 /*return*/];
+                            if (!entry) return [3 /*break*/, 3];
+                            return [4 /*yield*/, entry.channel.setName(name)];
+                        case 2:
+                            _a.sent();
+                            ctx.message.reply({
+                                content: "Salon renomm\u00E9 ! " + entry.channel.toString()
+                            });
+                            return [3 /*break*/, 4];
+                        case 3:
+                            ctx.message.reply({
+                                content: "Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration."
+                            });
+                            _a.label = 4;
+                        case 4: return [2 /*return*/];
                     }
                 });
             }); })();
@@ -90,7 +102,7 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
         var match = /^!channel\s+give\s+/img.exec(ctx.message.content);
         if (match) {
             (function () { return __awaiter(_this, void 0, void 0, function () {
-                var authorId, targetMember, entry;
+                var authorId, targetMember, entry, bot;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -103,10 +115,30 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                             if (entry) {
                                 if (!entry.data.admins.includes(targetMember.id)) {
                                     entry.data.admins.push(targetMember.id);
+                                    ctx.message.reply({
+                                        content: targetMember.toString() + " a \u00E9t\u00E9 ajout\u00E9 \u00E0 la liste des admins du channel " + entry.channel.toString() + "."
+                                    });
+                                }
+                                else {
+                                    ctx.message.reply({
+                                        content: targetMember.toString() + " est d\u00E9j\u00E0 un admin du channel " + entry.channel.toString() + "."
+                                    });
                                 }
                             }
-                            _a.label = 2;
-                        case 2: return [2 /*return*/];
+                            else {
+                                ctx.message.reply({
+                                    content: "Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration."
+                                });
+                            }
+                            return [3 /*break*/, 4];
+                        case 2: return [4 /*yield*/, this.getBotAsMember(ctx.message.guild)];
+                        case 3:
+                            bot = _a.sent();
+                            ctx.message.reply({
+                                content: "Vous devez mentionner une personne dans la commande.\nExemple :\n!channel give " + bot.toString()
+                            });
+                            _a.label = 4;
+                        case 4: return [2 /*return*/];
                     }
                 });
             }); })();
@@ -117,7 +149,7 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
         var match = /^!channel\s+remove\s+/img.exec(ctx.message.content);
         if (match) {
             (function () { return __awaiter(_this, void 0, void 0, function () {
-                var authorId, targetMember, entry, index;
+                var authorId, targetMember, entry, index, bot;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -131,10 +163,30 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                                 index = entry.data.admins.indexOf(targetMember.id);
                                 if (index !== -1) {
                                     entry.data.admins.splice(index, 1);
+                                    ctx.message.reply({
+                                        content: targetMember.toString() + " a \u00E9t\u00E9 retir\u00E9 de la liste des admins du channel " + entry.channel.toString() + "."
+                                    });
+                                }
+                                else {
+                                    ctx.message.reply({
+                                        content: targetMember.toString() + " n'est pas un admin du channel " + entry.channel.toString() + "."
+                                    });
                                 }
                             }
-                            _a.label = 2;
-                        case 2: return [2 /*return*/];
+                            else {
+                                ctx.message.reply({
+                                    content: "Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration."
+                                });
+                            }
+                            return [3 /*break*/, 4];
+                        case 2: return [4 /*yield*/, this.getBotAsMember(ctx.message.guild)];
+                        case 3:
+                            bot = _a.sent();
+                            ctx.message.reply({
+                                content: "Vous devez mentionner une personne dans la commande.\nExemple :\n!channel remove " + bot.toString()
+                            });
+                            _a.label = 4;
+                        case 4: return [2 /*return*/];
                     }
                 });
             }); })();
@@ -274,7 +326,7 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                         return [4 /*yield*/, entry.channel.guild.channels.create(this.getNewChannelName(member), {
                                 type: "GUILD_VOICE",
                                 parent: entry.channel.parent,
-                                position: entry.channel.position + 1000
+                                position: entry.channel.calculatedPosition + 1
                             })];
                     case 11:
                         channel = _g.sent();

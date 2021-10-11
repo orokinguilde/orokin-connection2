@@ -26,6 +26,8 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
     
     public executeMessage(ctx: IActionCtx_Message<Option>): boolean {
         this.rename(ctx);
+        this.giveLead(ctx);
+        this.removeLead(ctx);
 
         return false;
     }
@@ -40,7 +42,14 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                 const entry = await this.findByAdminId(authorId, ctx);
 
                 if(entry) {
-                    entry.channel.setName(name);
+                    await entry.channel.setName(name);
+                    ctx.message.reply({
+                        content: `Salon renommé ! ${entry.channel.toString()}`
+                    })
+                } else {
+                    ctx.message.reply({
+                        content: `Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.`
+                    })
                 }
             })()
         }
@@ -59,9 +68,26 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                     if(entry) {
                         if(!entry.data.admins.includes(targetMember.id)) {
                             entry.data.admins.push(targetMember.id);
+                            ctx.message.reply({
+                                content: `${targetMember.toString()} a été ajouté à la liste des admins du channel ${entry.channel.toString()}.`
+                            })
+                        } else {
+                            ctx.message.reply({
+                                content: `${targetMember.toString()} est déjà un admin du channel ${entry.channel.toString()}.`
+                            })
                         }
+                    } else {
+                        ctx.message.reply({
+                            content: `Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.`
+                        })
                     }
+                } else {
+                    const bot = await this.getBotAsMember(ctx.message.guild);
+                    ctx.message.reply({
+                        content: `Vous devez mentionner une personne dans la commande.\nExemple :\n!channel give ${bot.toString()}`
+                    })
                 }
+
             })()
         }
     }
@@ -80,8 +106,24 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                         const index = entry.data.admins.indexOf(targetMember.id);
                         if(index !== -1) {
                             entry.data.admins.splice(index, 1);
+                            ctx.message.reply({
+                                content: `${targetMember.toString()} a été retiré de la liste des admins du channel ${entry.channel.toString()}.`
+                            })
+                        } else {
+                            ctx.message.reply({
+                                content: `${targetMember.toString()} n'est pas un admin du channel ${entry.channel.toString()}.`
+                            })
                         }
+                    } else {
+                        ctx.message.reply({
+                            content: `Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.`
+                        })
                     }
+                } else {
+                    const bot = await this.getBotAsMember(ctx.message.guild);
+                    ctx.message.reply({
+                        content: `Vous devez mentionner une personne dans la commande.\nExemple :\n!channel remove ${bot.toString()}`
+                    })
                 }
             })()
         }
@@ -170,7 +212,7 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                 const channel = await entry.channel.guild.channels.create(this.getNewChannelName(member), {
                     type: "GUILD_VOICE",
                     parent: entry.channel.parent,
-                    position: entry.channel.position + 1000
+                    position: entry.channel.calculatedPosition + 1
                 })
                 await member.voice.setChannel(channel, 'Channel créé automatiquement');
 

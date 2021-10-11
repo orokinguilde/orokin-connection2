@@ -96,7 +96,7 @@
             {
                 "type": "VoiceChannelCreator",
                 "options": {
-                    "newChannelNameXXX": "{name}",
+                    "newChannelName": "Salon (créé par {name})",
                     "channelsId": [
                         "897047676686827521",
                         "897053812701949962"

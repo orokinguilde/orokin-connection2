@@ -59,47 +59,131 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     VoiceChannelCreator.prototype.executeMessage = function (ctx) {
+        this.rename(ctx);
+        return false;
+    };
+    VoiceChannelCreator.prototype.rename = function (ctx) {
         var _this = this;
         var match = /^!channel\s+rename\s+(.+)$/img.exec(ctx.message.content);
         if (match) {
             (function () { return __awaiter(_this, void 0, void 0, function () {
-                var name, authorId, _i, _a, channelToWatch, _b, _c, cc, channel;
-                return __generator(this, function (_d) {
-                    switch (_d.label) {
+                var name, authorId, entry;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
                         case 0:
                             name = match[1].trim();
                             authorId = ctx.message.member.id;
-                            _i = 0, _a = this.channelsToWatch;
-                            _d.label = 1;
+                            return [4 /*yield*/, this.findByAdminId(authorId, ctx)];
                         case 1:
-                            if (!(_i < _a.length)) return [3 /*break*/, 6];
-                            channelToWatch = _a[_i];
-                            _b = 0, _c = channelToWatch.data.createdChannels;
-                            _d.label = 2;
-                        case 2:
-                            if (!(_b < _c.length)) return [3 /*break*/, 5];
-                            cc = _c[_b];
-                            if (!(cc.creatorId === authorId)) return [3 /*break*/, 4];
-                            return [4 /*yield*/, this.findChannelById(cc.channelId, ctx)];
-                        case 3:
-                            channel = _d.sent();
-                            if (channel && channel.members.some(function (m) { return m.id === authorId; })) {
-                                channel.setName(name);
-                                return [2 /*return*/];
+                            entry = _a.sent();
+                            if (entry) {
+                                entry.channel.setName(name);
                             }
-                            _d.label = 4;
-                        case 4:
-                            _b++;
-                            return [3 /*break*/, 2];
-                        case 5:
-                            _i++;
-                            return [3 /*break*/, 1];
-                        case 6: return [2 /*return*/];
+                            return [2 /*return*/];
                     }
                 });
             }); })();
         }
-        return false;
+    };
+    VoiceChannelCreator.prototype.giveLead = function (ctx) {
+        var _this = this;
+        var match = /^!channel\s+give\s+/img.exec(ctx.message.content);
+        if (match) {
+            (function () { return __awaiter(_this, void 0, void 0, function () {
+                var authorId, targetMember, entry;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            authorId = ctx.message.member.id;
+                            targetMember = ctx.message.mentions.members.map(function (m) { return m; })[0];
+                            if (!targetMember) return [3 /*break*/, 2];
+                            return [4 /*yield*/, this.findByAdminId(authorId, ctx)];
+                        case 1:
+                            entry = _a.sent();
+                            if (entry) {
+                                if (!entry.data.admins.includes(targetMember.id)) {
+                                    entry.data.admins.push(targetMember.id);
+                                }
+                            }
+                            _a.label = 2;
+                        case 2: return [2 /*return*/];
+                    }
+                });
+            }); })();
+        }
+    };
+    VoiceChannelCreator.prototype.removeLead = function (ctx) {
+        var _this = this;
+        var match = /^!channel\s+remove\s+/img.exec(ctx.message.content);
+        if (match) {
+            (function () { return __awaiter(_this, void 0, void 0, function () {
+                var authorId, targetMember, entry, index;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            authorId = ctx.message.member.id;
+                            targetMember = ctx.message.mentions.members.map(function (m) { return m; })[0];
+                            if (!targetMember) return [3 /*break*/, 2];
+                            return [4 /*yield*/, this.findByAdminId(authorId, ctx)];
+                        case 1:
+                            entry = _a.sent();
+                            if (entry) {
+                                index = entry.data.admins.indexOf(targetMember.id);
+                                if (index !== -1) {
+                                    entry.data.admins.splice(index, 1);
+                                }
+                            }
+                            _a.label = 2;
+                        case 2: return [2 /*return*/];
+                    }
+                });
+            }); })();
+        }
+    };
+    VoiceChannelCreator.prototype.findByAdminId = function (adminId, ctx) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _i, _a, cc, channel;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _i = 0, _a = this.listByAdminId(adminId);
+                        _b.label = 1;
+                    case 1:
+                        if (!(_i < _a.length)) return [3 /*break*/, 4];
+                        cc = _a[_i];
+                        return [4 /*yield*/, this.findChannelById(cc.channelId, ctx)];
+                    case 2:
+                        channel = _b.sent();
+                        if (channel && channel.members.some(function (m) { return m.id === adminId; })) {
+                            return [2 /*return*/, {
+                                    data: cc,
+                                    channel: channel
+                                }];
+                        }
+                        _b.label = 3;
+                    case 3:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 4: return [2 /*return*/, undefined];
+                }
+            });
+        });
+    };
+    VoiceChannelCreator.prototype.listByAdminId = function (adminId) {
+        var list = [];
+        for (var _i = 0, _a = this.channelsToWatch; _i < _a.length; _i++) {
+            var channelToWatch = _a[_i];
+            for (var _b = 0, _c = channelToWatch.data.createdChannels; _b < _c.length; _b++) {
+                var cc = _c[_b];
+                if (!cc.admins) {
+                    cc.admins = [];
+                }
+                if (cc.creatorId === adminId || cc.admins.includes(adminId)) {
+                    list.push(cc);
+                }
+            }
+        }
+        return list;
     };
     VoiceChannelCreator.prototype.executeTicker = function (ctx) {
         var _a;
@@ -199,7 +283,8 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                         _g.sent();
                         entry.data.createdChannels.push({
                             channelId: channel.id,
-                            creatorId: member.id
+                            creatorId: member.id,
+                            admins: []
                         });
                         _g.label = 13;
                     case 13:

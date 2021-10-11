@@ -190,7 +190,8 @@
                 "fields": {
                     "XP Vocal/Textuel": "`rank`, `rank templates`, `rank template custom <json>`, `rank template show`, `rank template <name>`, `ranks`, `server xp`, `server xp md`, `server xp csv`, `server xp txt`,\r\n`start server xp`, `stop server xp`, `start xp`, `stop xp`\r\n\r\n*Plus de détails :* `!helpme xp`\r\n¯¯¯¯¯¯¯¯¯¯¯",
                     "Leaderboard": "`server rank <nb>`, `server last rank <nb>`, `server rank reset`, `server rank ranges`, `server rank range <name> <start> <end>`\r\n\r\n*Plus de détails :* `!helpme leaderboard`\r\n¯¯¯¯¯¯¯¯¯¯¯",
-                    "XP Bonus": "`xpbonus <enable|disable>`, `xpbonus pop`, `xpbonus config <messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>`, `xpbonus config`, `xpbonus channel <add|remove|list>`\r\n\r\n*Plus de détails :* `!helpme xpbonus`\r\n¯¯¯¯¯¯¯¯¯¯¯"
+                    "XP Bonus": "`xpbonus <enable|disable>`, `xpbonus pop`, `xpbonus config <messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact> <value>`, `xpbonus config`, `xpbonus channel <add|remove|list>`\r\n\r\n*Plus de détails :* `!helpme xpbonus`\r\n¯¯¯¯¯¯¯¯¯¯¯",
+                    "Channel": "`channel rename <nom>`, `channel give <@user>`, `channel remove <@user>`\r\n\r\n*Plus de détails :* `!helpme channel`\r\n¯¯¯¯¯¯¯¯¯¯¯"
                 }
             },
             "xpbonus": {
@@ -202,6 +203,11 @@
                 "title": "Leaderboard\r\n¯¯¯¯¯¯¯¯",
                 "thumbnail": "https://media.discordapp.net/attachments/514178068835860498/718771841476460604/XP-bonus_1.gif",
                 "desc": ":small_blue_diamond: **!server rank <nb>** | Affiche le leaderboard\n:small_blue_diamond: **!server last rank <nb>** | Affiche le leaderboard de la dernière fois (jour dernier et semaine dernière)\n:small_orange_diamond: **!server rank reset** | Réinitialise le leaderboard\n:small_blue_diamond: **!server rank ranges** | Affiche les plages horaires pour recevoir de l'exp\n:small_orange_diamond: **!server rank range <name> <start> <end>** | Modifie une plage horaire"
+            },
+            "channel": {
+                "title": "Channel\r\n¯¯¯¯¯¯¯¯",
+                "thumbnail": "https://media.discordapp.net/attachments/514178068835860498/718771841476460604/XP-bonus_1.gif",
+                "desc": ":small_blue_diamond: **!channel rename <name>** | Renomme le channel actuel\n:small_blue_diamond: **!channel give <@user>** | Donne les droits à un autre utilisateur\n:small_blue_diamond: **!channel remove <@user>** | Retire les droits à un utilisateur"
             },
             "xp": {
                 "title": "XP Vocal/Textuel\r\n¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯",

@@ -11,6 +11,7 @@ type Option = IVoiceChannelCreatorOptions
 export interface IVoiceChannelCreator_ServerCustomData_CreatedChannel {
     channelId: string
     creatorId: string
+    admins: string[]
 }
 export interface IVoiceChannelCreator_ServerCustomData {
     createdChannels: IVoiceChannelCreator_ServerCustomData_CreatedChannel[]
@@ -23,28 +24,95 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
     protected channelsToWatch: { data: IVoiceChannelCreator_ServerCustomData, channel: VoiceChannel }[]
     
     public executeMessage(ctx: IActionCtx_Message<Option>): boolean {
+        this.rename(ctx);
+
+        return false;
+    }
+
+    protected rename(ctx: IActionCtx_Message<Option>) {
         const match = /^!channel\s+rename\s+(.+)$/img.exec(ctx.message.content);
 
         if(match) {
             (async () => {
                 const name = match[1].trim();
                 const authorId = ctx.message.member.id;
+                const entry = await this.findByAdminId(authorId, ctx);
+
+                if(entry) {
+                    entry.channel.setName(name);
+                }
+            })()
+        }
+    }
+    protected giveLead(ctx: IActionCtx_Message<Option>) {
+        const match = /^!channel\s+give\s+/img.exec(ctx.message.content);
+
+        if(match) {
+            (async () => {
+                const authorId = ctx.message.member.id;
+                const targetMember = ctx.message.mentions.members.map(m => m)[0];
                 
-                for(const channelToWatch of this.channelsToWatch) {
-                    for(const cc of channelToWatch.data.createdChannels) {
-                        if(cc.creatorId === authorId) {
-                            const channel = await this.findChannelById(cc.channelId, ctx);
-                            if(channel && channel.members.some(m => m.id === authorId)) {
-                                channel.setName(name);
-                                return;
-                            }
+                if(targetMember) {
+                    const entry = await this.findByAdminId(authorId, ctx);
+    
+                    if(entry) {
+                        if(!entry.data.admins.includes(targetMember.id)) {
+                            entry.data.admins.push(targetMember.id);
                         }
                     }
                 }
             })()
         }
+    }
+    protected removeLead(ctx: IActionCtx_Message<Option>) {
+        const match = /^!channel\s+remove\s+/img.exec(ctx.message.content);
 
-        return false;
+        if(match) {
+            (async () => {
+                const authorId = ctx.message.member.id;
+                const targetMember = ctx.message.mentions.members.map(m => m)[0];
+                
+                if(targetMember) {
+                    const entry = await this.findByAdminId(authorId, ctx);
+    
+                    if(entry) {
+                        const index = entry.data.admins.indexOf(targetMember.id);
+                        if(index !== -1) {
+                            entry.data.admins.splice(index, 1);
+                        }
+                    }
+                }
+            })()
+        }
+    }
+
+    protected async findByAdminId(adminId: string, ctx: IActionCtx_Message<Option>) {
+        for(const cc of this.listByAdminId(adminId)) {
+            const channel = await this.findChannelById(cc.channelId, ctx);
+            if(channel && channel.members.some(m => m.id === adminId)) {
+                return {
+                    data: cc,
+                    channel: channel
+                };
+            }
+        }
+
+        return undefined
+    }
+    protected listByAdminId(adminId: string) {
+        const list: IVoiceChannelCreator_ServerCustomData_CreatedChannel[] = [];
+        for(const channelToWatch of this.channelsToWatch) {
+            for(const cc of channelToWatch.data.createdChannels) {
+                if(!cc.admins) {
+                    cc.admins = [];
+                }
+
+                if(cc.creatorId === adminId || cc.admins.includes(adminId)) {
+                    list.push(cc);
+                }
+            }
+        }
+        return list;
     }
 
     public async executeTicker(ctx: IActionCtx_Ticker<Option>) {
@@ -106,7 +174,8 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
 
                 entry.data.createdChannels.push({
                     channelId: channel.id,
-                    creatorId: member.id
+                    creatorId: member.id,
+                    admins: []
                 })
             }
         }

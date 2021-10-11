@@ -39,11 +39,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.IBot = void 0;
 var discord_js_1 = require("discord.js");
 var config_1 = require("./config");
-var ActionsManager_1 = require("./ActionsManager");
 var ActionsManagerV2_1 = require("./actions/ActionsManagerV2");
 var IBot = /** @class */ (function () {
     function IBot(options) {
-        this.actionsManager = new ActionsManager_1.ActionsManager(this);
         this.actionsManagerV2 = new ActionsManagerV2_1.ActionsManagerV2(this);
         if (!options)
             options = {};
@@ -183,10 +181,8 @@ var IBot = /** @class */ (function () {
                     return;
                 message.content = message.content.slice(1);
             }
-            if (!_this.actionsManager.catchMessage(message, checkForCommand, params)) {
-                if (!_this.actionsManagerV2.catchMessage(message, checkForCommand, params)) {
-                    _this.onMessage(message, checkForCommand, params);
-                }
+            if (!_this.actionsManagerV2.catchMessage(message, checkForCommand, params)) {
+                _this.onMessage(message, checkForCommand, params);
             }
         });
         client.on('error', function (value) {
@@ -259,15 +255,16 @@ var IBot = /** @class */ (function () {
                 client.user.setUsername(botName);
             }
             _this.ready();
-            if (_this._onReady)
+            if (_this._onReady) {
                 _this._onReady(function () { return _this.startRuntime(); });
-            else
+            }
+            else {
                 _this.startRuntime();
+            }
         });
     };
     IBot.prototype.startRuntime = function () {
         this._startRuntime();
-        this.actionsManager.createTickers();
         this.actionsManagerV2.createTickers();
     };
     IBot.prototype.onReady = function (fn) {

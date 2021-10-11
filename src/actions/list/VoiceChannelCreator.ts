@@ -1,6 +1,6 @@
 import { GuildMember, VoiceChannel } from "discord.js";
-import { Action } from "./Action";
-import { IActionCtx, IActionCtx_Message, IActionCtx_Ticker, IActionMessage, IActionTicker } from "./interfaces";
+import { Action } from "../Action";
+import { IActionCtx, IActionCtx_Message, IActionCtx_Ticker, IActionMessage, IActionTicker } from "../interfaces";
 
 export interface IVoiceChannelCreatorOptions {
     id?: string

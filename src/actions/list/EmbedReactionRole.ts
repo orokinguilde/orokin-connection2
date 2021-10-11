@@ -1,7 +1,8 @@
-import { Client, Guild, GuildMember, Message, MessageEmbed, TextChannel } from "discord.js";
+import { GuildMember, Message, MessageEmbed, TextChannel } from "discord.js";
 import moment = require("moment");
-import { BigBrowserV2 } from "../BigBrowserV2";
-import { Ticker } from "../Ticker";
+import { BigBrowserV2 } from "../../BigBrowserV2";
+import { Action } from "../Action";
+import { IActionCtx_Ticker, IActionTicker } from "../interfaces";
 
 interface EmbedReactionRole_Info {
     id: string
@@ -55,11 +56,10 @@ interface ServerEntry_EmbedReactionRole {
 
 const defaultUserCustomData: () => UserItems_EmbedReactionRole = () => ({});
 
-export class EmbedReactionRole {
-    public start(cconf: EmbedReactionRole_Config, params: { client: Client, bigBrowser: BigBrowserV2 }) {
-        Ticker.start(4000, () => this.run(cconf, params.client, params.bigBrowser), 1000);
-    }
-    
+export class EmbedReactionRole extends Action<EmbedReactionRole_Config> implements IActionTicker<EmbedReactionRole_Config> {
+    public static typeId = 'EmbedReactionRole'
+    public static builder = (options) => new EmbedReactionRole(options)
+
     protected createEmbed(info: EmbedReactionRole_InfoGroup) {
         const embed = new MessageEmbed();
 
@@ -102,27 +102,27 @@ export class EmbedReactionRole {
         }
         return value;
     }
-    
-    public async run(cconf: EmbedReactionRole_Config, client: Client, bigBrowser: BigBrowserV2) {
-        cconf.deadlineMode = cconf.deadlineMode ?? 'push-new';
+    //cconf: EmbedReactionRole_Config, client: Client, bigBrowser: BigBrowserV2
+    public async executeTicker(ctx: IActionCtx_Ticker) {
+        this.options.deadlineMode = this.options.deadlineMode ?? 'push-new';
 
-        const index = this.frequencyToIndex(cconf.frequency, cconf.frequencyNb, cconf.frequencyOffset);
-        const userDataKey: string = cconf.userDataKey;
+        const index = this.frequencyToIndex(this.options.frequency, this.options.frequencyNb, this.options.frequencyOffset);
+        const userDataKey: string = this.options.userDataKey;
     
-        const guilds = client.guilds.valueOf().map(g => g);
+        const guilds = ctx.bot.client.guilds.valueOf().map(g => g);
 
         const promises: (() => Promise<any>)[] = [];
         let isReseting = false;
     
         for(const guild of guilds) {
-            const channel = await guild.channels.fetch(cconf.channelId) as TextChannel;
+            const channel = await guild.channels.fetch(this.options.channelId) as TextChannel;
 
             if(!channel) {
                 continue;
             }
 
             const guildMembers = (await guild.members.fetch()).map(m => m);
-            const server = bigBrowser.getServer(guild);
+            const server = ctx.bigBrowser.getServer(guild);
     
             if(!server.customData) {
                 server.customData = {};
@@ -136,7 +136,7 @@ export class EmbedReactionRole {
             }
             const entries = customData[index];
     
-            for(const centry of cconf.entries) {
+            for(const centry of this.options.entries) {
                 let entry = entries[centry.id];
                 if(!entry) {
                     entry = {};
@@ -158,7 +158,7 @@ export class EmbedReactionRole {
                 }
     
                 if(!message) {
-                    if(cconf.deadlineMode === 'flush-reactions' && serverEntry.messageId) {
+                    if(this.options.deadlineMode === 'flush-reactions' && serverEntry.messageId) {
                         try {
                             message = await channel.messages.fetch(serverEntry.messageId);
                             await Promise.all([
@@ -181,15 +181,15 @@ export class EmbedReactionRole {
                         promises.push(() => message.react(inf.emoji));
                     }
                 } else {
-                    promises.push(() => this.mngMsg(message, guildMembers, bigBrowser, index, centry, userDataKey));
+                    promises.push(() => this.mngMsg(message, guildMembers, ctx.bigBrowser, index, centry, userDataKey));
                 }
             }
 
-            if(isReseting && cconf.messageOnReset) {
+            if(isReseting && this.options.messageOnReset) {
                 promises.unshift(async () => {
-                    const chan = await guild.channels.fetch(cconf.messageOnReset.channelId) as TextChannel;
+                    const chan = await guild.channels.fetch(this.options.messageOnReset.channelId) as TextChannel;
                     if(chan) {
-                        chan.send(cconf.messageOnReset.message);
+                        chan.send(this.options.messageOnReset.message);
                     }
                 })
             }

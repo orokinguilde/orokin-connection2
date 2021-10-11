@@ -1,5 +1,7 @@
-import { Guild, GuildMember, TextChannel, VoiceChannel } from "discord.js";
+import { GuildMember, TextChannel, VoiceChannel } from "discord.js";
 import moment = require("moment");
+import { Action } from "../Action";
+import { IActionCtx_Ticker, IActionTicker } from "../interfaces";
 
 export class IChannelNotification {
     channelsToWatch: string[]
@@ -8,17 +10,20 @@ export class IChannelNotification {
     message: string
 }
 
-export class ChannelNotification {
+export class ChannelNotification extends Action<IChannelNotification> implements IActionTicker<IChannelNotification> {
+    public static typeId = 'ChannelNotification'
+    public static builder = (options) => new ChannelNotification(options)
+
     protected channelsNotEmpty: string[] = [];
     protected channelsToNotify: TextChannel[];
     protected channelsToWatch: VoiceChannel[];
 
-    public async check(options: IChannelNotification, guilds: Guild[]) {
+    public async executeTicker(ctx: IActionCtx_Ticker<IChannelNotification>) {
         if(!this.channelsToNotify) {
             this.channelsToNotify = [];
 
-            for(const id of options.channelsToNotify) {
-                for(const guild of guilds) {
+            for(const id of this.options.channelsToNotify) {
+                for(const guild of ctx.guilds) {
                     try {
                         const channel = await guild.channels.fetch(id);
 
@@ -40,8 +45,8 @@ export class ChannelNotification {
         if(!this.channelsToWatch) {
             this.channelsToWatch = [];
 
-            for(const id of options.channelsToWatch) {
-                for(const guild of guilds) {
+            for(const id of this.options.channelsToWatch) {
+                for(const guild of ctx.guilds) {
                     try {
                         const channel = await guild.channels.fetch(id);
 
@@ -66,7 +71,7 @@ export class ChannelNotification {
         for(const channel of this.channelsToWatch) {
             let members = channel.members.map(x => x);
 
-            if(options.triggerOnlyOnNoRole) {
+            if(this.options.triggerOnlyOnNoRole) {
                 members = members.filter(m => m.roles.cache.size === 1); // 1 => role @everyone
             }
 
@@ -95,7 +100,7 @@ export class ChannelNotification {
         }
 
         if(newNotEmptyChannels.length > 0) {
-            const msg = options.message
+            const msg = this.options.message
                 .replace(/\{links\}/img, newNotEmptyChannels.map(m => m.toString()).join(', '))
                 .replace(/\{names\}/img, newNotEmptyChannels.map(m => m.name).join(', '))
                 .replace(/\{users\}/img, users.map(m => m.toString()).join(' et '))

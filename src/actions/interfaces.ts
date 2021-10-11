@@ -1,5 +1,6 @@
 import { CategoryChannel, Guild, GuildMember, Message, NewsChannel, StageChannel, StoreChannel, TextChannel, VoiceChannel } from "discord.js";
 import { BigBrowserV2 } from "../BigBrowserV2";
+import { IBot } from "../Bot";
 
 export interface IAction<T> {
     isCurrentDate(date: ITickerActionDate, allowMultipleTriggers?: boolean): boolean
@@ -24,6 +25,7 @@ export interface ITickerActionDate {
 export interface IActionCtx<T = any> {
     bigBrowser: BigBrowserV2
     guilds: Guild[]
+    bot: IBot
 }
 export interface IActionCtx_Ticker<T = any> extends IActionCtx<T> {
 }

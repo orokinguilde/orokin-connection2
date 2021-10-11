@@ -1,4 +1,19 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -39,15 +54,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmbedReactionRole = void 0;
 var discord_js_1 = require("discord.js");
 var moment = require("moment");
-var Ticker_1 = require("../Ticker");
+var Action_1 = require("../Action");
 var defaultUserCustomData = function () { return ({}); };
-var EmbedReactionRole = /** @class */ (function () {
+var EmbedReactionRole = /** @class */ (function (_super) {
+    __extends(EmbedReactionRole, _super);
     function EmbedReactionRole() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    EmbedReactionRole.prototype.start = function (cconf, params) {
-        var _this = this;
-        Ticker_1.Ticker.start(4000, function () { return _this.run(cconf, params.client, params.bigBrowser); }, 1000);
-    };
     EmbedReactionRole.prototype.createEmbed = function (info) {
         var embed = new discord_js_1.MessageEmbed();
         embed.setTitle(info.name);
@@ -86,7 +99,8 @@ var EmbedReactionRole = /** @class */ (function () {
         }
         return value;
     };
-    EmbedReactionRole.prototype.run = function (cconf, client, bigBrowser) {
+    //cconf: EmbedReactionRole_Config, client: Client, bigBrowser: BigBrowserV2
+    EmbedReactionRole.prototype.executeTicker = function (ctx) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
             var index, userDataKey, guilds, promises, isReseting, _loop_1, this_1, _i, guilds_1, guild, state_1;
@@ -94,17 +108,17 @@ var EmbedReactionRole = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        cconf.deadlineMode = (_a = cconf.deadlineMode) !== null && _a !== void 0 ? _a : 'push-new';
-                        index = this.frequencyToIndex(cconf.frequency, cconf.frequencyNb, cconf.frequencyOffset);
-                        userDataKey = cconf.userDataKey;
-                        guilds = client.guilds.valueOf().map(function (g) { return g; });
+                        this.options.deadlineMode = (_a = this.options.deadlineMode) !== null && _a !== void 0 ? _a : 'push-new';
+                        index = this.frequencyToIndex(this.options.frequency, this.options.frequencyNb, this.options.frequencyOffset);
+                        userDataKey = this.options.userDataKey;
+                        guilds = ctx.bot.client.guilds.valueOf().map(function (g) { return g; });
                         promises = [];
                         isReseting = false;
                         _loop_1 = function (guild) {
                             var channel, guildMembers, server, customData, entries, _loop_2, _c, _d, centry;
                             return __generator(this, function (_e) {
                                 switch (_e.label) {
-                                    case 0: return [4 /*yield*/, guild.channels.fetch(cconf.channelId)];
+                                    case 0: return [4 /*yield*/, guild.channels.fetch(this_1.options.channelId)];
                                     case 1:
                                         channel = _e.sent();
                                         if (!channel) {
@@ -113,7 +127,7 @@ var EmbedReactionRole = /** @class */ (function () {
                                         return [4 /*yield*/, guild.members.fetch()];
                                     case 2:
                                         guildMembers = (_e.sent()).map(function (m) { return m; });
-                                        server = bigBrowser.getServer(guild);
+                                        server = ctx.bigBrowser.getServer(guild);
                                         if (!server.customData) {
                                             server.customData = {};
                                         }
@@ -160,7 +174,7 @@ var EmbedReactionRole = /** @class */ (function () {
                                                         return [3 /*break*/, 6];
                                                     case 6:
                                                         if (!!message) return [3 /*break*/, 14];
-                                                        if (!(cconf.deadlineMode === 'flush-reactions' && serverEntry.messageId)) return [3 /*break*/, 11];
+                                                        if (!(this_1.options.deadlineMode === 'flush-reactions' && serverEntry.messageId)) return [3 /*break*/, 11];
                                                         _j.label = 7;
                                                     case 7:
                                                         _j.trys.push([7, 10, , 11]);
@@ -197,13 +211,13 @@ var EmbedReactionRole = /** @class */ (function () {
                                                         }
                                                         return [3 /*break*/, 15];
                                                     case 14:
-                                                        promises.push(function () { return _this.mngMsg(message, guildMembers, bigBrowser, index, centry, userDataKey); });
+                                                        promises.push(function () { return _this.mngMsg(message, guildMembers, ctx.bigBrowser, index, centry, userDataKey); });
                                                         _j.label = 15;
                                                     case 15: return [2 /*return*/];
                                                 }
                                             });
                                         };
-                                        _c = 0, _d = cconf.entries;
+                                        _c = 0, _d = this_1.options.entries;
                                         _e.label = 3;
                                     case 3:
                                         if (!(_c < _d.length)) return [3 /*break*/, 6];
@@ -216,16 +230,16 @@ var EmbedReactionRole = /** @class */ (function () {
                                         _c++;
                                         return [3 /*break*/, 3];
                                     case 6:
-                                        if (isReseting && cconf.messageOnReset) {
+                                        if (isReseting && this_1.options.messageOnReset) {
                                             promises.unshift(function () { return __awaiter(_this, void 0, void 0, function () {
                                                 var chan;
                                                 return __generator(this, function (_a) {
                                                     switch (_a.label) {
-                                                        case 0: return [4 /*yield*/, guild.channels.fetch(cconf.messageOnReset.channelId)];
+                                                        case 0: return [4 /*yield*/, guild.channels.fetch(this.options.messageOnReset.channelId)];
                                                         case 1:
                                                             chan = _a.sent();
                                                             if (chan) {
-                                                                chan.send(cconf.messageOnReset.message);
+                                                                chan.send(this.options.messageOnReset.message);
                                                             }
                                                             return [2 /*return*/];
                                                     }
@@ -384,6 +398,8 @@ var EmbedReactionRole = /** @class */ (function () {
             });
         });
     };
+    EmbedReactionRole.typeId = 'EmbedReactionRole';
+    EmbedReactionRole.builder = function (options) { return new EmbedReactionRole(options); };
     return EmbedReactionRole;
-}());
+}(Action_1.Action));
 exports.EmbedReactionRole = EmbedReactionRole;

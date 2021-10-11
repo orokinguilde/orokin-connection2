@@ -52,7 +52,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoiceChannelCreator = void 0;
-var Action_1 = require("./Action");
+var Action_1 = require("../Action");
 var VoiceChannelCreator = /** @class */ (function (_super) {
     __extends(VoiceChannelCreator, _super);
     function VoiceChannelCreator() {

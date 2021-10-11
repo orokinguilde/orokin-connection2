@@ -1,9 +1,5 @@
-import { Client, TextChannel, GuildChannel, Collection, Message, Intents, ThreadChannel, GuildMember, PartialMessageReaction, MessageReaction, PartialUser, User, MessageOptions, PartialGuildMember } from "discord.js";
+import { Client, TextChannel, GuildChannel, Message, Intents, GuildMember, PartialMessageReaction, MessageReaction, PartialUser, User, MessageOptions, PartialGuildMember } from "discord.js";
 import config, { IConfigMemberChange, isDebug } from "./config";
-import { EmbedReactionRole, EmbedReactionRole_Config } from "./actions/EmbedReactionRole";
-import { Ticker } from "./Ticker";
-import { ChannelNotification, IChannelNotification } from "./actions/ChannelNotification";
-import { ActionsManager } from "./ActionsManager";
 import { ActionsManagerV2 } from "./actions/ActionsManagerV2";
 
 export abstract class IBot {
@@ -17,7 +13,7 @@ export abstract class IBot {
             this.initialize();
     }
     
-    private _onReady;
+    private _onReady?: (callback: () => void) => void;
     public options;
     public noAutoInitialization;
     public client: Client;
@@ -169,10 +165,8 @@ export abstract class IBot {
                 message.content = message.content.slice(1);
             }
 
-            if(!this.actionsManager.catchMessage(message, checkForCommand, params)) {
-                if(!this.actionsManagerV2.catchMessage(message, checkForCommand, params)) {
-                    this.onMessage(message, checkForCommand, params);
-                }
+            if(!this.actionsManagerV2.catchMessage(message, checkForCommand, params)) {
+                this.onMessage(message, checkForCommand, params);
             }
         });
 
@@ -228,27 +222,26 @@ export abstract class IBot {
 
             this.ready();
 
-            if(this._onReady)
+            if(this._onReady) {
                 this._onReady(() => this.startRuntime());
-            else
+            } else {
                 this.startRuntime();
+            }
         })
     }
 
     protected abstract ready(): void;
 
-    protected actionsManager = new ActionsManager(this);
     protected actionsManagerV2 = new ActionsManagerV2(this);
 
     protected startRuntime(): void {
         this._startRuntime();
         
-        this.actionsManager.createTickers();
         this.actionsManagerV2.createTickers();
     }
     protected abstract _startRuntime(): void;
 
-    public onReady(fn) {
+    public onReady(fn: (callback: () => void) => void) {
         this._onReady = fn;
     }
 }

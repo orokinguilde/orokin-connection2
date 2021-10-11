@@ -1,5 +1,7 @@
+
+/*
 import { DMChannel, MessageEmbed } from "discord.js";
-import { IAction, IActionCtx } from "../ActionsManager";
+import { IAction, IActionCtx } from "../../ActionsManager";
 
 export interface INewWorldJobCommandOptions {
     channel: string
@@ -107,3 +109,4 @@ export class NewWorldJobCommand implements IAction {
         await requestMsg.react('✳️');
     }
 }
+*/

@@ -1,13 +1,13 @@
-import { Client, Message, ThreadChannel } from "discord.js";
-import { ChannelNotification, IChannelNotification } from "./ChannelNotification";
-import { EmbedReactionRole, EmbedReactionRole_Config } from "./EmbedReactionRole";
-import { NewWorldJobCommand } from "./NewWorldJobCommand";
-import { Texter } from "./Texter";
+import { Message } from "discord.js";
 import { IBot } from "../Bot";
 import config, { IConfigAction, isDebug } from "../config";
 import { Ticker } from "../Ticker";
-import { VoiceChannelCreator } from "./VoiceChannelCreator";
+import { VoiceChannelCreator } from "./list/VoiceChannelCreator";
 import { IActionMessage, IActionTicker } from "./interfaces";
+import { Texter } from "./list/Texter";
+import { ChannelNotification } from "./list/ChannelNotification";
+import { ThreadManager } from "./list/ThreadManager";
+import { EmbedReactionRole } from "./list/EmbedReactionRole";
 
 export interface IActionCtx {
     message?: Message
@@ -51,6 +51,7 @@ export class ActionsManagerV2 {
                         bigBrowser: (this.bot as any).bigBrowserV2,
                         guilds: this.bot.client.guilds.valueOf().map(g => g),
                         message: message,
+                        bot: this.bot,
                         params: params
                     })) {
                         return true;
@@ -63,7 +64,11 @@ export class ActionsManagerV2 {
     }
 
     protected static types: IActionType[] = [
-        VoiceChannelCreator
+        VoiceChannelCreator,
+        Texter,
+        ChannelNotification,
+        EmbedReactionRole,
+        ThreadManager
     ]
 
     protected getInstance<T = any>(item: any, builder?: (options) => T): T {
@@ -121,6 +126,7 @@ export class ActionsManagerV2 {
                     if(instance && instance.executeTicker) {
                         await instance.executeTicker({
                             bigBrowser: (this.bot as any).bigBrowserV2,
+                            bot: this.bot,
                             guilds: guilds
                         })
                     }

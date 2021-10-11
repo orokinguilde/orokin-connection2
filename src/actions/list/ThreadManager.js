@@ -51,49 +51,67 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Texter = exports.ITexter = void 0;
-var TickerAction_1 = require("./TickerAction");
-var ITexter = /** @class */ (function () {
-    function ITexter() {
+exports.ThreadManager = exports.IThreadManager = void 0;
+var Action_1 = require("../Action");
+var IThreadManager = /** @class */ (function () {
+    function IThreadManager() {
     }
-    return ITexter;
+    return IThreadManager;
 }());
-exports.ITexter = ITexter;
-var Texter = /** @class */ (function (_super) {
-    __extends(Texter, _super);
-    function Texter() {
+exports.IThreadManager = IThreadManager;
+var ThreadManager = /** @class */ (function (_super) {
+    __extends(ThreadManager, _super);
+    function ThreadManager() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    Texter.prototype.execute = function (options, ctx) {
+    ThreadManager.prototype.executeTicker = function (ctx) {
         return __awaiter(this, void 0, void 0, function () {
-            var channel, _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var threadIds, _i, threadIds_1, threadId, found, _a, _b, guild, channel;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
-                        if (options.date && !this.isCurrentDate(options.date)) {
-                            return [2 /*return*/];
-                        }
-                        if (!options.channelId) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.findChannelById(options.channelId, ctx)];
+                        threadIds = Array.isArray(this.options.threadId) ? this.options.threadId : [this.options.threadId];
+                        _i = 0, threadIds_1 = threadIds;
+                        _c.label = 1;
                     case 1:
-                        _a = (_b.sent());
-                        return [3 /*break*/, 5];
-                    case 2: return [4 /*yield*/, this.findMemberById(options.memberId, ctx)];
-                    case 3: return [4 /*yield*/, (_b.sent()).createDM()];
+                        if (!(_i < threadIds_1.length)) return [3 /*break*/, 9];
+                        threadId = threadIds_1[_i];
+                        found = false;
+                        _a = 0, _b = ctx.guilds;
+                        _c.label = 2;
+                    case 2:
+                        if (!(_a < _b.length)) return [3 /*break*/, 7];
+                        guild = _b[_a];
+                        return [4 /*yield*/, guild.channels.fetch(threadId)];
+                    case 3:
+                        channel = _c.sent();
+                        if (!channel) return [3 /*break*/, 6];
+                        if (!this.options.keepUnarchived) return [3 /*break*/, 5];
+                        return [4 /*yield*/, channel.setArchived(false)];
                     case 4:
-                        _a = _b.sent();
-                        _b.label = 5;
+                        _c.sent();
+                        _c.label = 5;
                     case 5:
-                        channel = _a;
-                        if (!channel || !channel.isText()) {
-                            return [2 /*return*/];
+                        found = true;
+                        return [3 /*break*/, 7];
+                    case 6:
+                        _a++;
+                        return [3 /*break*/, 2];
+                    case 7:
+                        if (!found) {
+                            console.log("Thread " + threadId + " introuvable");
                         }
-                        channel.send(options.message);
-                        return [2 /*return*/];
+                        _c.label = 8;
+                    case 8:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 9: return [2 /*return*/];
                 }
             });
         });
     };
-    return Texter;
-}(TickerAction_1.TickerAction));
-exports.Texter = Texter;
+    ThreadManager.typeId = 'ThreadManager';
+    ThreadManager.builder = function (options) { return new ThreadManager(options); };
+    return ThreadManager;
+}(Action_1.Action));
+exports.ThreadManager = ThreadManager;

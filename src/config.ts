@@ -2,9 +2,6 @@ import { MessageEmbedOptions } from 'discord.js';
 import * as path from 'path'
 import * as fs from 'fs'
 import { IBigBrowserV2Rangs } from './BigBrowserV2';
-import { EmbedReactionRole_Config } from './actions/EmbedReactionRole';
-import { IChannelNotification } from './actions/ChannelNotification';
-import { INewWorldJobCommandOptions } from './actions/NewWorldJobCommand';
 
 export type APP_SELECTOR = 'BigBrowser' | 'General' | string
 
@@ -28,7 +25,7 @@ export interface IConfigAction {
         enabled?: boolean
         threadId: string | string[],
         keepUnarchived?: boolean,
-        options?: EmbedReactionRole_Config | IChannelNotification | INewWorldJobCommandOptions
+        options?: any
     }[]
 }
 

@@ -39,7 +39,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActionsManagerV2 = void 0;
 var config_1 = require("../config");
 var Ticker_1 = require("../Ticker");
-var VoiceChannelCreator_1 = require("./VoiceChannelCreator");
+var VoiceChannelCreator_1 = require("./list/VoiceChannelCreator");
+var Texter_1 = require("./list/Texter");
+var ChannelNotification_1 = require("./list/ChannelNotification");
+var ThreadManager_1 = require("./list/ThreadManager");
+var EmbedReactionRole_1 = require("./list/EmbedReactionRole");
 var ActionsManagerV2 = /** @class */ (function () {
     function ActionsManagerV2(bot) {
         this.bot = bot;
@@ -67,6 +71,7 @@ var ActionsManagerV2 = /** @class */ (function () {
                         bigBrowser: this.bot.bigBrowserV2,
                         guilds: this.bot.client.guilds.valueOf().map(function (g) { return g; }),
                         message: message,
+                        bot: this.bot,
                         params: params
                     })) {
                         return true;
@@ -137,6 +142,7 @@ var ActionsManagerV2 = /** @class */ (function () {
                             if (!(instance && instance.executeTicker)) return [3 /*break*/, 3];
                             return [4 /*yield*/, instance.executeTicker({
                                     bigBrowser: this.bot.bigBrowserV2,
+                                    bot: this.bot,
                                     guilds: guilds
                                 })];
                         case 2:
@@ -160,7 +166,11 @@ var ActionsManagerV2 = /** @class */ (function () {
         }
     };
     ActionsManagerV2.types = [
-        VoiceChannelCreator_1.VoiceChannelCreator
+        VoiceChannelCreator_1.VoiceChannelCreator,
+        Texter_1.Texter,
+        ChannelNotification_1.ChannelNotification,
+        EmbedReactionRole_1.EmbedReactionRole,
+        ThreadManager_1.ThreadManager
     ];
     return ActionsManagerV2;
 }());

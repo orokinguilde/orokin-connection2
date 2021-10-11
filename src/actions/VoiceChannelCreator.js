@@ -185,6 +185,12 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
         }
         return list;
     };
+    VoiceChannelCreator.prototype.getNewChannelName = function (member) {
+        var _a;
+        var newChannelName = (_a = this.options.newChannelName) !== null && _a !== void 0 ? _a : "Salon ({name})";
+        return newChannelName
+            .replace(/\{name\}/img, member.displayName);
+    };
     VoiceChannelCreator.prototype.executeTicker = function (ctx) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
@@ -265,15 +271,9 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                     case 10:
                         if (!(_e < _f.length)) return [3 /*break*/, 14];
                         member = _f[_e];
-                        return [4 /*yield*/, entry.channel.guild.channels.create(member.displayName, {
+                        return [4 /*yield*/, entry.channel.guild.channels.create(this.getNewChannelName(member), {
                                 type: "GUILD_VOICE",
                                 parent: entry.channel.parent,
-                                permissionOverwrites: [{
-                                        id: member,
-                                        allow: [
-                                            "MANAGE_CHANNELS"
-                                        ]
-                                    }],
                                 position: entry.channel.position + 1000
                             })];
                     case 11:

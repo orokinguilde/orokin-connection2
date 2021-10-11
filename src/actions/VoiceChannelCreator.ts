@@ -1,10 +1,11 @@
-import { VoiceChannel } from "discord.js";
+import { GuildMember, VoiceChannel } from "discord.js";
 import { Action } from "./Action";
 import { IActionCtx, IActionCtx_Message, IActionCtx_Ticker, IActionMessage, IActionTicker } from "./interfaces";
 
 export interface IVoiceChannelCreatorOptions {
     id?: string
     channelsId: string[]
+    newChannelName?: string
 }
 type Option = IVoiceChannelCreatorOptions
 
@@ -115,6 +116,13 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
         return list;
     }
 
+    protected getNewChannelName(member: GuildMember) {
+        const newChannelName = this.options.newChannelName ?? "Salon ({name})";
+
+        return newChannelName
+            .replace(/\{name\}/img, member.displayName);
+    }
+
     public async executeTicker(ctx: IActionCtx_Ticker<Option>) {
         const dataKey = this.options.id ?? 'VoiceChannelCreator';
 
@@ -159,15 +167,9 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
             }
 
             for(const member of entry.channel.members.map(m => m)) {
-                const channel = await entry.channel.guild.channels.create(member.displayName, {
+                const channel = await entry.channel.guild.channels.create(this.getNewChannelName(member), {
                     type: "GUILD_VOICE",
                     parent: entry.channel.parent,
-                    permissionOverwrites: [{
-                        id: member,
-                        allow: [
-                            "MANAGE_CHANNELS"
-                        ]
-                    }],
                     position: entry.channel.position + 1000
                 })
                 await member.voice.setChannel(channel, 'Channel créé automatiquement');

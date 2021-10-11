@@ -82,6 +82,23 @@
         ]
     }, {
         "on": "BigBrowser",
+        "name": "Voice channel creators",
+        "enabled": "prod",
+        "periodSec": 1,
+        "silent": true,
+        "list": [
+            {
+                "type": "VoiceChannelCreator",
+                "options": {
+                    "channelsId": [
+                        "897047676686827521",
+                        "897053812701949962"
+                    ]
+                }
+            }
+        ]
+    }, {
+        "on": "BigBrowser",
         "name": "Notification de présence",
         "enabled": "prod",
         "periodSec": 5,

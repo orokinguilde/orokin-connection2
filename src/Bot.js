@@ -40,9 +40,11 @@ exports.IBot = void 0;
 var discord_js_1 = require("discord.js");
 var config_1 = require("./config");
 var ActionsManager_1 = require("./ActionsManager");
+var ActionsManagerV2_1 = require("./actions/ActionsManagerV2");
 var IBot = /** @class */ (function () {
     function IBot(options) {
         this.actionsManager = new ActionsManager_1.ActionsManager(this);
+        this.actionsManagerV2 = new ActionsManagerV2_1.ActionsManagerV2(this);
         if (!options)
             options = {};
         this.options = options;
@@ -182,7 +184,9 @@ var IBot = /** @class */ (function () {
                 message.content = message.content.slice(1);
             }
             if (!_this.actionsManager.catchMessage(message, checkForCommand, params)) {
-                _this.onMessage(message, checkForCommand, params);
+                if (!_this.actionsManagerV2.catchMessage(message, checkForCommand, params)) {
+                    _this.onMessage(message, checkForCommand, params);
+                }
             }
         });
         client.on('error', function (value) {
@@ -264,6 +268,7 @@ var IBot = /** @class */ (function () {
     IBot.prototype.startRuntime = function () {
         this._startRuntime();
         this.actionsManager.createTickers();
+        this.actionsManagerV2.createTickers();
     };
     IBot.prototype.onReady = function (fn) {
         this._onReady = fn;

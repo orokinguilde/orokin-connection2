@@ -116,8 +116,10 @@ var ActionsManager = /** @class */ (function () {
                 return __generator(this, function (_e) {
                     switch (_e.label) {
                         case 0:
-                            logText = "Execution de l'action : " + action.name;
-                            console.log(logText + " [running]");
+                            logText = "Execution de l'action v1 : " + action.name;
+                            if (!action.silent) {
+                                console.log(logText + " [running]");
+                            }
                             guilds = this.bot.client.guilds.valueOf().map(function (g) { return g; });
                             _i = 0, _a = action.list;
                             _e.label = 1;
@@ -203,7 +205,9 @@ var ActionsManager = /** @class */ (function () {
                             _i++;
                             return [3 /*break*/, 1];
                         case 21:
-                            console.log(logText + " [success]");
+                            if (!action.silent) {
+                                console.log(logText + " [success]");
+                            }
                             return [2 /*return*/];
                     }
                 });

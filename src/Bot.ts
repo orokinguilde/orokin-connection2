@@ -4,6 +4,7 @@ import { EmbedReactionRole, EmbedReactionRole_Config } from "./actions/EmbedReac
 import { Ticker } from "./Ticker";
 import { ChannelNotification, IChannelNotification } from "./actions/ChannelNotification";
 import { ActionsManager } from "./ActionsManager";
+import { ActionsManagerV2 } from "./actions/ActionsManagerV2";
 
 export abstract class IBot {
     public constructor(options) {
@@ -169,7 +170,9 @@ export abstract class IBot {
             }
 
             if(!this.actionsManager.catchMessage(message, checkForCommand, params)) {
-                this.onMessage(message, checkForCommand, params);
+                if(!this.actionsManagerV2.catchMessage(message, checkForCommand, params)) {
+                    this.onMessage(message, checkForCommand, params);
+                }
             }
         });
 
@@ -235,11 +238,13 @@ export abstract class IBot {
     protected abstract ready(): void;
 
     protected actionsManager = new ActionsManager(this);
+    protected actionsManagerV2 = new ActionsManagerV2(this);
 
     protected startRuntime(): void {
         this._startRuntime();
         
         this.actionsManager.createTickers();
+        this.actionsManagerV2.createTickers();
     }
     protected abstract _startRuntime(): void;
 

@@ -89,8 +89,10 @@ export class ActionsManager {
     public createTickers() {
         for(const action of this.actions) {
             Ticker.start((action.periodSec || 60) * 1000, async () => {
-                const logText = `Execution de l'action : ${action.name}`;
-                console.log(`${logText} [running]`);
+                const logText = `Execution de l'action v1 : ${action.name}`;
+                if(!action.silent) {
+                    console.log(`${logText} [running]`);
+                }
 
                 const guilds = this.bot.client.guilds.valueOf().map(g => g);
 
@@ -156,7 +158,9 @@ export class ActionsManager {
                     }
                 }
                 
-                console.log(`${logText} [success]`);
+                if(!action.silent) {
+                    console.log(`${logText} [success]`);
+                }
             }, action.startDelaySec);
         }
     }

@@ -20,6 +20,7 @@ export interface IConfigAction {
     name?: string,
     periodSec?: number,
     startDelaySec?: number,
+    silent?: boolean,
     list: {
         type: string,
         regex?: string

@@ -1,6 +1,7 @@
 import { Client, TextChannel, GuildChannel, Message, Intents, GuildMember, PartialMessageReaction, MessageReaction, PartialUser, User, MessageOptions, PartialGuildMember } from "discord.js";
 import config, { IConfigMemberChange, isDebug } from "./config";
 import { ActionsManagerV2 } from "./actions/ActionsManagerV2";
+import { ErrorManager } from "./ErrorManager";
 
 export abstract class IBot {
     public constructor(options) {
@@ -166,7 +167,11 @@ export abstract class IBot {
             }
 
             if(!this.actionsManagerV2.catchMessage(message, checkForCommand, params)) {
-                this.onMessage(message, checkForCommand, params);
+                try {
+                    this.onMessage(message, checkForCommand, params);
+                } catch(ex) {
+                    ErrorManager.instance.error('Bot', ex);
+                }
             }
         });
 

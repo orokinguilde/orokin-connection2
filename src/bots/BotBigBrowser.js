@@ -387,7 +387,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                         var domain = params[1];
                         var errors = ErrorManager_1.ErrorManager.instance.errorList.filter(function (e) { return domain ? e.domain.toLowerCase() === domain.toLowerCase() : true; });
                         var errorsStr = errors
-                            .map(function (e) { return e.error.toString(); })
+                            .map(function (e) { return "[" + e.domain + "]\n===============\n" + e.error.toString(); })
                             .join('\n==========================================\n');
                         message.reply({
                             content: "**Erreurs (filtered: " + errors.length + " / all: " + ErrorManager_1.ErrorManager.instance.errorList.length + " / max: " + ErrorManager_1.ErrorManager.instance.errorListMax + ") :**\n" + (errorsStr || 'Aucune erreur.')

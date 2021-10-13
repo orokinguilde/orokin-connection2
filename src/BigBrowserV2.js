@@ -825,6 +825,9 @@ var BigBrowserV2 = /** @class */ (function () {
         return user && BigBrowserV2User.get(user);
     };
     BigBrowserV2.prototype.getUser = function (member) {
+        if (!member) {
+            return undefined;
+        }
         var now = Date.now();
         var id = member.id;
         var server = this.getServer(member.guild);
@@ -1177,6 +1180,9 @@ var BigBrowserV2 = /** @class */ (function () {
         var content = message.content;
         if (content) {
             var member = message.member;
+            if (!member) { // Ne fait pas partie d'un serveur mais d'un DM
+                return;
+            }
             /*
             if(member.displayName !== 'Akamelia ♡')
                 return;*/

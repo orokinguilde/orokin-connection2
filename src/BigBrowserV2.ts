@@ -825,7 +825,11 @@ export class BigBrowserV2 {
         return user && BigBrowserV2User.get(user);
     }
 
-    getUser(member: GuildMember): BigBrowserV2User {
+    public getUser(member: GuildMember): BigBrowserV2User {
+        if(!member) {
+            return undefined;
+        }
+
         const now = Date.now();
 
         const id = member.id;
@@ -1087,7 +1091,7 @@ export class BigBrowserV2 {
         }
     }*/
 
-    updateServer(guild: Guild) {
+    public updateServer(guild: Guild) {
         return new Promise<void>((resolve) => {
             const server = this.getServer(guild);
 
@@ -1230,13 +1234,15 @@ export class BigBrowserV2 {
         }
     }
 
-    updateUserText(message)
-    {
+    public updateUserText(message) {
         const content = message.content;
 
-        if(content)
-        {
+        if(content) {
             const member = message.member;
+
+            if(!member) { // Ne fait pas partie d'un serveur mais d'un DM
+                return;
+            }
 
             /*
             if(member.displayName !== 'Akamelia ♡')
@@ -1269,8 +1275,7 @@ export class BigBrowserV2 {
         }
     }
 
-    setTrackingUser(member, isTracking)
-    {
+    public setTrackingUser(member, isTracking) {
         const user = this.getUser(member);
 
         if(isTracking)

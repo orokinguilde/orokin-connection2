@@ -40,6 +40,7 @@ exports.IBot = void 0;
 var discord_js_1 = require("discord.js");
 var config_1 = require("./config");
 var ActionsManagerV2_1 = require("./actions/ActionsManagerV2");
+var ErrorManager_1 = require("./ErrorManager");
 var IBot = /** @class */ (function () {
     function IBot(options) {
         this.actionsManagerV2 = new ActionsManagerV2_1.ActionsManagerV2(this);
@@ -182,7 +183,12 @@ var IBot = /** @class */ (function () {
                 message.content = message.content.slice(1);
             }
             if (!_this.actionsManagerV2.catchMessage(message, checkForCommand, params)) {
-                _this.onMessage(message, checkForCommand, params);
+                try {
+                    _this.onMessage(message, checkForCommand, params);
+                }
+                catch (ex) {
+                    ErrorManager_1.ErrorManager.instance.error('Bot', ex);
+                }
             }
         });
         client.on('error', function (value) {

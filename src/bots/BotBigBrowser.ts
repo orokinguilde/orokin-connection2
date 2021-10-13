@@ -366,7 +366,7 @@ ${createStrLine(result.week)}\`\`\``);
                 const [, domain ] = params;
                 const errors = ErrorManager.instance.errorList.filter(e => domain ? e.domain.toLowerCase() === domain.toLowerCase() : true);
                 const errorsStr = errors
-                    .map(e => e.error.toString())
+                    .map(e => `[${e.domain}]\n===============\n${e.error.toString()}`)
                     .join('\n==========================================\n');
 
                 message.reply({

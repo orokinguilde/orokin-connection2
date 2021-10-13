@@ -33,6 +33,14 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
         return false;
     }
 
+    protected get embedsWrongPlace() {
+        return [{
+            image: {
+                url: 'https://tenor.com/view/wrong-place-wrong-time-them-wrong-timing-bad-timing-amazon-prime-gif-21090576'
+            }
+        }]
+    }
+
     protected rename(ctx: IActionCtx_Message<Option>) {
         const match = /^!channel\s+rename\s+(.+)$/img.exec(ctx.message.content);
 
@@ -49,7 +57,8 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                     })
                 } else {
                     ctx.message.reply({
-                        content: `Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.`
+                        content: `Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.`,
+                        embeds: this.embedsWrongPlace
                     })
                 }
             })
@@ -79,7 +88,8 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                         }
                     } else {
                         ctx.message.reply({
-                            content: `Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.`
+                            content: `Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.`,
+                            embeds: this.embedsWrongPlace
                         })
                     }
                 } else {
@@ -117,7 +127,8 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                         }
                     } else {
                         ctx.message.reply({
-                            content: `Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.`
+                            content: `Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.`,
+                            embeds: this.embedsWrongPlace
                         })
                     }
                 } else {

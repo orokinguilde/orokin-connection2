@@ -71,7 +71,14 @@ export abstract class IBot {
         if(IBot.isAdmin(message.member)) {
             callback();
         } else {
-            message.reply(':small_orange_diamond: Tu n\'as pas les droits pour cette commande');
+            message.reply({
+                content: ':small_orange_diamond: Tu n\'as pas les droits pour cette commande',
+                embeds: [{
+                    image: {
+                        url: 'https://cdn.discordapp.com/attachments/483003722830577671/897808140421169152/nonono.gif'
+                    }
+                }]
+            });
         }
     }
 

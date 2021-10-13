@@ -65,6 +65,17 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
         this.removeLead(ctx);
         return false;
     };
+    Object.defineProperty(VoiceChannelCreator.prototype, "embedsWrongPlace", {
+        get: function () {
+            return [{
+                    image: {
+                        url: 'https://tenor.com/view/wrong-place-wrong-time-them-wrong-timing-bad-timing-amazon-prime-gif-21090576'
+                    }
+                }];
+        },
+        enumerable: false,
+        configurable: true
+    });
     VoiceChannelCreator.prototype.rename = function (ctx) {
         var _this = this;
         var match = /^!channel\s+rename\s+(.+)$/img.exec(ctx.message.content);
@@ -89,7 +100,8 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                             return [3 /*break*/, 4];
                         case 3:
                             ctx.message.reply({
-                                content: "Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration."
+                                content: "Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.",
+                                embeds: this.embedsWrongPlace
                             });
                             _a.label = 4;
                         case 4: return [2 /*return*/];
@@ -128,7 +140,8 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                             }
                             else {
                                 ctx.message.reply({
-                                    content: "Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration."
+                                    content: "Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.",
+                                    embeds: this.embedsWrongPlace
                                 });
                             }
                             return [3 /*break*/, 4];
@@ -176,7 +189,8 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                             }
                             else {
                                 ctx.message.reply({
-                                    content: "Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration."
+                                    content: "Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.",
+                                    embeds: this.embedsWrongPlace
                                 });
                             }
                             return [3 /*break*/, 4];

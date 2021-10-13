@@ -31,6 +31,6 @@ export class NotifyRestart extends Action<INotifyRestart> implements IActionTick
             return;
         }
         
-        channel.send(this.options.message ?? `Bot restarted at ${moment().toISOString()}`);
+        channel.send(this.options.message ?? `Bot restarted at ${moment().toISOString(true)}`);
     }
 }

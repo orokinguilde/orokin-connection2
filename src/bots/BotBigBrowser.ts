@@ -8,6 +8,7 @@ import { Help } from "../Help";
 import bannerTemplates, { IBannerTemplateData } from "../BannerTemplate";
 import { Banner } from "../Banner"
 import { ErrorManager } from "../ErrorManager";
+import { GlobalDataManager } from "../GlobalDataManager";
 
 const BigBrowser = require('../BigBrowser');
 const globals = require('../globals');
@@ -360,6 +361,16 @@ ${createStrLine(result.week)}\`\`\``);
 
             message.delete();
             message.channel.send(':small_blue_diamond: démarrage du stockage de l\'expérience du serveur.');
+        } else if(checkForCommand(/^\s*!server\s+get\s*(.+)$/img)) {
+
+            const [, key ] = params;
+            
+            const result = await GlobalDataManager.instance.get(key, '\n==========================\n');
+
+            message.reply({
+                content: result || '*Aucun résultat*'
+            });
+
         } else if(checkForCommand(/^\s*!server\s+errors\s*(.+)?$/img)) {
 
             BotBigBrowser.adminOnly(message, () => {

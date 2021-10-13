@@ -100,7 +100,7 @@ var NotifyRestart = /** @class */ (function (_super) {
                         if (!channel || !channel.isText()) {
                             return [2 /*return*/];
                         }
-                        channel.send((_a = this.options.message) !== null && _a !== void 0 ? _a : "Bot restarted at " + moment().toISOString());
+                        channel.send((_a = this.options.message) !== null && _a !== void 0 ? _a : "Bot restarted at " + moment().toISOString(true));
                         return [2 /*return*/];
                 }
             });

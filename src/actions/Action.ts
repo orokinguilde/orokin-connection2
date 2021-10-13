@@ -4,6 +4,10 @@ import { IAction, IActionCtx, IActionMessage, IActionTicker, ITickerActionDate }
 
 export abstract class Action<T = any> implements IAction<T> {
     public constructor(public options: T) {
+        this.onCreate();
+    }
+
+    protected onCreate() {
     }
 
     public isDisposed = false;

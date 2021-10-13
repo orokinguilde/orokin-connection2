@@ -1,5 +1,6 @@
 import { GuildMember, VoiceChannel } from "discord.js";
 import { ErrorManager } from "../../ErrorManager";
+import { GlobalDataManager } from "../../GlobalDataManager";
 import { Action } from "../Action";
 import { IActionCtx, IActionCtx_Message, IActionCtx_Ticker, IActionMessage, IActionTicker } from "../interfaces";
 
@@ -39,6 +40,14 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                 url: 'https://tenor.com/view/wrong-place-wrong-time-them-wrong-timing-bad-timing-amazon-prime-gif-21090576'
             }
         }]
+    }
+
+    protected onCreate() {
+        GlobalDataManager.instance.register('VoiceChannelCreator', async () =>
+            this.channelsToWatch
+                .map(c => `>> ${c.channel.toString()}\n${c.data.createdChannels.map(c => `Salon <#${c.channelId}> créé par <@${c.creatorId}>`).join('\n')}`)
+                .join('\n')
+        );
     }
 
     protected rename(ctx: IActionCtx_Message<Option>) {

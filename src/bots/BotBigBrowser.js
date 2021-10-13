@@ -62,6 +62,7 @@ var Help_1 = require("../Help");
 var BannerTemplate_1 = require("../BannerTemplate");
 var Banner_1 = require("../Banner");
 var ErrorManager_1 = require("../ErrorManager");
+var GlobalDataManager_1 = require("../GlobalDataManager");
 var BigBrowser = require('../BigBrowser');
 var globals = require('../globals');
 var BotBigBrowser = /** @class */ (function (_super) {
@@ -129,365 +130,394 @@ var BotBigBrowser = /** @class */ (function (_super) {
     BotBigBrowser.prototype.onMessage = function (message, checkForCommand, params) {
         var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function () {
-            var user, exp_1, userRank_1, msg, msg, user, json, json, templateInfo, user, name_1, user, template, user, voiceExp, textExp, ranking, rank, banner, template, _d, getLast, nbRosterStr, nbRoster, result, createStrLine, result, result, result, result, result, result, result, result, propNames, xpBonusScheduledEvent_1;
+            var user, exp_1, userRank_1, msg, msg, user, json, json, templateInfo, user, name_1, user, template, user, voiceExp, textExp, ranking, rank, banner, template, _d, getLast, nbRosterStr, nbRoster, result, createStrLine, result, result, result, result, result, result, result, result, key, result, propNames, xpBonusScheduledEvent_1;
             var _this = this;
             return __generator(this, function (_e) {
-                if (!message.author.bot) {
-                    this.bigBrowser.increaseTextActivity(message.guild, message.author, 0.5);
-                }
-                this.bigBrowserV2.updateUserText(message);
-                /*
-                const setCommonSetting = (message, callback) => {
-                    BotBigBrowser.adminOnly(message, () => {
-                        callback();
-        
-                        message.delete();
-                        globals.saver.save();
-                    });
-                }*/
-                if (checkForCommand(Help_1.Help.instance.regex)) {
-                    Help_1.Help.instance.manageMessage(message, params[1]);
-                }
-                else if (checkForCommand(/^\s*!mp\s+(<@[^@>]+>\s*)+\s*(.+)$/img)) {
-                    BotBigBrowser.adminOnly(message, function () {
-                        var _a;
-                        var roles = message.mentions.roles.map(function (r) { return r.id; }).reduce(function (p, c) { return p.includes(c) ? p : p.concat(c); }, []);
-                        var membres = message.guild.members.valueOf()
-                            .map(function (m) { return m; })
-                            .filter(function (m) {
-                            var memberRoles = m.roles.valueOf().map(function (r) { return r.id; });
-                            return roles.some(function (r) { return memberRoles.includes(r); });
-                        });
-                        var msg = params[2].trim();
-                        if (msg) {
-                            if (membres.length > 0) {
-                                for (var _i = 0, membres_1 = membres; _i < membres_1.length; _i++) {
-                                    var member = membres_1[_i];
-                                    member.send({
-                                        content: msg,
-                                        embeds: message.embeds,
-                                        files: (_a = message.attachments) === null || _a === void 0 ? void 0 : _a.map(function (a) { return a; })
-                                    });
+                switch (_e.label) {
+                    case 0:
+                        if (!message.author.bot) {
+                            this.bigBrowser.increaseTextActivity(message.guild, message.author, 0.5);
+                        }
+                        this.bigBrowserV2.updateUserText(message);
+                        if (!checkForCommand(Help_1.Help.instance.regex)) return [3 /*break*/, 1];
+                        Help_1.Help.instance.manageMessage(message, params[1]);
+                        return [3 /*break*/, 26];
+                    case 1:
+                        if (!checkForCommand(/^\s*!mp\s+(<@[^@>]+>\s*)+\s*(.+)$/img)) return [3 /*break*/, 2];
+                        BotBigBrowser.adminOnly(message, function () {
+                            var _a;
+                            var roles = message.mentions.roles.map(function (r) { return r.id; }).reduce(function (p, c) { return p.includes(c) ? p : p.concat(c); }, []);
+                            var membres = message.guild.members.valueOf()
+                                .map(function (m) { return m; })
+                                .filter(function (m) {
+                                var memberRoles = m.roles.valueOf().map(function (r) { return r.id; });
+                                return roles.some(function (r) { return memberRoles.includes(r); });
+                            });
+                            var msg = params[2].trim();
+                            if (msg) {
+                                if (membres.length > 0) {
+                                    for (var _i = 0, membres_1 = membres; _i < membres_1.length; _i++) {
+                                        var member = membres_1[_i];
+                                        member.send({
+                                            content: msg,
+                                            embeds: message.embeds,
+                                            files: (_a = message.attachments) === null || _a === void 0 ? void 0 : _a.map(function (a) { return a; })
+                                        });
+                                    }
+                                    message.reply('[ ' + membres.map(function (m) { var _a; return (_a = m.nickname) !== null && _a !== void 0 ? _a : m.displayName; }).join(', ') + ' ] a/ont reçu le message');
                                 }
-                                message.reply('[ ' + membres.map(function (m) { var _a; return (_a = m.nickname) !== null && _a !== void 0 ? _a : m.displayName; }).join(', ') + ' ] a/ont reçu le message');
+                                else {
+                                    message.reply('Personne ne possède ce(s) rôle(s)');
+                                }
                             }
                             else {
-                                message.reply('Personne ne possède ce(s) rôle(s)');
+                                message.reply('Message vide');
                             }
-                        }
-                        else {
-                            message.reply('Message vide');
-                        }
-                    });
-                }
-                else if (checkForCommand(/^\s*!ranks$/img)) {
-                    user = this.bigBrowserV2.getUser(message.member);
-                    exp_1 = user.stats.xp;
-                    userRank_1 = user.stats.rank;
-                    msg = "Voici la liste des rangs disponibles :\r\n" + Object.keys(BigBrowserV2_1.BigBrowserV2.ranks)
-                        .map(function (key) { return BigBrowserV2_1.BigBrowserV2.ranks[key]; })
-                        .map(function (rank) { return "`[" + globals.padN(rank.start, 4) + ", " + globals.padN(rank.end || '∞', 4) + "[ " + rank.name + "`" + (rank === userRank_1.currentRank ? " \u21E6 **" + message.member.displayName + "**, tu es ici avec **" + Math.floor(exp_1) + " exp** !" : ''); })
-                        .join('\r\n');
-                    message.reply(msg);
-                }
-                else if (checkForCommand(/^\s*!rank templates$/img)) {
-                    msg = "Voici la liste des templates disponibles (`!rank template ...`) :\r\n" + BannerTemplate_1.default.list.map(function (bannerTemplate) {
-                        return "**" + bannerTemplate.key + ".** " + bannerTemplate.name;
-                    }).join('\r\n');
-                    message.reply(msg);
-                }
-                else if (checkForCommand(/^\s*!rank\s*template\s*show$/imgs)) {
-                    user = this.bigBrowserV2.getUser(message.member);
-                    json = JSON.stringify((_a = user.bannerTemplate) === null || _a === void 0 ? void 0 : _a.template, null, 4);
-                    message.reply("```json\n" + json + "\n```");
-                }
-                else if (checkForCommand(/^\s*!rank template custom\s+\{(.+)\}\s*$/imgs)) {
-                    try {
-                        json = /^\s*!rank template custom\s+(.+)\s*$/imgs.exec(message.content)[1].trim();
-                        templateInfo = JSON.parse(json);
-                        user = this.bigBrowserV2.getUser(message.member);
-                        user.customBannerTemplate = templateInfo;
-                        message.reply("le template personnalis\u00E9 t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
-                    }
-                    catch (ex) {
-                        message.reply("Le JSON n'est pas valide \uD83D\uDE22");
-                    }
-                }
-                else if (checkForCommand(/^\s*!rank template (.+)$/img)) {
-                    name_1 = /^\s*!rank template (.+)$/img.exec(message.content)[1].trim().toLowerCase();
-                    user = this.bigBrowserV2.getUser(message.member);
-                    template = (_c = (_b = BannerTemplate_1.default.list.find(function (templateItem) { return templateItem.key.toString().toLowerCase() == name_1; })) !== null && _b !== void 0 ? _b : BannerTemplate_1.default.list.find(function (templateItem) { return templateItem.name.toString().toLowerCase().indexOf(name_1) > -1; })) !== null && _c !== void 0 ? _c : BannerTemplate_1.default.list.find(function (templateItem) { return (templateItem.key + ". " + templateItem.name).toLowerCase().indexOf(name_1) > -1; });
-                    if (!template) {
-                        message.reply("Le template \"" + name_1 + "\" n'a pas \u00E9t\u00E9 trouv\u00E9 \uD83D\uDE22");
-                    }
-                    else {
-                        user.bannerTemplateKey = template.key;
-                        user.customBannerTemplate = undefined;
-                        message.reply("Le template \"" + name_1 + "\" t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
-                    }
-                }
-                else if (checkForCommand(/^\s*!rank\s*$/img)) {
-                    user = this.bigBrowserV2.getUser(message.member);
-                    voiceExp = user.stats.voiceXp;
-                    textExp = user.stats.textXp;
-                    ranking = user.stats.rank;
-                    rank = this.bigBrowserV2.getUserRanking(user, message.guild);
-                    banner = new Banner_1.Banner({
-                        avatarUrl: (message.member.user.avatarURL({ dynamic: false, format: 'png' }) || config_1.default.server.info.defaultAvatarURL).replace('?size=2048', '?size=128'),
-                        nickname: message.member.displayName,
-                        rankIndex: rank.index,
-                        rankTotal: rank.total,
-                        level: ranking.currentRank.index,
-                        levelName: ranking.currentRank ? ranking.currentRank.name : '?',
-                        exp: ranking.expInCurrentRank,
-                        expText: textExp,
-                        expVocal: voiceExp,
-                        maxExp: ranking.expFromCurrentToNextRank
-                    });
-                    template = user.bannerTemplate;
-                    message.react('🐰');
-                    banner.createBuffer(template, function (e, buffer) {
-                        if (e) {
-                            console.log(e);
-                            message.channel.send("D\u00E9sol\u00E9, une erreur s'est produite lors de la g\u00E9n\u00E9ration de l'image.");
-                        }
-                        else {
-                            var attachment = new discord_js_1.MessageAttachment(buffer, 'banner.png');
-                            message.delete();
-                            message.channel.send({
-                                files: [attachment]
-                            });
-                        }
-                    });
-                }
-                else if (checkForCommand(/^\s*!server\s+rank\s+reset\s*$/img)) {
-                    BotBigBrowser.adminOnly(message, function () {
-                        _this.bigBrowserV2.resetDayWeekStats(message.guild);
-                        message.reply("Les stats viennent d'\u00EAtre r\u00E9initialis\u00E9es.");
-                    });
-                }
-                else if (checkForCommand(/^\s*!server\s+rank\s+ranges\s*$/img)) {
-                    message.reply("```" + this.bigBrowserV2.dayRange.map(function (range) { return "::: " + range.name + " :::\nJours : " + range.days.map(function (j) { return j + 1; }) + "\nD\u00E9but : " + range.start + " h\nFin : " + range.end + " h"; }).reduce(function (p, c) { return p + "\n\n" + c; }, '').trim() + "```");
-                }
-                else if (checkForCommand(/^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s*h?\s+(\d+)\s*h?\s*$/img)) {
-                    BotBigBrowser.adminOnly(message, function () {
-                        var regex = /^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s*h?\s+(\d+)\s*h?\s*$/img;
-                        var _a = regex.exec(message.content), name = _a[1], startStr = _a[2], endStr = _a[3];
-                        var start = parseInt(startStr);
-                        var end = parseInt(endStr);
-                        if (isNaN(start) || isNaN(end)) {
-                            message.reply('Paramètres invalides. Exemple : !server rank range Semaine 9 23');
-                        }
-                        else {
-                            var range = _this.bigBrowserV2.dayRange.find(function (range) { return range.name.toLowerCase().includes(name.toLowerCase().trim()); });
-                            if (!range) {
-                                message.reply("Impossible de trouver la plage \"" + name.trim() + "\"");
-                            }
-                            else {
-                                range.start = start;
-                                range.end = end;
-                                message.reply("Plage chang\u00E9e : [" + start + " h, " + end + " h]");
-                            }
-                        }
-                    });
-                }
-                else if (checkForCommand(/^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img)) {
-                    console.log('SERVER RANK');
-                    _d = /^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img.exec(message.content), getLast = _d[1], nbRosterStr = _d[2];
-                    nbRoster = nbRosterStr && parseInt(nbRosterStr);
-                    result = this.bigBrowserV2.getRosterRanks(message.guild, nbRoster, !!getLast);
-                    createStrLine = function (entries) { return entries
-                        .map(function (u, i) { return u.stats.xp <= 0 ? (i + 1 + ".").padEnd(entries.length.toString().length + 1, ' ') + " -" : (i + 1 + ".").padEnd(entries.length.toString().length + 1, ' ') + " " + (Math.round(u.stats.xp * 100) / 100).toString().padStart(7, ' ') + (Math.round(u.stats.xpBonus * 100) / 100 > 0 ? " BONNUS (" + Math.round(u.stats.xpBonus * 100) / 100 + ")" : '') + " :: " + u.user.userData.displayName; })
-                        .reduce(function (p, c) { return !p ? c : p + "\n" + c; }, ''); };
-                    message.channel.send('\r\n' + ("```::: Jour :::\n" + createStrLine(result.day) + "\n\n::: Semaine :::\n" + createStrLine(result.week) + "```"));
-                    message.delete();
-                }
-                else if (checkForCommand(/^\s*!dbinfo\s*$/img)) {
-                    BotBigBrowser.adminOnly(message, function () {
-                        var time = _this.saver.dataCreationDate;
-                        message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
-                    });
-                }
-                else if (checkForCommand(/^\s*!server\s+xp\s*$/img)) {
-                    console.log('SERVER STATS');
-                    result = this.bigBrowserV2.getServerText(message.guild);
-                    message.delete();
-                    message.channel.send('\r\n' + result);
-                }
-                else if (checkForCommand(/^\s*!server\s+xp\s+csv\s*$/img)) {
-                    console.log('SERVER STATS');
-                    result = this.bigBrowserV2.getServerCSV(message.guild, true);
-                    message.delete();
-                    message.channel.send({
-                        files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.csv')]
-                    });
-                }
-                else if (checkForCommand(/^\s*!server\s+xp\s+md\s*$/img)) {
-                    console.log('SERVER STATS');
-                    result = this.bigBrowserV2.getServerMarkDown(message.guild);
-                    message.delete();
-                    message.channel.send({
-                        files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.md')]
-                    });
-                }
-                else if (checkForCommand(/^\s*!server\s+xp\s+txt\s*$/img)) {
-                    console.log('SERVER STATS');
-                    result = this.bigBrowserV2.getServerText(message.guild);
-                    message.delete();
-                    message.channel.send({
-                        files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.txt')]
-                    });
-                }
-                else if (checkForCommand(/^\s*!global\s+xp\s*$/img)) {
-                    console.log('GLOBAL STATS');
-                    result = this.bigBrowserV2.getServersText(this.client.guilds.valueOf().map(function (g) { return g; }));
-                    message.delete();
-                    message.channel.send('\r\n' + result);
-                }
-                else if (checkForCommand(/^\s*!global\s+xp\s+csv\s*$/img)) {
-                    console.log('GLOBAL STATS DL');
-                    result = this.bigBrowserV2.getServersCSV(this.client.guilds.valueOf().map(function (g) { return g; }), true);
-                    message.delete();
-                    message.channel.send({
-                        files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.csv')]
-                    });
-                }
-                else if (checkForCommand(/^\s*!global\s+xp\s+md\s*$/img)) {
-                    console.log('GLOBAL STATS DL');
-                    result = this.bigBrowserV2.getServersMarkDown(this.client.guilds.valueOf().map(function (g) { return g; }));
-                    message.delete();
-                    message.channel.send({
-                        files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.md')]
-                    });
-                }
-                else if (checkForCommand(/^\s*!global\s+xp\s+txt\s*$/img)) {
-                    console.log('GLOBAL STATS DL');
-                    result = this.bigBrowserV2.getServersText(this.client.guilds.valueOf().map(function (g) { return g; }));
-                    message.delete();
-                    message.channel.send({
-                        files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.txt')]
-                    });
-                }
-                else if (checkForCommand(/^\s*!stop\s+server\s+xp\s*$/img)) {
-                    console.log('STOP SERVER XP');
-                    this.bigBrowserV2.setTrackingServer(message.guild, false);
-                    this.bigBrowser.setServerTracking(message.guild, false);
-                    message.delete();
-                    message.channel.send(':small_orange_diamond: arrêt du stockage de l\'expérience du serveur.');
-                }
-                else if (checkForCommand(/^\s*!start\s+server\s+xp\s*$/img)) {
-                    console.log('START SERVER XP');
-                    this.bigBrowserV2.setTrackingServer(message.guild, true);
-                    this.bigBrowser.setServerTracking(message.guild, true);
-                    message.delete();
-                    message.channel.send(':small_blue_diamond: démarrage du stockage de l\'expérience du serveur.');
-                }
-                else if (checkForCommand(/^\s*!server\s+errors\s*(.+)?$/img)) {
-                    BotBigBrowser.adminOnly(message, function () {
-                        var domain = params[1];
-                        var errors = ErrorManager_1.ErrorManager.instance.errorList.filter(function (e) { return domain ? e.domain.toLowerCase() === domain.toLowerCase() : true; });
-                        var errorsStr = errors
-                            .map(function (e) { return "[" + e.domain + "]\n===============\n" + e.error.toString(); })
-                            .join('\n==========================================\n');
-                        message.reply({
-                            content: "**Erreurs (filtered: " + errors.length + " / all: " + ErrorManager_1.ErrorManager.instance.errorList.length + " / max: " + ErrorManager_1.ErrorManager.instance.errorListMax + ") :**\n" + (errorsStr || 'Aucune erreur.')
                         });
-                    });
-                }
-                else if (checkForCommand(/^\s*!stop\s+xp\s*$/img)) {
-                    console.log('STOP XP');
-                    this.bigBrowserV2.setTrackingUser(message.member, false);
-                    this.bigBrowser.setTracking(message.guild, message.author, false);
-                    message.delete();
-                    message.channel.send(':small_orange_diamond: arrêt du stockage de ton expérience.');
-                }
-                else if (checkForCommand(/^\s*!start\s+xp\s*$/img)) {
-                    console.log('START XP');
-                    this.bigBrowserV2.setTrackingUser(message.member, true);
-                    this.bigBrowser.setTracking(message.guild, message.author, true);
-                    message.delete();
-                    message.channel.send(':small_blue_diamond: démarrage du stockage de ton expérience.');
-                }
-                else if (checkForCommand(/^\s*!xpbonus\s+pop\s*$/img)) {
-                    BotBigBrowser.adminOnly(message, function () {
-                        var xpBonusScheduledEvent = _this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
-                        if (xpBonusScheduledEvent) {
-                            xpBonusScheduledEvent.runtime({
-                                periodMs: 0
-                            });
-                            message.reply("Pop !");
+                        return [3 /*break*/, 26];
+                    case 2:
+                        if (!checkForCommand(/^\s*!ranks$/img)) return [3 /*break*/, 3];
+                        user = this.bigBrowserV2.getUser(message.member);
+                        exp_1 = user.stats.xp;
+                        userRank_1 = user.stats.rank;
+                        msg = "Voici la liste des rangs disponibles :\r\n" + Object.keys(BigBrowserV2_1.BigBrowserV2.ranks)
+                            .map(function (key) { return BigBrowserV2_1.BigBrowserV2.ranks[key]; })
+                            .map(function (rank) { return "`[" + globals.padN(rank.start, 4) + ", " + globals.padN(rank.end || '∞', 4) + "[ " + rank.name + "`" + (rank === userRank_1.currentRank ? " \u21E6 **" + message.member.displayName + "**, tu es ici avec **" + Math.floor(exp_1) + " exp** !" : ''); })
+                            .join('\r\n');
+                        message.reply(msg);
+                        return [3 /*break*/, 26];
+                    case 3:
+                        if (!checkForCommand(/^\s*!rank templates$/img)) return [3 /*break*/, 4];
+                        msg = "Voici la liste des templates disponibles (`!rank template ...`) :\r\n" + BannerTemplate_1.default.list.map(function (bannerTemplate) {
+                            return "**" + bannerTemplate.key + ".** " + bannerTemplate.name;
+                        }).join('\r\n');
+                        message.reply(msg);
+                        return [3 /*break*/, 26];
+                    case 4:
+                        if (!checkForCommand(/^\s*!rank\s*template\s*show$/imgs)) return [3 /*break*/, 5];
+                        user = this.bigBrowserV2.getUser(message.member);
+                        json = JSON.stringify((_a = user.bannerTemplate) === null || _a === void 0 ? void 0 : _a.template, null, 4);
+                        message.reply("```json\n" + json + "\n```");
+                        return [3 /*break*/, 26];
+                    case 5:
+                        if (!checkForCommand(/^\s*!rank template custom\s+\{(.+)\}\s*$/imgs)) return [3 /*break*/, 6];
+                        try {
+                            json = /^\s*!rank template custom\s+(.+)\s*$/imgs.exec(message.content)[1].trim();
+                            templateInfo = JSON.parse(json);
+                            user = this.bigBrowserV2.getUser(message.member);
+                            user.customBannerTemplate = templateInfo;
+                            message.reply("le template personnalis\u00E9 t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
                         }
-                    });
-                }
-                else if (checkForCommand(/^\s*!xpbonus\s+(enable|disable)\s*$/img)) {
-                    BotBigBrowser.adminOnly(message, function () {
-                        var action = params[1];
-                        var xpBonusScheduledEvent = _this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
-                        if (xpBonusScheduledEvent) {
-                            if (action.toLowerCase() === 'enable') {
-                                xpBonusScheduledEvent.active = true;
-                                message.reply("XP Bonus activ\u00E9");
+                        catch (ex) {
+                            message.reply("Le JSON n'est pas valide \uD83D\uDE22");
+                        }
+                        return [3 /*break*/, 26];
+                    case 6:
+                        if (!checkForCommand(/^\s*!rank template (.+)$/img)) return [3 /*break*/, 7];
+                        name_1 = /^\s*!rank template (.+)$/img.exec(message.content)[1].trim().toLowerCase();
+                        user = this.bigBrowserV2.getUser(message.member);
+                        template = (_c = (_b = BannerTemplate_1.default.list.find(function (templateItem) { return templateItem.key.toString().toLowerCase() == name_1; })) !== null && _b !== void 0 ? _b : BannerTemplate_1.default.list.find(function (templateItem) { return templateItem.name.toString().toLowerCase().indexOf(name_1) > -1; })) !== null && _c !== void 0 ? _c : BannerTemplate_1.default.list.find(function (templateItem) { return (templateItem.key + ". " + templateItem.name).toLowerCase().indexOf(name_1) > -1; });
+                        if (!template) {
+                            message.reply("Le template \"" + name_1 + "\" n'a pas \u00E9t\u00E9 trouv\u00E9 \uD83D\uDE22");
+                        }
+                        else {
+                            user.bannerTemplateKey = template.key;
+                            user.customBannerTemplate = undefined;
+                            message.reply("Le template \"" + name_1 + "\" t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
+                        }
+                        return [3 /*break*/, 26];
+                    case 7:
+                        if (!checkForCommand(/^\s*!rank\s*$/img)) return [3 /*break*/, 8];
+                        user = this.bigBrowserV2.getUser(message.member);
+                        voiceExp = user.stats.voiceXp;
+                        textExp = user.stats.textXp;
+                        ranking = user.stats.rank;
+                        rank = this.bigBrowserV2.getUserRanking(user, message.guild);
+                        banner = new Banner_1.Banner({
+                            avatarUrl: (message.member.user.avatarURL({ dynamic: false, format: 'png' }) || config_1.default.server.info.defaultAvatarURL).replace('?size=2048', '?size=128'),
+                            nickname: message.member.displayName,
+                            rankIndex: rank.index,
+                            rankTotal: rank.total,
+                            level: ranking.currentRank.index,
+                            levelName: ranking.currentRank ? ranking.currentRank.name : '?',
+                            exp: ranking.expInCurrentRank,
+                            expText: textExp,
+                            expVocal: voiceExp,
+                            maxExp: ranking.expFromCurrentToNextRank
+                        });
+                        template = user.bannerTemplate;
+                        message.react('🐰');
+                        banner.createBuffer(template, function (e, buffer) {
+                            if (e) {
+                                console.log(e);
+                                message.channel.send("D\u00E9sol\u00E9, une erreur s'est produite lors de la g\u00E9n\u00E9ration de l'image.");
                             }
                             else {
-                                xpBonusScheduledEvent.active = false;
-                                message.reply("XP Bonus d\u00E9sactiv\u00E9");
+                                var attachment = new discord_js_1.MessageAttachment(buffer, 'banner.png');
+                                message.delete();
+                                message.channel.send({
+                                    files: [attachment]
+                                });
                             }
+                        });
+                        return [3 /*break*/, 26];
+                    case 8:
+                        if (!checkForCommand(/^\s*!server\s+rank\s+reset\s*$/img)) return [3 /*break*/, 9];
+                        BotBigBrowser.adminOnly(message, function () {
+                            _this.bigBrowserV2.resetDayWeekStats(message.guild);
+                            message.reply("Les stats viennent d'\u00EAtre r\u00E9initialis\u00E9es.");
+                        });
+                        return [3 /*break*/, 26];
+                    case 9:
+                        if (!checkForCommand(/^\s*!server\s+rank\s+ranges\s*$/img)) return [3 /*break*/, 10];
+                        message.reply("```" + this.bigBrowserV2.dayRange.map(function (range) { return "::: " + range.name + " :::\nJours : " + range.days.map(function (j) { return j + 1; }) + "\nD\u00E9but : " + range.start + " h\nFin : " + range.end + " h"; }).reduce(function (p, c) { return p + "\n\n" + c; }, '').trim() + "```");
+                        return [3 /*break*/, 26];
+                    case 10:
+                        if (!checkForCommand(/^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s*h?\s+(\d+)\s*h?\s*$/img)) return [3 /*break*/, 11];
+                        BotBigBrowser.adminOnly(message, function () {
+                            var regex = /^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s*h?\s+(\d+)\s*h?\s*$/img;
+                            var _a = regex.exec(message.content), name = _a[1], startStr = _a[2], endStr = _a[3];
+                            var start = parseInt(startStr);
+                            var end = parseInt(endStr);
+                            if (isNaN(start) || isNaN(end)) {
+                                message.reply('Paramètres invalides. Exemple : !server rank range Semaine 9 23');
+                            }
+                            else {
+                                var range = _this.bigBrowserV2.dayRange.find(function (range) { return range.name.toLowerCase().includes(name.toLowerCase().trim()); });
+                                if (!range) {
+                                    message.reply("Impossible de trouver la plage \"" + name.trim() + "\"");
+                                }
+                                else {
+                                    range.start = start;
+                                    range.end = end;
+                                    message.reply("Plage chang\u00E9e : [" + start + " h, " + end + " h]");
+                                }
+                            }
+                        });
+                        return [3 /*break*/, 26];
+                    case 11:
+                        if (!checkForCommand(/^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img)) return [3 /*break*/, 12];
+                        console.log('SERVER RANK');
+                        _d = /^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img.exec(message.content), getLast = _d[1], nbRosterStr = _d[2];
+                        nbRoster = nbRosterStr && parseInt(nbRosterStr);
+                        result = this.bigBrowserV2.getRosterRanks(message.guild, nbRoster, !!getLast);
+                        createStrLine = function (entries) { return entries
+                            .map(function (u, i) { return u.stats.xp <= 0 ? (i + 1 + ".").padEnd(entries.length.toString().length + 1, ' ') + " -" : (i + 1 + ".").padEnd(entries.length.toString().length + 1, ' ') + " " + (Math.round(u.stats.xp * 100) / 100).toString().padStart(7, ' ') + (Math.round(u.stats.xpBonus * 100) / 100 > 0 ? " BONNUS (" + Math.round(u.stats.xpBonus * 100) / 100 + ")" : '') + " :: " + u.user.userData.displayName; })
+                            .reduce(function (p, c) { return !p ? c : p + "\n" + c; }, ''); };
+                        message.channel.send('\r\n' + ("```::: Jour :::\n" + createStrLine(result.day) + "\n\n::: Semaine :::\n" + createStrLine(result.week) + "```"));
+                        message.delete();
+                        return [3 /*break*/, 26];
+                    case 12:
+                        if (!checkForCommand(/^\s*!dbinfo\s*$/img)) return [3 /*break*/, 13];
+                        BotBigBrowser.adminOnly(message, function () {
+                            var time = _this.saver.dataCreationDate;
+                            message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
+                        });
+                        return [3 /*break*/, 26];
+                    case 13:
+                        if (!checkForCommand(/^\s*!server\s+xp\s*$/img)) return [3 /*break*/, 14];
+                        console.log('SERVER STATS');
+                        result = this.bigBrowserV2.getServerText(message.guild);
+                        message.delete();
+                        message.channel.send('\r\n' + result);
+                        return [3 /*break*/, 26];
+                    case 14:
+                        if (!checkForCommand(/^\s*!server\s+xp\s+csv\s*$/img)) return [3 /*break*/, 15];
+                        console.log('SERVER STATS');
+                        result = this.bigBrowserV2.getServerCSV(message.guild, true);
+                        message.delete();
+                        message.channel.send({
+                            files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.csv')]
+                        });
+                        return [3 /*break*/, 26];
+                    case 15:
+                        if (!checkForCommand(/^\s*!server\s+xp\s+md\s*$/img)) return [3 /*break*/, 16];
+                        console.log('SERVER STATS');
+                        result = this.bigBrowserV2.getServerMarkDown(message.guild);
+                        message.delete();
+                        message.channel.send({
+                            files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.md')]
+                        });
+                        return [3 /*break*/, 26];
+                    case 16:
+                        if (!checkForCommand(/^\s*!server\s+xp\s+txt\s*$/img)) return [3 /*break*/, 17];
+                        console.log('SERVER STATS');
+                        result = this.bigBrowserV2.getServerText(message.guild);
+                        message.delete();
+                        message.channel.send({
+                            files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.txt')]
+                        });
+                        return [3 /*break*/, 26];
+                    case 17:
+                        if (!checkForCommand(/^\s*!global\s+xp\s*$/img)) return [3 /*break*/, 18];
+                        console.log('GLOBAL STATS');
+                        result = this.bigBrowserV2.getServersText(this.client.guilds.valueOf().map(function (g) { return g; }));
+                        message.delete();
+                        message.channel.send('\r\n' + result);
+                        return [3 /*break*/, 26];
+                    case 18:
+                        if (!checkForCommand(/^\s*!global\s+xp\s+csv\s*$/img)) return [3 /*break*/, 19];
+                        console.log('GLOBAL STATS DL');
+                        result = this.bigBrowserV2.getServersCSV(this.client.guilds.valueOf().map(function (g) { return g; }), true);
+                        message.delete();
+                        message.channel.send({
+                            files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.csv')]
+                        });
+                        return [3 /*break*/, 26];
+                    case 19:
+                        if (!checkForCommand(/^\s*!global\s+xp\s+md\s*$/img)) return [3 /*break*/, 20];
+                        console.log('GLOBAL STATS DL');
+                        result = this.bigBrowserV2.getServersMarkDown(this.client.guilds.valueOf().map(function (g) { return g; }));
+                        message.delete();
+                        message.channel.send({
+                            files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.md')]
+                        });
+                        return [3 /*break*/, 26];
+                    case 20:
+                        if (!checkForCommand(/^\s*!global\s+xp\s+txt\s*$/img)) return [3 /*break*/, 21];
+                        console.log('GLOBAL STATS DL');
+                        result = this.bigBrowserV2.getServersText(this.client.guilds.valueOf().map(function (g) { return g; }));
+                        message.delete();
+                        message.channel.send({
+                            files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.txt')]
+                        });
+                        return [3 /*break*/, 26];
+                    case 21:
+                        if (!checkForCommand(/^\s*!stop\s+server\s+xp\s*$/img)) return [3 /*break*/, 22];
+                        console.log('STOP SERVER XP');
+                        this.bigBrowserV2.setTrackingServer(message.guild, false);
+                        this.bigBrowser.setServerTracking(message.guild, false);
+                        message.delete();
+                        message.channel.send(':small_orange_diamond: arrêt du stockage de l\'expérience du serveur.');
+                        return [3 /*break*/, 26];
+                    case 22:
+                        if (!checkForCommand(/^\s*!start\s+server\s+xp\s*$/img)) return [3 /*break*/, 23];
+                        console.log('START SERVER XP');
+                        this.bigBrowserV2.setTrackingServer(message.guild, true);
+                        this.bigBrowser.setServerTracking(message.guild, true);
+                        message.delete();
+                        message.channel.send(':small_blue_diamond: démarrage du stockage de l\'expérience du serveur.');
+                        return [3 /*break*/, 26];
+                    case 23:
+                        if (!checkForCommand(/^\s*!server\s+get\s*(.+)$/img)) return [3 /*break*/, 25];
+                        key = params[1];
+                        return [4 /*yield*/, GlobalDataManager_1.GlobalDataManager.instance.get(key, '\n==========================\n')];
+                    case 24:
+                        result = _e.sent();
+                        message.reply({
+                            content: result || '*Aucun résultat*'
+                        });
+                        return [3 /*break*/, 26];
+                    case 25:
+                        if (checkForCommand(/^\s*!server\s+errors\s*(.+)?$/img)) {
+                            BotBigBrowser.adminOnly(message, function () {
+                                var domain = params[1];
+                                var errors = ErrorManager_1.ErrorManager.instance.errorList.filter(function (e) { return domain ? e.domain.toLowerCase() === domain.toLowerCase() : true; });
+                                var errorsStr = errors
+                                    .map(function (e) { return "[" + e.domain + "]\n===============\n" + e.error.toString(); })
+                                    .join('\n==========================================\n');
+                                message.reply({
+                                    content: "**Erreurs (filtered: " + errors.length + " / all: " + ErrorManager_1.ErrorManager.instance.errorList.length + " / max: " + ErrorManager_1.ErrorManager.instance.errorListMax + ") :**\n" + (errorsStr || 'Aucune erreur.')
+                                });
+                            });
                         }
-                    });
-                }
-                else if (checkForCommand(/^\s*!xpbonus\s+config\s*$/img)) {
-                    propNames = ['messageTimeoutSec', 'periodMsMin', 'periodMsMax', 'xpBonusOnPopUp', 'xpBonusOnReact'];
-                    xpBonusScheduledEvent_1 = this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
-                    if (xpBonusScheduledEvent_1) {
-                        message.reply("```active = " + (xpBonusScheduledEvent_1.active ? 'oui' : 'non') + "\n" + propNames.map(function (propName) { return propName + " = " + xpBonusScheduledEvent_1[propName]; }).reduce(function (p, c) { return p + '\n' + c; }).trim() + "```");
-                    }
-                }
-                else if (checkForCommand(/^\s*!xpbonus\s+config\s+(messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact)\s+(\d+(?:\.\d+)?)\s*$/img)) {
-                    BotBigBrowser.adminOnly(message, function () {
-                        var propName = params[1], valueStr = params[2];
-                        var xpBonusScheduledEvent = _this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
-                        if (xpBonusScheduledEvent) {
-                            xpBonusScheduledEvent[propName] = parseFloat(valueStr);
-                            message.reply("Modification confirm\u00E9e\n```" + propName + " = " + xpBonusScheduledEvent[propName] + "```");
+                        else if (checkForCommand(/^\s*!stop\s+xp\s*$/img)) {
+                            console.log('STOP XP');
+                            this.bigBrowserV2.setTrackingUser(message.member, false);
+                            this.bigBrowser.setTracking(message.guild, message.author, false);
+                            message.delete();
+                            message.channel.send(':small_orange_diamond: arrêt du stockage de ton expérience.');
                         }
-                    });
-                }
-                else if (checkForCommand(/^\s*!xpbonus\s+channel\s+(add|remove|list)\s*$/img)) {
-                    BotBigBrowser.adminOnly(message, function () {
-                        var _a = /^\s*!xpbonus\s+channel\s+(add|remove|list)\s*$/img.exec(message.content), action = _a[1];
-                        var xpBonusScheduledEvent = _this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
-                        if (xpBonusScheduledEvent) {
-                            var channel = message.channel;
-                            switch (action.toLowerCase().trim()) {
-                                case 'add':
-                                    xpBonusScheduledEvent.addChannel(channel);
-                                    message.reply({
-                                        content: "Salon `" + channel.name + "` ajout\u00E9 \u00E0 la liste.",
-                                        embeds: [{
-                                                image: {
-                                                    url: 'https://cdn.discordapp.com/attachments/472724867381461012/866612882669305856/tenor.gif'
-                                                }
-                                            }]
+                        else if (checkForCommand(/^\s*!start\s+xp\s*$/img)) {
+                            console.log('START XP');
+                            this.bigBrowserV2.setTrackingUser(message.member, true);
+                            this.bigBrowser.setTracking(message.guild, message.author, true);
+                            message.delete();
+                            message.channel.send(':small_blue_diamond: démarrage du stockage de ton expérience.');
+                        }
+                        else if (checkForCommand(/^\s*!xpbonus\s+pop\s*$/img)) {
+                            BotBigBrowser.adminOnly(message, function () {
+                                var xpBonusScheduledEvent = _this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
+                                if (xpBonusScheduledEvent) {
+                                    xpBonusScheduledEvent.runtime({
+                                        periodMs: 0
                                     });
-                                    break;
-                                case 'remove':
-                                    xpBonusScheduledEvent.removeChannel(channel);
-                                    message.reply("Salon `" + channel.name + "` supprim\u00E9 de la liste.");
-                                    break;
-                                case 'list':
-                                    if (xpBonusScheduledEvent.channels.length === 0) {
-                                        message.reply('Aucun salon dans la liste.');
+                                    message.reply("Pop !");
+                                }
+                            });
+                        }
+                        else if (checkForCommand(/^\s*!xpbonus\s+(enable|disable)\s*$/img)) {
+                            BotBigBrowser.adminOnly(message, function () {
+                                var action = params[1];
+                                var xpBonusScheduledEvent = _this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
+                                if (xpBonusScheduledEvent) {
+                                    if (action.toLowerCase() === 'enable') {
+                                        xpBonusScheduledEvent.active = true;
+                                        message.reply("XP Bonus activ\u00E9");
                                     }
                                     else {
-                                        message.reply(("```::: Channels :::\n                                    " + xpBonusScheduledEvent.channels.map(function (c) { return c.name; }).reduce(function (p, c) { return p + '\n' + c; }, '').trim() + "\n                                ```").replace(/^ +/img, ''));
+                                        xpBonusScheduledEvent.active = false;
+                                        message.reply("XP Bonus d\u00E9sactiv\u00E9");
                                     }
-                                    break;
+                                }
+                            });
+                        }
+                        else if (checkForCommand(/^\s*!xpbonus\s+config\s*$/img)) {
+                            propNames = ['messageTimeoutSec', 'periodMsMin', 'periodMsMax', 'xpBonusOnPopUp', 'xpBonusOnReact'];
+                            xpBonusScheduledEvent_1 = this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
+                            if (xpBonusScheduledEvent_1) {
+                                message.reply("```active = " + (xpBonusScheduledEvent_1.active ? 'oui' : 'non') + "\n" + propNames.map(function (propName) { return propName + " = " + xpBonusScheduledEvent_1[propName]; }).reduce(function (p, c) { return p + '\n' + c; }).trim() + "```");
                             }
                         }
-                    });
+                        else if (checkForCommand(/^\s*!xpbonus\s+config\s+(messageTimeoutSec|periodMsMin|periodMsMax|xpBonusOnPopUp|xpBonusOnReact)\s+(\d+(?:\.\d+)?)\s*$/img)) {
+                            BotBigBrowser.adminOnly(message, function () {
+                                var propName = params[1], valueStr = params[2];
+                                var xpBonusScheduledEvent = _this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
+                                if (xpBonusScheduledEvent) {
+                                    xpBonusScheduledEvent[propName] = parseFloat(valueStr);
+                                    message.reply("Modification confirm\u00E9e\n```" + propName + " = " + xpBonusScheduledEvent[propName] + "```");
+                                }
+                            });
+                        }
+                        else if (checkForCommand(/^\s*!xpbonus\s+channel\s+(add|remove|list)\s*$/img)) {
+                            BotBigBrowser.adminOnly(message, function () {
+                                var _a = /^\s*!xpbonus\s+channel\s+(add|remove|list)\s*$/img.exec(message.content), action = _a[1];
+                                var xpBonusScheduledEvent = _this.xpBonusScheduledEvents.find(function (item) { return item.guild.id === message.guild.id; });
+                                if (xpBonusScheduledEvent) {
+                                    var channel = message.channel;
+                                    switch (action.toLowerCase().trim()) {
+                                        case 'add':
+                                            xpBonusScheduledEvent.addChannel(channel);
+                                            message.reply({
+                                                content: "Salon `" + channel.name + "` ajout\u00E9 \u00E0 la liste.",
+                                                embeds: [{
+                                                        image: {
+                                                            url: 'https://cdn.discordapp.com/attachments/472724867381461012/866612882669305856/tenor.gif'
+                                                        }
+                                                    }]
+                                            });
+                                            break;
+                                        case 'remove':
+                                            xpBonusScheduledEvent.removeChannel(channel);
+                                            message.reply("Salon `" + channel.name + "` supprim\u00E9 de la liste.");
+                                            break;
+                                        case 'list':
+                                            if (xpBonusScheduledEvent.channels.length === 0) {
+                                                message.reply('Aucun salon dans la liste.');
+                                            }
+                                            else {
+                                                message.reply(("```::: Channels :::\n                                    " + xpBonusScheduledEvent.channels.map(function (c) { return c.name; }).reduce(function (p, c) { return p + '\n' + c; }, '').trim() + "\n                                ```").replace(/^ +/img, ''));
+                                            }
+                                            break;
+                                    }
+                                }
+                            });
+                        }
+                        _e.label = 26;
+                    case 26:
+                        console.log(message.content.trim());
+                        return [2 /*return*/];
                 }
-                console.log(message.content.trim());
-                return [2 /*return*/];
             });
         });
     };

@@ -53,6 +53,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoiceChannelCreator = void 0;
 var ErrorManager_1 = require("../../ErrorManager");
+var GlobalDataManager_1 = require("../../GlobalDataManager");
 var Action_1 = require("../Action");
 var VoiceChannelCreator = /** @class */ (function (_super) {
     __extends(VoiceChannelCreator, _super);
@@ -76,6 +77,16 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    VoiceChannelCreator.prototype.onCreate = function () {
+        var _this = this;
+        GlobalDataManager_1.GlobalDataManager.instance.register('VoiceChannelCreator', function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.channelsToWatch
+                        .map(function (c) { return ">> " + c.channel.toString() + "\n" + c.data.createdChannels.map(function (c) { return "Salon <#" + c.channelId + "> cr\u00E9\u00E9 par <@" + c.creatorId + ">"; }).join('\n'); })
+                        .join('\n')];
+            });
+        }); });
+    };
     VoiceChannelCreator.prototype.rename = function (ctx) {
         var _this = this;
         var match = /^!channel\s+rename\s+(.+)$/img.exec(ctx.message.content);

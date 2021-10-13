@@ -42,7 +42,10 @@ var Action = /** @class */ (function () {
     function Action(options) {
         this.options = options;
         this.isDisposed = false;
+        this.onCreate();
     }
+    Action.prototype.onCreate = function () {
+    };
     Action.prototype.dispose = function () {
         this.isDisposed = true;
     };

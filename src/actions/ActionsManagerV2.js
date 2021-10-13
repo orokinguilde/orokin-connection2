@@ -44,6 +44,7 @@ var Texter_1 = require("./list/Texter");
 var ChannelNotification_1 = require("./list/ChannelNotification");
 var ThreadManager_1 = require("./list/ThreadManager");
 var EmbedReactionRole_1 = require("./list/EmbedReactionRole");
+var ErrorManager_1 = require("../ErrorManager");
 var ActionsManagerV2 = /** @class */ (function () {
     function ActionsManagerV2(bot) {
         this.bot = bot;
@@ -140,11 +141,11 @@ var ActionsManagerV2 = /** @class */ (function () {
                             }
                             instance = this.getInstance(item);
                             if (!(instance && instance.executeTicker)) return [3 /*break*/, 3];
-                            return [4 /*yield*/, instance.executeTicker({
+                            return [4 /*yield*/, ErrorManager_1.ErrorManager.instance.wrapPromise('ActionsManagerV2', instance.executeTicker({
                                     bigBrowser: this.bot.bigBrowserV2,
                                     bot: this.bot,
                                     guilds: guilds
-                                })];
+                                }))];
                         case 2:
                             _b.sent();
                             _b.label = 3;

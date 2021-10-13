@@ -152,7 +152,7 @@ var Action = /** @class */ (function () {
             });
         });
     };
-    Action.prototype.findChannelById = function (id, ctx) {
+    Action.prototype.findChannelById = function (id, ctx, fetchOption) {
         return __awaiter(this, void 0, void 0, function () {
             var _i, _a, guild, channel, ex_3;
             return __generator(this, function (_b) {
@@ -166,7 +166,7 @@ var Action = /** @class */ (function () {
                         _b.label = 2;
                     case 2:
                         _b.trys.push([2, 4, , 5]);
-                        return [4 /*yield*/, guild.channels.fetch(id)];
+                        return [4 /*yield*/, guild.channels.fetch(id, fetchOption)];
                     case 3:
                         channel = _b.sent();
                         if (channel) {
@@ -184,12 +184,12 @@ var Action = /** @class */ (function () {
             });
         });
     };
-    Action.prototype.findChannelsById = function (ids, ctx) {
+    Action.prototype.findChannelsById = function (ids, ctx, fetchOption) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, Promise.all(ids.map(function (id) { return _this.findChannelById(id, ctx); }))];
+                    case 0: return [4 /*yield*/, Promise.all(ids.map(function (id) { return _this.findChannelById(id, ctx, fetchOption); }))];
                     case 1: return [2 /*return*/, _a.sent()];
                 }
             });

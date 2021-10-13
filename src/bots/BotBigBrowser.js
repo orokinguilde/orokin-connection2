@@ -61,6 +61,7 @@ var config_1 = require("../config");
 var Help_1 = require("../Help");
 var BannerTemplate_1 = require("../BannerTemplate");
 var Banner_1 = require("../Banner");
+var ErrorManager_1 = require("../ErrorManager");
 var BigBrowser = require('../BigBrowser');
 var globals = require('../globals');
 var BotBigBrowser = /** @class */ (function (_super) {
@@ -380,6 +381,18 @@ var BotBigBrowser = /** @class */ (function (_super) {
                     this.bigBrowser.setServerTracking(message.guild, true);
                     message.delete();
                     message.channel.send(':small_blue_diamond: démarrage du stockage de l\'expérience du serveur.');
+                }
+                else if (checkForCommand(/^\s*!server\s+errors\s*(.+)?$/img)) {
+                    BotBigBrowser.adminOnly(message, function () {
+                        var domain = params[1];
+                        var errors = ErrorManager_1.ErrorManager.instance.errorList.filter(function (e) { return domain ? e.domain.toLowerCase() === domain.toLowerCase() : true; });
+                        var errorsStr = errors
+                            .map(function (e) { return e.error.toString(); })
+                            .join('\n==========================================\n');
+                        message.reply({
+                            content: "**Erreurs (filtered: " + errors.length + " / all: " + ErrorManager_1.ErrorManager.instance.errorList.length + " / max: " + ErrorManager_1.ErrorManager.instance.errorListMax + ") :**\n" + (errorsStr || 'Aucune erreur.')
+                        });
+                    });
                 }
                 else if (checkForCommand(/^\s*!stop\s+xp\s*$/img)) {
                     console.log('STOP XP');

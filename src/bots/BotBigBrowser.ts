@@ -7,6 +7,7 @@ import config from '../config'
 import { Help } from "../Help";
 import bannerTemplates, { IBannerTemplateData } from "../BannerTemplate";
 import { Banner } from "../Banner"
+import { ErrorManager } from "../ErrorManager";
 
 const BigBrowser = require('../BigBrowser');
 const globals = require('../globals');
@@ -359,8 +360,21 @@ ${createStrLine(result.week)}\`\`\``);
 
             message.delete();
             message.channel.send(':small_blue_diamond: démarrage du stockage de l\'expérience du serveur.');
-        }
-        else if(checkForCommand(/^\s*!stop\s+xp\s*$/img))
+        } else if(checkForCommand(/^\s*!server\s+errors\s*(.+)?$/img)) {
+
+            BotBigBrowser.adminOnly(message, () => {
+                const [, domain ] = params;
+                const errors = ErrorManager.instance.errorList.filter(e => domain ? e.domain.toLowerCase() === domain.toLowerCase() : true);
+                const errorsStr = errors
+                    .map(e => e.error.toString())
+                    .join('\n==========================================\n');
+
+                message.reply({
+                    content: `**Erreurs (filtered: ${errors.length} / all: ${ErrorManager.instance.errorList.length} / max: ${ErrorManager.instance.errorListMax}) :**\n${errorsStr || 'Aucune erreur.'}`
+                });
+            })
+
+        } else if(checkForCommand(/^\s*!stop\s+xp\s*$/img))
         {
             console.log('STOP XP');
 

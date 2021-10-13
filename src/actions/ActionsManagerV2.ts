@@ -8,6 +8,7 @@ import { Texter } from "./list/Texter";
 import { ChannelNotification } from "./list/ChannelNotification";
 import { ThreadManager } from "./list/ThreadManager";
 import { EmbedReactionRole } from "./list/EmbedReactionRole";
+import { ErrorManager } from "../ErrorManager";
 
 export interface IActionCtx {
     message?: Message
@@ -124,11 +125,11 @@ export class ActionsManagerV2 {
                     const instance = this.getInstance<IActionTicker<any>>(item);
 
                     if(instance && instance.executeTicker) {
-                        await instance.executeTicker({
+                        await ErrorManager.instance.wrapPromise('ActionsManagerV2', instance.executeTicker({
                             bigBrowser: (this.bot as any).bigBrowserV2,
                             bot: this.bot,
                             guilds: guilds
-                        })
+                        }))
                     }
                 }
                 

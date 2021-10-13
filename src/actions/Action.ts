@@ -1,4 +1,4 @@
-import { Guild } from "discord.js";
+import { BaseFetchOptions, Guild } from "discord.js";
 import moment = require("moment");
 import { IAction, IActionCtx, IActionMessage, IActionTicker, ITickerActionDate } from "./interfaces";
 
@@ -75,10 +75,10 @@ export abstract class Action<T = any> implements IAction<T> {
         return await Promise.all(ids.map(id => this.findMemberById(id, ctx)))
     }
 
-    public async findChannelById(id: string, ctx: IActionCtx<T>) {
+    public async findChannelById(id: string, ctx: IActionCtx<T>, fetchOption?: BaseFetchOptions) {
         for(const guild of ctx.guilds) {
             try {
-                const channel = await guild.channels.fetch(id);
+                const channel = await guild.channels.fetch(id, fetchOption);
 
                 if(channel) {
                     return channel;
@@ -89,7 +89,7 @@ export abstract class Action<T = any> implements IAction<T> {
         
         return undefined;
     }
-    public async findChannelsById(ids: string[], ctx: IActionCtx<T>) {
-        return await Promise.all(ids.map(id => this.findChannelById(id, ctx)))
+    public async findChannelsById(ids: string[], ctx: IActionCtx<T>, fetchOption?: BaseFetchOptions) {
+        return await Promise.all(ids.map(id => this.findChannelById(id, ctx, fetchOption)))
     }
 }

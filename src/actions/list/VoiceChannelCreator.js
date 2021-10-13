@@ -52,6 +52,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoiceChannelCreator = void 0;
+var ErrorManager_1 = require("../../ErrorManager");
 var Action_1 = require("../Action");
 var VoiceChannelCreator = /** @class */ (function (_super) {
     __extends(VoiceChannelCreator, _super);
@@ -68,7 +69,7 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
         var _this = this;
         var match = /^!channel\s+rename\s+(.+)$/img.exec(ctx.message.content);
         if (match) {
-            (function () { return __awaiter(_this, void 0, void 0, function () {
+            ErrorManager_1.ErrorManager.instance.wrapAsync('VoiceChannelCreator', function () { return __awaiter(_this, void 0, void 0, function () {
                 var name, authorId, entry;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -94,14 +95,14 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                         case 4: return [2 /*return*/];
                     }
                 });
-            }); })();
+            }); });
         }
     };
     VoiceChannelCreator.prototype.giveLead = function (ctx) {
         var _this = this;
         var match = /^!channel\s+give\s+/img.exec(ctx.message.content);
         if (match) {
-            (function () { return __awaiter(_this, void 0, void 0, function () {
+            ErrorManager_1.ErrorManager.instance.wrapAsync('VoiceChannelCreator', function () { return __awaiter(_this, void 0, void 0, function () {
                 var authorId, targetMember, entry, bot;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -141,14 +142,14 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                         case 4: return [2 /*return*/];
                     }
                 });
-            }); })();
+            }); });
         }
     };
     VoiceChannelCreator.prototype.removeLead = function (ctx) {
         var _this = this;
         var match = /^!channel\s+remove\s+/img.exec(ctx.message.content);
         if (match) {
-            (function () { return __awaiter(_this, void 0, void 0, function () {
+            ErrorManager_1.ErrorManager.instance.wrapAsync('VoiceChannelCreator', function () { return __awaiter(_this, void 0, void 0, function () {
                 var authorId, targetMember, entry, index, bot;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -189,7 +190,7 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                         case 4: return [2 /*return*/];
                     }
                 });
-            }); })();
+            }); });
         }
     };
     VoiceChannelCreator.prototype.findByAdminId = function (adminId, ctx) {
@@ -305,11 +306,11 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                     case 6:
                         if (!(i < entry.data.createdChannels.length)) return [3 /*break*/, 9];
                         createdChannel = entry.data.createdChannels[i];
-                        return [4 /*yield*/, this.findChannelById(createdChannel.channelId, ctx)];
+                        return [4 /*yield*/, this.findChannelById(createdChannel.channelId, ctx, { force: true })];
                     case 7:
                         channel = _g.sent();
-                        if (!channel || channel.members.size === 0) {
-                            channel === null || channel === void 0 ? void 0 : channel.delete();
+                        if (!channel || channel.members.filter(function (m) { return !m.user.bot; }).size === 0) {
+                            ErrorManager_1.ErrorManager.instance.wrapPromise('VoiceChannelCreator', channel === null || channel === void 0 ? void 0 : channel.delete());
                             entry.data.createdChannels.splice(i, 1);
                             --i;
                         }

@@ -1,4 +1,5 @@
 import { GuildMember, VoiceChannel } from "discord.js";
+import { ErrorManager } from "../../ErrorManager";
 import { Action } from "../Action";
 import { IActionCtx, IActionCtx_Message, IActionCtx_Ticker, IActionMessage, IActionTicker } from "../interfaces";
 
@@ -36,7 +37,7 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
         const match = /^!channel\s+rename\s+(.+)$/img.exec(ctx.message.content);
 
         if(match) {
-            (async () => {
+            ErrorManager.instance.wrapAsync('VoiceChannelCreator', async () => {
                 const name = match[1].trim();
                 const authorId = ctx.message.member.id;
                 const entry = await this.findByAdminId(authorId, ctx);
@@ -51,14 +52,14 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                         content: `Vous ne vous trouvez dans aucun channel dont vous disposez des droits d'administration.`
                     })
                 }
-            })()
+            })
         }
     }
     protected giveLead(ctx: IActionCtx_Message<Option>) {
         const match = /^!channel\s+give\s+/img.exec(ctx.message.content);
 
         if(match) {
-            (async () => {
+            ErrorManager.instance.wrapAsync('VoiceChannelCreator', async () => {
                 const authorId = ctx.message.member.id;
                 const targetMember = ctx.message.mentions.members.map(m => m)[0];
                 
@@ -88,14 +89,14 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                     })
                 }
 
-            })()
+            })
         }
     }
     protected removeLead(ctx: IActionCtx_Message<Option>) {
         const match = /^!channel\s+remove\s+/img.exec(ctx.message.content);
 
         if(match) {
-            (async () => {
+            ErrorManager.instance.wrapAsync('VoiceChannelCreator', async () => {
                 const authorId = ctx.message.member.id;
                 const targetMember = ctx.message.mentions.members.map(m => m)[0];
                 
@@ -125,7 +126,7 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                         content: `Vous devez mentionner une personne dans la commande.\nExemple :\n!channel remove ${bot.toString()}`
                     })
                 }
-            })()
+            })
         }
     }
 
@@ -199,10 +200,10 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
         for(const entry of this.channelsToWatch) {
             for(let i = 0; i < entry.data.createdChannels.length; ++i) {
                 const createdChannel = entry.data.createdChannels[i];
-                const channel = await this.findChannelById(createdChannel.channelId, ctx);
+                const channel = await this.findChannelById(createdChannel.channelId, ctx, { force: true });
 
-                if(!channel || channel.members.size === 0) {
-                    channel?.delete();
+                if(!channel || channel.members.filter(m => !m.user.bot).size === 0) {
+                    ErrorManager.instance.wrapPromise('VoiceChannelCreator', channel?.delete());
                     entry.data.createdChannels.splice(i, 1);
                     --i;
                 }

@@ -10,8 +10,8 @@ export interface IAction<T> {
     isCurrentDate(date: ITickerActionDate, allowMultipleTriggers?: boolean): boolean
     findMemberById(id: string, ctx: IActionCtx<T>): Promise<GuildMember>
     findMembersById(ids: string[], ctx: IActionCtx<T>): Promise<GuildMember[]>
-    findChannelById(id: string, ctx: IActionCtx<T>): Promise<(TextChannel | VoiceChannel | CategoryChannel | NewsChannel | StoreChannel | StageChannel)>
-    findChannelsById(ids: string[], ctx: IActionCtx<T>): Promise<(TextChannel | VoiceChannel | CategoryChannel | NewsChannel | StoreChannel | StageChannel)[]>
+    findChannelById<T extends TextChannel | VoiceChannel | CategoryChannel | NewsChannel | StoreChannel | StageChannel = TextChannel | VoiceChannel | CategoryChannel | NewsChannel | StoreChannel | StageChannel>(id: string, ctx: IActionCtx<T>): Promise<T>
+    findChannelsById<T extends TextChannel | VoiceChannel | CategoryChannel | NewsChannel | StoreChannel | StageChannel = TextChannel | VoiceChannel | CategoryChannel | NewsChannel | StoreChannel | StageChannel>(ids: string[], ctx: IActionCtx<T>): Promise<T[]>
 }
 export interface IActionMessage<T> extends IAction<T> {
     isMessageAction: boolean

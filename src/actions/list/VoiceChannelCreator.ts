@@ -19,12 +19,16 @@ export interface IVoiceChannelCreator_ServerCustomData_CreatedChannel {
 export interface IVoiceChannelCreator_ServerCustomData {
     createdChannels: IVoiceChannelCreator_ServerCustomData_CreatedChannel[]
 }
+export interface IVoiceChannelCreator_Server_CustomData {
+    [channelId: string]: IVoiceChannelCreator_ServerCustomData
+}
 
 export class VoiceChannelCreator extends Action implements IActionTicker<Option>, IActionMessage<Option> {
     public static typeId = 'VoiceChannelCreator'
     public static builder = (options: Option) => new VoiceChannelCreator(options)
 
-    protected channelsToWatch: { data: IVoiceChannelCreator_ServerCustomData, channel: VoiceChannel }[]
+    protected channelsToWatch: VoiceChannel[]
+    protected channelsToDispose: IVoiceChannelCreator_ServerCustomData_CreatedChannel[]
     
     public executeMessage(ctx: IActionCtx_Message<Option>): boolean {
         this.rename(ctx);
@@ -44,9 +48,8 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
 
     protected onCreate() {
         GlobalDataManager.instance.register('VoiceChannelCreator', async () =>
-            this.channelsToWatch
-                .map(c => `>> ${c.channel.toString()}\n${c.data.createdChannels.map(c => `Salon <#${c.channelId}> créé par <@${c.creatorId}>`).join('\n')}`)
-                .join('\n')
+            `**Salons observés**\n${this.channelsToWatch.map(c => c.toString()).join('\n')}`
+            + `\n**Salons créés**\n${this.channelsToDispose.map(c => `<#${c.channelId}> créé par <@${c.creatorId}>`).join('\n')}`
         );
     }
 
@@ -165,15 +168,13 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
     }
     protected listByAdminId(adminId: string) {
         const list: IVoiceChannelCreator_ServerCustomData_CreatedChannel[] = [];
-        for(const channelToWatch of this.channelsToWatch) {
-            for(const cc of channelToWatch.data.createdChannels) {
-                if(!cc.admins) {
-                    cc.admins = [];
-                }
+        for(const cc of this.channelsToDispose) {
+            if(!cc.admins) {
+                cc.admins = [];
+            }
 
-                if(cc.creatorId === adminId || cc.admins.includes(adminId)) {
-                    list.push(cc);
-                }
+            if(cc.creatorId === adminId || cc.admins.includes(adminId)) {
+                list.push(cc);
             }
         }
         return list;
@@ -193,51 +194,52 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
             this.channelsToWatch = [];
 
             for(const guild of ctx.guilds) {
-                const channels = await this.findChannelsById(this.options.channelsId, ctx);
-                this.channelsToWatch.push.apply(this.channelsToWatch, channels.map(c => ({
-                    data: (() => {
-                        const server = ctx.bigBrowser.getServer(guild);
-            
-                        if(!server.customData) {
-                            server.customData = {};
-                        }
-            
-                        let data: IVoiceChannelCreator_ServerCustomData = server.customData[dataKey];
-                        if(!data) {
-                            data = {
-                                createdChannels: []
-                            };
-                            server.customData[dataKey] = data;
-                        }
+                const server = ctx.bigBrowser.getServer(guild);
+    
+                if(!server.customData) {
+                    server.customData = {};
+                }
 
-                        return data;
-                    })(),
-                    channel: c
-                })))
+                const oldData = server.customData[dataKey] as any;
+                let customData: IVoiceChannelCreator_ServerCustomData_CreatedChannel[];
+
+                if(!oldData) {
+                    customData = [];
+                    server.customData[dataKey] = customData;
+                } else if(Array.isArray(oldData)) {
+                    customData = oldData;
+                } else {
+                    customData = (oldData as IVoiceChannelCreator_ServerCustomData).createdChannels
+                    server.customData[dataKey] = customData;
+                }
+
+                const channels = await this.findChannelsById<VoiceChannel>(this.options.channelsId, ctx);
+                this.channelsToWatch = channels;
+                this.channelsToDispose = customData;
             }
         }
 
         for(const entry of this.channelsToWatch) {
-            for(let i = 0; i < entry.data.createdChannels.length; ++i) {
-                const createdChannel = entry.data.createdChannels[i];
+            for(let i = 0; i < this.channelsToDispose.length; ++i) {
+                const createdChannel = this.channelsToDispose[i];
                 const channel = await this.findChannelById(createdChannel.channelId, ctx, { force: true });
 
                 if(!channel || channel.members.filter(m => !m.user.bot).size === 0) {
                     ErrorManager.instance.wrapPromise('VoiceChannelCreator', channel?.delete());
-                    entry.data.createdChannels.splice(i, 1);
+                    this.channelsToDispose.splice(i, 1);
                     --i;
                 }
             }
 
-            for(const member of entry.channel.members.map(m => m)) {
-                const channel = await entry.channel.guild.channels.create(this.getNewChannelName(member), {
+            for(const member of entry.members.map(m => m)) {
+                const channel = await entry.guild.channels.create(this.getNewChannelName(member), {
                     type: "GUILD_VOICE",
-                    parent: entry.channel.parent,
-                    position: entry.channel.calculatedPosition + 1
+                    parent: entry.parent,
+                    position: entry.calculatedPosition + 1
                 })
                 await member.voice.setChannel(channel, 'Channel créé automatiquement');
 
-                entry.data.createdChannels.push({
+                this.channelsToDispose.push({
                     channelId: channel.id,
                     creatorId: member.id,
                     admins: []

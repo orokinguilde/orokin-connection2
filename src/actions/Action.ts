@@ -1,4 +1,4 @@
-import { BaseFetchOptions, Guild } from "discord.js";
+import { BaseFetchOptions, CategoryChannel, Guild, NewsChannel, StageChannel, StoreChannel, TextChannel, VoiceChannel } from "discord.js";
 import moment = require("moment");
 import { IAction, IActionCtx, IActionMessage, IActionTicker, ITickerActionDate } from "./interfaces";
 
@@ -89,13 +89,13 @@ export abstract class Action<T = any> implements IAction<T> {
         return await Promise.all(ids.map(id => this.findMemberById(id, ctx)))
     }
 
-    public async findChannelById(id: string, ctx: IActionCtx<T>, fetchOption?: BaseFetchOptions) {
+    public async findChannelById<T extends TextChannel | VoiceChannel | CategoryChannel | NewsChannel | StoreChannel | StageChannel = TextChannel | VoiceChannel | CategoryChannel | NewsChannel | StoreChannel | StageChannel>(id: string, ctx: IActionCtx<T>, fetchOption?: BaseFetchOptions): Promise<T> {
         for(const guild of ctx.guilds) {
             try {
                 const channel = await guild.channels.fetch(id, fetchOption);
 
                 if(channel) {
-                    return channel;
+                    return channel as any;
                 }
             } catch(ex) {
             }
@@ -103,7 +103,7 @@ export abstract class Action<T = any> implements IAction<T> {
         
         return undefined;
     }
-    public async findChannelsById(ids: string[], ctx: IActionCtx<T>, fetchOption?: BaseFetchOptions) {
-        return await Promise.all(ids.map(id => this.findChannelById(id, ctx, fetchOption)))
+    public async findChannelsById<T extends TextChannel | VoiceChannel | CategoryChannel | NewsChannel | StoreChannel | StageChannel = TextChannel | VoiceChannel | CategoryChannel | NewsChannel | StoreChannel | StageChannel>(ids: string[], ctx: IActionCtx<T>, fetchOption?: BaseFetchOptions): Promise<T[]> {
+        return await Promise.all(ids.map(id => this.findChannelById(id, ctx, fetchOption))) as any
     }
 }

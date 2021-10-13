@@ -81,9 +81,8 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
         var _this = this;
         GlobalDataManager_1.GlobalDataManager.instance.register('VoiceChannelCreator', function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.channelsToWatch
-                        .map(function (c) { return ">> " + c.channel.toString() + "\n" + c.data.createdChannels.map(function (c) { return "Salon <#" + c.channelId + "> cr\u00E9\u00E9 par <@" + c.creatorId + ">"; }).join('\n'); })
-                        .join('\n')];
+                return [2 /*return*/, "**Salons observ\u00E9s**\n" + this.channelsToWatch.map(function (c) { return c.toString(); }).join('\n')
+                        + ("\n**Salons cr\u00E9\u00E9s**\n" + this.channelsToDispose.map(function (c) { return "<#" + c.channelId + "> cr\u00E9\u00E9 par <@" + c.creatorId + ">"; }).join('\n'))];
             });
         }); });
     };
@@ -249,16 +248,13 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
     };
     VoiceChannelCreator.prototype.listByAdminId = function (adminId) {
         var list = [];
-        for (var _i = 0, _a = this.channelsToWatch; _i < _a.length; _i++) {
-            var channelToWatch = _a[_i];
-            for (var _b = 0, _c = channelToWatch.data.createdChannels; _b < _c.length; _b++) {
-                var cc = _c[_b];
-                if (!cc.admins) {
-                    cc.admins = [];
-                }
-                if (cc.creatorId === adminId || cc.admins.includes(adminId)) {
-                    list.push(cc);
-                }
+        for (var _i = 0, _a = this.channelsToDispose; _i < _a.length; _i++) {
+            var cc = _a[_i];
+            if (!cc.admins) {
+                cc.admins = [];
+            }
+            if (cc.creatorId === adminId || cc.admins.includes(adminId)) {
+                list.push(cc);
             }
         }
         return list;
@@ -272,50 +268,40 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
     VoiceChannelCreator.prototype.executeTicker = function (ctx) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var dataKey, _loop_1, this_1, _i, _b, guild, _c, _d, entry, i, createdChannel, channel, _e, _f, member, channel;
+            var dataKey, _i, _b, guild, server, oldData, customData, channels, _c, _d, entry, i, createdChannel, channel, _e, _f, member, channel;
             return __generator(this, function (_g) {
                 switch (_g.label) {
                     case 0:
                         dataKey = (_a = this.options.id) !== null && _a !== void 0 ? _a : 'VoiceChannelCreator';
                         if (!!this.channelsToWatch) return [3 /*break*/, 4];
                         this.channelsToWatch = [];
-                        _loop_1 = function (guild) {
-                            var channels;
-                            return __generator(this, function (_h) {
-                                switch (_h.label) {
-                                    case 0: return [4 /*yield*/, this_1.findChannelsById(this_1.options.channelsId, ctx)];
-                                    case 1:
-                                        channels = _h.sent();
-                                        this_1.channelsToWatch.push.apply(this_1.channelsToWatch, channels.map(function (c) { return ({
-                                            data: (function () {
-                                                var server = ctx.bigBrowser.getServer(guild);
-                                                if (!server.customData) {
-                                                    server.customData = {};
-                                                }
-                                                var data = server.customData[dataKey];
-                                                if (!data) {
-                                                    data = {
-                                                        createdChannels: []
-                                                    };
-                                                    server.customData[dataKey] = data;
-                                                }
-                                                return data;
-                                            })(),
-                                            channel: c
-                                        }); }));
-                                        return [2 /*return*/];
-                                }
-                            });
-                        };
-                        this_1 = this;
                         _i = 0, _b = ctx.guilds;
                         _g.label = 1;
                     case 1:
                         if (!(_i < _b.length)) return [3 /*break*/, 4];
                         guild = _b[_i];
-                        return [5 /*yield**/, _loop_1(guild)];
+                        server = ctx.bigBrowser.getServer(guild);
+                        if (!server.customData) {
+                            server.customData = {};
+                        }
+                        oldData = server.customData[dataKey];
+                        customData = void 0;
+                        if (!oldData) {
+                            customData = [];
+                            server.customData[dataKey] = customData;
+                        }
+                        else if (Array.isArray(oldData)) {
+                            customData = oldData;
+                        }
+                        else {
+                            customData = oldData.createdChannels;
+                            server.customData[dataKey] = customData;
+                        }
+                        return [4 /*yield*/, this.findChannelsById(this.options.channelsId, ctx)];
                     case 2:
-                        _g.sent();
+                        channels = _g.sent();
+                        this.channelsToWatch = channels;
+                        this.channelsToDispose = customData;
                         _g.label = 3;
                     case 3:
                         _i++;
@@ -329,14 +315,14 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                         i = 0;
                         _g.label = 6;
                     case 6:
-                        if (!(i < entry.data.createdChannels.length)) return [3 /*break*/, 9];
-                        createdChannel = entry.data.createdChannels[i];
+                        if (!(i < this.channelsToDispose.length)) return [3 /*break*/, 9];
+                        createdChannel = this.channelsToDispose[i];
                         return [4 /*yield*/, this.findChannelById(createdChannel.channelId, ctx, { force: true })];
                     case 7:
                         channel = _g.sent();
                         if (!channel || channel.members.filter(function (m) { return !m.user.bot; }).size === 0) {
                             ErrorManager_1.ErrorManager.instance.wrapPromise('VoiceChannelCreator', channel === null || channel === void 0 ? void 0 : channel.delete());
-                            entry.data.createdChannels.splice(i, 1);
+                            this.channelsToDispose.splice(i, 1);
                             --i;
                         }
                         _g.label = 8;
@@ -344,22 +330,22 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                         ++i;
                         return [3 /*break*/, 6];
                     case 9:
-                        _e = 0, _f = entry.channel.members.map(function (m) { return m; });
+                        _e = 0, _f = entry.members.map(function (m) { return m; });
                         _g.label = 10;
                     case 10:
                         if (!(_e < _f.length)) return [3 /*break*/, 14];
                         member = _f[_e];
-                        return [4 /*yield*/, entry.channel.guild.channels.create(this.getNewChannelName(member), {
+                        return [4 /*yield*/, entry.guild.channels.create(this.getNewChannelName(member), {
                                 type: "GUILD_VOICE",
-                                parent: entry.channel.parent,
-                                position: entry.channel.calculatedPosition + 1
+                                parent: entry.parent,
+                                position: entry.calculatedPosition + 1
                             })];
                     case 11:
                         channel = _g.sent();
                         return [4 /*yield*/, member.voice.setChannel(channel, 'Channel créé automatiquement')];
                     case 12:
                         _g.sent();
-                        entry.data.createdChannels.push({
+                        this.channelsToDispose.push({
                             channelId: channel.id,
                             creatorId: member.id,
                             admins: []

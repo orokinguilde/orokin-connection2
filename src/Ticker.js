@@ -36,21 +36,32 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Ticker = void 0;
+exports.Ticker = exports.TickerCtx = void 0;
+var TickerCtx = /** @class */ (function () {
+    function TickerCtx() {
+        this.dispose = false;
+    }
+    return TickerCtx;
+}());
+exports.TickerCtx = TickerCtx;
 var Ticker = /** @class */ (function () {
     function Ticker() {
     }
     Ticker.start = function (delayTime, fn, initialDelay) {
         var _this = this;
         setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
-            var ex_1;
+            var ctx, ex_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, fn()];
+                        ctx = new TickerCtx();
+                        return [4 /*yield*/, fn(ctx)];
                     case 1:
                         _a.sent();
+                        if (ctx.dispose) {
+                            return [2 /*return*/];
+                        }
                         return [3 /*break*/, 3];
                     case 2:
                         ex_1 = _a.sent();

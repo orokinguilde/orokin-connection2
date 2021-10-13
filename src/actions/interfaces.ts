@@ -3,6 +3,10 @@ import { BigBrowserV2 } from "../BigBrowserV2";
 import { IBot } from "../Bot";
 
 export interface IAction<T> {
+    get mustDispose(): boolean
+    get isDisposed(): boolean
+    dispose(): void
+
     isCurrentDate(date: ITickerActionDate, allowMultipleTriggers?: boolean): boolean
     findMemberById(id: string, ctx: IActionCtx<T>): Promise<GuildMember>
     findMembersById(ids: string[], ctx: IActionCtx<T>): Promise<GuildMember[]>

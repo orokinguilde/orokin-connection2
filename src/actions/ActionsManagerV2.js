@@ -45,6 +45,7 @@ var ChannelNotification_1 = require("./list/ChannelNotification");
 var ThreadManager_1 = require("./list/ThreadManager");
 var EmbedReactionRole_1 = require("./list/EmbedReactionRole");
 var ErrorManager_1 = require("../ErrorManager");
+var NotifyRestart_1 = require("./list/NotifyRestart");
 var ActionsManagerV2 = /** @class */ (function () {
     function ActionsManagerV2(bot) {
         this.bot = bot;
@@ -67,15 +68,20 @@ var ActionsManagerV2 = /** @class */ (function () {
                     continue;
                 }
                 var instance = this.getInstance(item);
-                if (instance && instance.executeMessage) {
-                    if (instance.executeMessage({
-                        bigBrowser: this.bot.bigBrowserV2,
-                        guilds: this.bot.client.guilds.valueOf().map(function (g) { return g; }),
-                        message: message,
-                        bot: this.bot,
-                        params: params
-                    })) {
-                        return true;
+                if (instance && !instance.isDisposed && instance.executeMessage) {
+                    if (instance.mustDispose) {
+                        instance.dispose();
+                    }
+                    else {
+                        if (instance.executeMessage({
+                            bigBrowser: this.bot.bigBrowserV2,
+                            guilds: this.bot.client.guilds.valueOf().map(function (g) { return g; }),
+                            message: message,
+                            bot: this.bot,
+                            params: params
+                        })) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -121,7 +127,7 @@ var ActionsManagerV2 = /** @class */ (function () {
     ActionsManagerV2.prototype.createTickers = function () {
         var _this = this;
         var _loop_2 = function (action) {
-            Ticker_1.Ticker.start((action.periodSec || 60) * 1000, function () { return __awaiter(_this, void 0, void 0, function () {
+            Ticker_1.Ticker.start((action.periodSec || 60) * 1000, function (tickerCtx) { return __awaiter(_this, void 0, void 0, function () {
                 var logText, guilds, _i, _a, item, instance;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
@@ -134,25 +140,32 @@ var ActionsManagerV2 = /** @class */ (function () {
                             _i = 0, _a = action.list;
                             _b.label = 1;
                         case 1:
-                            if (!(_i < _a.length)) return [3 /*break*/, 4];
+                            if (!(_i < _a.length)) return [3 /*break*/, 5];
                             item = _a[_i];
                             if (!this.isEnabled(item)) {
-                                return [3 /*break*/, 3];
+                                return [3 /*break*/, 4];
                             }
                             instance = this.getInstance(item);
-                            if (!(instance && instance.executeTicker)) return [3 /*break*/, 3];
-                            return [4 /*yield*/, ErrorManager_1.ErrorManager.instance.wrapPromise('ActionsManagerV2', instance.executeTicker({
-                                    bigBrowser: this.bot.bigBrowserV2,
-                                    bot: this.bot,
-                                    guilds: guilds
-                                }))];
-                        case 2:
-                            _b.sent();
-                            _b.label = 3;
+                            if (instance === null || instance === void 0 ? void 0 : instance.isDisposed) {
+                                tickerCtx.dispose = true;
+                            }
+                            if (!(instance && !instance.isDisposed && instance.executeTicker)) return [3 /*break*/, 4];
+                            if (!instance.mustDispose) return [3 /*break*/, 2];
+                            instance.dispose();
+                            tickerCtx.dispose = true;
+                            return [3 /*break*/, 4];
+                        case 2: return [4 /*yield*/, ErrorManager_1.ErrorManager.instance.wrapPromise('ActionsManagerV2', instance.executeTicker({
+                                bigBrowser: this.bot.bigBrowserV2,
+                                bot: this.bot,
+                                guilds: guilds
+                            }))];
                         case 3:
+                            _b.sent();
+                            _b.label = 4;
+                        case 4:
                             _i++;
                             return [3 /*break*/, 1];
-                        case 4:
+                        case 5:
                             if (!action.silent) {
                                 console.log(logText + " [success]");
                             }
@@ -171,6 +184,7 @@ var ActionsManagerV2 = /** @class */ (function () {
         Texter_1.Texter,
         ChannelNotification_1.ChannelNotification,
         EmbedReactionRole_1.EmbedReactionRole,
+        NotifyRestart_1.NotifyRestart,
         ThreadManager_1.ThreadManager
     ];
     return ActionsManagerV2;

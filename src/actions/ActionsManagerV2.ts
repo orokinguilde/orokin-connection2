@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { IBot } from "../Bot";
 import config, { IConfigAction, isDebug } from "../config";
-import { Ticker } from "../Ticker";
+import { Ticker, TickerCtx } from "../Ticker";
 import { VoiceChannelCreator } from "./list/VoiceChannelCreator";
 import { IActionMessage, IActionTicker } from "./interfaces";
 import { Texter } from "./list/Texter";
@@ -9,6 +9,7 @@ import { ChannelNotification } from "./list/ChannelNotification";
 import { ThreadManager } from "./list/ThreadManager";
 import { EmbedReactionRole } from "./list/EmbedReactionRole";
 import { ErrorManager } from "../ErrorManager";
+import { NotifyRestart } from "./list/NotifyRestart";
 
 export interface IActionCtx {
     message?: Message
@@ -47,15 +48,19 @@ export class ActionsManagerV2 {
 
                 const instance = this.getInstance<IActionMessage<any>>(item);
 
-                if(instance && instance.executeMessage) {
-                    if(instance.executeMessage({
-                        bigBrowser: (this.bot as any).bigBrowserV2,
-                        guilds: this.bot.client.guilds.valueOf().map(g => g),
-                        message: message,
-                        bot: this.bot,
-                        params: params
-                    })) {
-                        return true;
+                if(instance && !instance.isDisposed && instance.executeMessage) {
+                    if(instance.mustDispose) {
+                        instance.dispose();
+                    } else {
+                        if(instance.executeMessage({
+                            bigBrowser: (this.bot as any).bigBrowserV2,
+                            guilds: this.bot.client.guilds.valueOf().map(g => g),
+                            message: message,
+                            bot: this.bot,
+                            params: params
+                        })) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -69,6 +74,7 @@ export class ActionsManagerV2 {
         Texter,
         ChannelNotification,
         EmbedReactionRole,
+        NotifyRestart,
         ThreadManager
     ]
 
@@ -109,7 +115,7 @@ export class ActionsManagerV2 {
 
     public createTickers() {
         for(const action of this.actions) {
-            Ticker.start((action.periodSec || 60) * 1000, async () => {
+            Ticker.start((action.periodSec || 60) * 1000, async (tickerCtx: TickerCtx) => {
                 const logText = `Execution de l'action v2 : ${action.name}`;
                 if(!action.silent) {
                     console.log(`${logText} [running]`);
@@ -124,12 +130,21 @@ export class ActionsManagerV2 {
 
                     const instance = this.getInstance<IActionTicker<any>>(item);
 
-                    if(instance && instance.executeTicker) {
-                        await ErrorManager.instance.wrapPromise('ActionsManagerV2', instance.executeTicker({
-                            bigBrowser: (this.bot as any).bigBrowserV2,
-                            bot: this.bot,
-                            guilds: guilds
-                        }))
+                    if(instance?.isDisposed) {
+                        tickerCtx.dispose = true;
+                    }
+
+                    if(instance && !instance.isDisposed && instance.executeTicker) {
+                        if(instance.mustDispose) {
+                            instance.dispose();
+                            tickerCtx.dispose = true;
+                        } else {
+                            await ErrorManager.instance.wrapPromise('ActionsManagerV2', instance.executeTicker({
+                                bigBrowser: (this.bot as any).bigBrowserV2,
+                                bot: this.bot,
+                                guilds: guilds
+                            }))
+                        }
                     }
                 }
                 

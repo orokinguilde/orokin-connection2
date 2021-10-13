@@ -5,6 +5,16 @@ import { IAction, IActionCtx, IActionMessage, IActionTicker, ITickerActionDate }
 export abstract class Action<T = any> implements IAction<T> {
     public constructor(public options: T) {
     }
+
+    public isDisposed = false;
+
+    public dispose() {
+        this.isDisposed = true;
+    }
+
+    public get mustDispose() {
+        return false;
+    }
     
     public get isTickerAction() {
         return !!(this as any as IActionTicker<any>).executeTicker;

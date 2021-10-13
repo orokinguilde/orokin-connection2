@@ -41,6 +41,19 @@
         ]
     }, {
         "on": "BigBrowser",
+        "name": "Notify restart",
+        "enabled": "prod",
+        "periodSec": 1,
+        "list": [
+            {
+                "type": "NotifyRestart",
+                "options": {
+                    "memberId": "338349097851289610"
+                }
+            }
+        ]
+    }, {
+        "on": "BigBrowser",
         "name": "Event texts",
         "enabled": "prod",
         "periodSec": 1500,

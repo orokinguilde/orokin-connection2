@@ -41,7 +41,18 @@ var moment = require("moment");
 var Action = /** @class */ (function () {
     function Action(options) {
         this.options = options;
+        this.isDisposed = false;
     }
+    Action.prototype.dispose = function () {
+        this.isDisposed = true;
+    };
+    Object.defineProperty(Action.prototype, "mustDispose", {
+        get: function () {
+            return false;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(Action.prototype, "isTickerAction", {
         get: function () {
             return !!this.executeTicker;

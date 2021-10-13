@@ -3,6 +3,7 @@ import { StorageFile } from './storage/StorageFile';
 //import { StorageSQL } from './storage/StorageSQL';
 import * as moment from 'moment-timezone'
 import config from "./config";
+import { ErrorManager } from "./ErrorManager";
 
 //const StorageSystem = StorageSQL;
 const StorageSystem = StorageFile
@@ -43,6 +44,7 @@ export class Saver {
     protected forceSave(callback: () => void) {
         if(this.file) {
             const obj = this.object.save();
+            obj._ErrorManager = ErrorManager.instance.save();
             obj.___save = {
                 dateStr: moment().format(),
                 date: Date.now(),
@@ -78,6 +80,7 @@ export class Saver {
 
                 this.dataCreationDate = data.___save?.dataCreationDate || this.dataCreationDate;
                 this.object.load(data);
+                ErrorManager.instance.load(data?._ErrorManager);
                 dataLoaded = true;
             }
 

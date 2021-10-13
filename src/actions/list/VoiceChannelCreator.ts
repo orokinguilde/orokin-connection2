@@ -225,9 +225,14 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                 const channel = await this.findChannelById(createdChannel.channelId, ctx, { force: true });
 
                 if(!channel || channel.members.filter(m => !m.user.bot).size === 0) {
-                    ErrorManager.instance.wrapPromise('VoiceChannelCreator', channel?.delete());
-                    this.channelsToDispose.splice(i, 1);
-                    --i;
+                    await ErrorManager.instance.wrapAsync('VoiceChannelCreator', async () => {
+                        if(channel) {
+                            await channel.delete();
+                        }
+
+                        this.channelsToDispose.splice(i, 1);
+                        --i;
+                    })
                 }
             }
 

@@ -5,6 +5,7 @@ var StorageFile_1 = require("./storage/StorageFile");
 //import { StorageSQL } from './storage/StorageSQL';
 var moment = require("moment-timezone");
 var config_1 = require("./config");
+var ErrorManager_1 = require("./ErrorManager");
 //const StorageSystem = StorageSQL;
 var StorageSystem = StorageFile_1.StorageFile;
 var Saver = /** @class */ (function () {
@@ -33,6 +34,7 @@ var Saver = /** @class */ (function () {
     Saver.prototype.forceSave = function (callback) {
         if (this.file) {
             var obj = this.object.save();
+            obj._ErrorManager = ErrorManager_1.ErrorManager.instance.save();
             obj.___save = {
                 dateStr: moment().format(),
                 date: Date.now(),
@@ -63,6 +65,7 @@ var Saver = /** @class */ (function () {
                 console.log("**************");
                 _this.dataCreationDate = ((_a = data.___save) === null || _a === void 0 ? void 0 : _a.dataCreationDate) || _this.dataCreationDate;
                 _this.object.load(data);
+                ErrorManager_1.ErrorManager.instance.load(data === null || data === void 0 ? void 0 : data._ErrorManager);
                 dataLoaded = true;
             }
             if (dataLoaded) {

@@ -268,7 +268,8 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
     VoiceChannelCreator.prototype.executeTicker = function (ctx) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var dataKey, _i, _b, guild, server, oldData, customData, channels, _c, _d, entry, i, createdChannel, channel, _e, _f, member, channel;
+            var dataKey, _i, _b, guild, server, oldData, customData, channels, _c, _d, entry, _loop_1, this_1, out_i_1, i, _e, _f, member, channel;
+            var _this = this;
             return __generator(this, function (_g) {
                 switch (_g.label) {
                     case 0:
@@ -312,19 +313,50 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                     case 5:
                         if (!(_c < _d.length)) return [3 /*break*/, 15];
                         entry = _d[_c];
+                        _loop_1 = function (i) {
+                            var createdChannel, channel;
+                            return __generator(this, function (_h) {
+                                switch (_h.label) {
+                                    case 0:
+                                        createdChannel = this_1.channelsToDispose[i];
+                                        return [4 /*yield*/, this_1.findChannelById(createdChannel.channelId, ctx, { force: true })];
+                                    case 1:
+                                        channel = _h.sent();
+                                        if (!(!channel || channel.members.filter(function (m) { return !m.user.bot; }).size === 0)) return [3 /*break*/, 3];
+                                        return [4 /*yield*/, ErrorManager_1.ErrorManager.instance.wrapAsync('VoiceChannelCreator', function () { return __awaiter(_this, void 0, void 0, function () {
+                                                return __generator(this, function (_a) {
+                                                    switch (_a.label) {
+                                                        case 0:
+                                                            if (!channel) return [3 /*break*/, 2];
+                                                            return [4 /*yield*/, channel.delete()];
+                                                        case 1:
+                                                            _a.sent();
+                                                            _a.label = 2;
+                                                        case 2:
+                                                            this.channelsToDispose.splice(i, 1);
+                                                            --i;
+                                                            return [2 /*return*/];
+                                                    }
+                                                });
+                                            }); })];
+                                    case 2:
+                                        _h.sent();
+                                        _h.label = 3;
+                                    case 3:
+                                        out_i_1 = i;
+                                        return [2 /*return*/];
+                                }
+                            });
+                        };
+                        this_1 = this;
                         i = 0;
                         _g.label = 6;
                     case 6:
                         if (!(i < this.channelsToDispose.length)) return [3 /*break*/, 9];
-                        createdChannel = this.channelsToDispose[i];
-                        return [4 /*yield*/, this.findChannelById(createdChannel.channelId, ctx, { force: true })];
+                        return [5 /*yield**/, _loop_1(i)];
                     case 7:
-                        channel = _g.sent();
-                        if (!channel || channel.members.filter(function (m) { return !m.user.bot; }).size === 0) {
-                            ErrorManager_1.ErrorManager.instance.wrapPromise('VoiceChannelCreator', channel === null || channel === void 0 ? void 0 : channel.delete());
-                            this.channelsToDispose.splice(i, 1);
-                            --i;
-                        }
+                        _g.sent();
+                        i = out_i_1;
                         _g.label = 8;
                     case 8:
                         ++i;

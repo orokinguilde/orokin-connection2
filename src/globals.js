@@ -26,8 +26,7 @@ module.exports = {
         module.exports.bot = bot;
         module.exports.saver = saver;
     },
-    pad: function(value)
-    {
+    pad: function(value) {
         value = value.toString();
         while(value.length < 2)
             value = '0' + value;
@@ -45,8 +44,7 @@ module.exports = {
 
         return value;
     },
-    findById: function(collection, id)
-    {
+    findById: function(collection, id) {
         return collection.filter(item => item.id === id).first();
     },
     iconBefore: function() {

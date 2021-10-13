@@ -1,5 +1,5 @@
 import * as moment from 'moment-timezone'
-import { Guild, GuildMember } from 'discord.js'
+import { Guild, GuildMember, Message } from 'discord.js'
 import config from './config'
 import bannerTemplates, { IBannerTemplate, IBannerTemplateData } from "./BannerTemplate";
 
@@ -1234,7 +1234,7 @@ export class BigBrowserV2 {
         }
     }
 
-    public updateUserText(message) {
+    public updateUserText(message: Message) {
         const content = message.content;
 
         if(content) {

@@ -1,14 +1,26 @@
 
 export interface IErrorManagerEntry {
     domain: string
-    error: any
+    error: string
 }
 
 export class ErrorManager {
     public static instance = new ErrorManager();
 
     public errorList: IErrorManagerEntry[] = [];
-    public errorListMax: number = 30;
+    public errorListMax: number = 15;
+
+    public load(obj: any) {
+        if(obj) {
+            this.errorList = obj.errorList ?? this.errorList
+        }
+    }
+
+    public save() {
+        return {
+            errorList: this.errorList
+        }
+    }
 
     public error(domain: string, error: any) {
         if(error) {
@@ -18,7 +30,7 @@ export class ErrorManager {
 
             this.errorList.unshift({
                 domain: domain,
-                error: error
+                error: error.toString()
             });
         }
     }

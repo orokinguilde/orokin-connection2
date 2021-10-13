@@ -40,8 +40,19 @@ exports.ErrorManager = void 0;
 var ErrorManager = /** @class */ (function () {
     function ErrorManager() {
         this.errorList = [];
-        this.errorListMax = 30;
+        this.errorListMax = 15;
     }
+    ErrorManager.prototype.load = function (obj) {
+        var _a;
+        if (obj) {
+            this.errorList = (_a = obj.errorList) !== null && _a !== void 0 ? _a : this.errorList;
+        }
+    };
+    ErrorManager.prototype.save = function () {
+        return {
+            errorList: this.errorList
+        };
+    };
     ErrorManager.prototype.error = function (domain, error) {
         if (error) {
             if (this.errorList.length > this.errorListMax) {
@@ -49,7 +60,7 @@ var ErrorManager = /** @class */ (function () {
             }
             this.errorList.unshift({
                 domain: domain,
-                error: error
+                error: error.toString()
             });
         }
     };

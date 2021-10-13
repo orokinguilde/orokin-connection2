@@ -141,7 +141,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                         this.bigBrowserV2.updateUserText(message);
                         if (!checkForCommand(Help_1.Help.instance.regex)) return [3 /*break*/, 1];
                         Help_1.Help.instance.manageMessage(message, params[1]);
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 1:
                         if (!checkForCommand(/^\s*!mp\s+(<@[^@>]+>\s*)+\s*(.+)$/img)) return [3 /*break*/, 2];
                         BotBigBrowser.adminOnly(message, function () {
@@ -174,7 +174,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                                 message.reply('Message vide');
                             }
                         });
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 2:
                         if (!checkForCommand(/^\s*!ranks$/img)) return [3 /*break*/, 3];
                         user = this.bigBrowserV2.getUser(message.member);
@@ -185,20 +185,20 @@ var BotBigBrowser = /** @class */ (function (_super) {
                             .map(function (rank) { return "`[" + globals.padN(rank.start, 4) + ", " + globals.padN(rank.end || '∞', 4) + "[ " + rank.name + "`" + (rank === userRank_1.currentRank ? " \u21E6 **" + message.member.displayName + "**, tu es ici avec **" + Math.floor(exp_1) + " exp** !" : ''); })
                             .join('\r\n');
                         message.reply(msg);
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 3:
                         if (!checkForCommand(/^\s*!rank templates$/img)) return [3 /*break*/, 4];
                         msg = "Voici la liste des templates disponibles (`!rank template ...`) :\r\n" + BannerTemplate_1.default.list.map(function (bannerTemplate) {
                             return "**" + bannerTemplate.key + ".** " + bannerTemplate.name;
                         }).join('\r\n');
                         message.reply(msg);
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 4:
                         if (!checkForCommand(/^\s*!rank\s*template\s*show$/imgs)) return [3 /*break*/, 5];
                         user = this.bigBrowserV2.getUser(message.member);
                         json = JSON.stringify((_a = user.bannerTemplate) === null || _a === void 0 ? void 0 : _a.template, null, 4);
                         message.reply("```json\n" + json + "\n```");
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 5:
                         if (!checkForCommand(/^\s*!rank template custom\s+\{(.+)\}\s*$/imgs)) return [3 /*break*/, 6];
                         try {
@@ -211,7 +211,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                         catch (ex) {
                             message.reply("Le JSON n'est pas valide \uD83D\uDE22");
                         }
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 6:
                         if (!checkForCommand(/^\s*!rank template (.+)$/img)) return [3 /*break*/, 7];
                         name_1 = /^\s*!rank template (.+)$/img.exec(message.content)[1].trim().toLowerCase();
@@ -225,7 +225,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                             user.customBannerTemplate = undefined;
                             message.reply("Le template \"" + name_1 + "\" t'a \u00E9t\u00E9 assign\u00E9 \uD83D\uDC4D");
                         }
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 7:
                         if (!checkForCommand(/^\s*!rank\s*$/img)) return [3 /*break*/, 8];
                         user = this.bigBrowserV2.getUser(message.member);
@@ -260,18 +260,18 @@ var BotBigBrowser = /** @class */ (function (_super) {
                                 });
                             }
                         });
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 8:
                         if (!checkForCommand(/^\s*!server\s+rank\s+reset\s*$/img)) return [3 /*break*/, 9];
                         BotBigBrowser.adminOnly(message, function () {
                             _this.bigBrowserV2.resetDayWeekStats(message.guild);
                             message.reply("Les stats viennent d'\u00EAtre r\u00E9initialis\u00E9es.");
                         });
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 9:
                         if (!checkForCommand(/^\s*!server\s+rank\s+ranges\s*$/img)) return [3 /*break*/, 10];
                         message.reply("```" + this.bigBrowserV2.dayRange.map(function (range) { return "::: " + range.name + " :::\nJours : " + range.days.map(function (j) { return j + 1; }) + "\nD\u00E9but : " + range.start + " h\nFin : " + range.end + " h"; }).reduce(function (p, c) { return p + "\n\n" + c; }, '').trim() + "```");
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 10:
                         if (!checkForCommand(/^\s*!server\s+rank\s+range\s+([a-zA-Z0-9]+)\s+(\d+)\s*h?\s+(\d+)\s*h?\s*$/img)) return [3 /*break*/, 11];
                         BotBigBrowser.adminOnly(message, function () {
@@ -294,7 +294,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                                 }
                             }
                         });
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 11:
                         if (!checkForCommand(/^\s*!server\s+(last\s+)?rank(\s+\d+)?\s*$/img)) return [3 /*break*/, 12];
                         console.log('SERVER RANK');
@@ -306,21 +306,21 @@ var BotBigBrowser = /** @class */ (function (_super) {
                             .reduce(function (p, c) { return !p ? c : p + "\n" + c; }, ''); };
                         message.channel.send('\r\n' + ("```::: Jour :::\n" + createStrLine(result.day) + "\n\n::: Semaine :::\n" + createStrLine(result.week) + "```"));
                         message.delete();
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 12:
                         if (!checkForCommand(/^\s*!dbinfo\s*$/img)) return [3 /*break*/, 13];
                         BotBigBrowser.adminOnly(message, function () {
                             var time = _this.saver.dataCreationDate;
                             message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
                         });
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 13:
                         if (!checkForCommand(/^\s*!server\s+xp\s*$/img)) return [3 /*break*/, 14];
                         console.log('SERVER STATS');
                         result = this.bigBrowserV2.getServerText(message.guild);
                         message.delete();
                         message.channel.send('\r\n' + result);
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 14:
                         if (!checkForCommand(/^\s*!server\s+xp\s+csv\s*$/img)) return [3 /*break*/, 15];
                         console.log('SERVER STATS');
@@ -329,7 +329,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                         message.channel.send({
                             files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.csv')]
                         });
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 15:
                         if (!checkForCommand(/^\s*!server\s+xp\s+md\s*$/img)) return [3 /*break*/, 16];
                         console.log('SERVER STATS');
@@ -338,7 +338,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                         message.channel.send({
                             files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.md')]
                         });
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 16:
                         if (!checkForCommand(/^\s*!server\s+xp\s+txt\s*$/img)) return [3 /*break*/, 17];
                         console.log('SERVER STATS');
@@ -347,14 +347,14 @@ var BotBigBrowser = /** @class */ (function (_super) {
                         message.channel.send({
                             files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.txt')]
                         });
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 17:
                         if (!checkForCommand(/^\s*!global\s+xp\s*$/img)) return [3 /*break*/, 18];
                         console.log('GLOBAL STATS');
                         result = this.bigBrowserV2.getServersText(this.client.guilds.valueOf().map(function (g) { return g; }));
                         message.delete();
                         message.channel.send('\r\n' + result);
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 18:
                         if (!checkForCommand(/^\s*!global\s+xp\s+csv\s*$/img)) return [3 /*break*/, 19];
                         console.log('GLOBAL STATS DL');
@@ -363,7 +363,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                         message.channel.send({
                             files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.csv')]
                         });
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 19:
                         if (!checkForCommand(/^\s*!global\s+xp\s+md\s*$/img)) return [3 /*break*/, 20];
                         console.log('GLOBAL STATS DL');
@@ -372,7 +372,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                         message.channel.send({
                             files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.md')]
                         });
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 20:
                         if (!checkForCommand(/^\s*!global\s+xp\s+txt\s*$/img)) return [3 /*break*/, 21];
                         console.log('GLOBAL STATS DL');
@@ -381,7 +381,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                         message.channel.send({
                             files: [new discord_js_1.MessageAttachment(Buffer.from(result), 'stats.txt')]
                         });
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 21:
                         if (!checkForCommand(/^\s*!stop\s+server\s+xp\s*$/img)) return [3 /*break*/, 22];
                         console.log('STOP SERVER XP');
@@ -389,7 +389,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                         this.bigBrowser.setServerTracking(message.guild, false);
                         message.delete();
                         message.channel.send(':small_orange_diamond: arrêt du stockage de l\'expérience du serveur.');
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 22:
                         if (!checkForCommand(/^\s*!start\s+server\s+xp\s*$/img)) return [3 /*break*/, 23];
                         console.log('START SERVER XP');
@@ -397,18 +397,30 @@ var BotBigBrowser = /** @class */ (function (_super) {
                         this.bigBrowser.setServerTracking(message.guild, true);
                         message.delete();
                         message.channel.send(':small_blue_diamond: démarrage du stockage de l\'expérience du serveur.');
-                        return [3 /*break*/, 26];
+                        return [3 /*break*/, 27];
                     case 23:
-                        if (!checkForCommand(/^\s*!server\s+get\s*(.+)$/img)) return [3 /*break*/, 25];
+                        if (!checkForCommand(/^\s*!say\s*(.+)$/img)) return [3 /*break*/, 24];
+                        BotBigBrowser.adminOnly(message, function () {
+                            var toSay = params[1];
+                            message.delete();
+                            message.channel.send({
+                                content: toSay,
+                                files: message.attachments.map(function (a) { return a; }),
+                                embeds: message.embeds
+                            });
+                        });
+                        return [3 /*break*/, 27];
+                    case 24:
+                        if (!checkForCommand(/^\s*!server\s+get\s*(.+)$/img)) return [3 /*break*/, 26];
                         key = params[1];
                         return [4 /*yield*/, GlobalDataManager_1.GlobalDataManager.instance.get(key, '\n==========================\n')];
-                    case 24:
+                    case 25:
                         result = _e.sent();
                         message.reply({
                             content: result || '*Aucun résultat*'
                         });
-                        return [3 /*break*/, 26];
-                    case 25:
+                        return [3 /*break*/, 27];
+                    case 26:
                         if (checkForCommand(/^\s*!server\s+errors\s*(.+)?$/img)) {
                             BotBigBrowser.adminOnly(message, function () {
                                 var domain = params[1];
@@ -513,8 +525,8 @@ var BotBigBrowser = /** @class */ (function (_super) {
                                 }
                             });
                         }
-                        _e.label = 26;
-                    case 26:
+                        _e.label = 27;
+                    case 27:
                         console.log(message.content.trim());
                         return [2 /*return*/];
                 }

@@ -361,6 +361,19 @@ ${createStrLine(result.week)}\`\`\``);
 
             message.delete();
             message.channel.send(':small_blue_diamond: démarrage du stockage de l\'expérience du serveur.');
+        } else if(checkForCommand(/^\s*!say\s*(.+)$/img)) {
+
+            BotBigBrowser.adminOnly(message, () => {
+                const [, toSay ] = params;
+
+                message.delete();
+                message.channel.send({
+                    content: toSay,
+                    files: message.attachments.map(a => a),
+                    embeds: message.embeds
+                });
+            });
+
         } else if(checkForCommand(/^\s*!server\s+get\s*(.+)$/img)) {
 
             const [, key ] = params;

@@ -2,6 +2,7 @@
 export interface IErrorManagerEntry {
     domain: string
     error: string
+    date: number
 }
 
 export class ErrorManager {
@@ -30,7 +31,8 @@ export class ErrorManager {
 
             this.errorList.unshift({
                 domain: domain,
-                error: error.toString()
+                error: error.toString(),
+                date: Date.now()
             });
         }
     }

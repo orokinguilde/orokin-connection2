@@ -60,7 +60,8 @@ var ErrorManager = /** @class */ (function () {
             }
             this.errorList.unshift({
                 domain: domain,
-                error: error.toString()
+                error: error.toString(),
+                date: Date.now()
             });
         }
     };

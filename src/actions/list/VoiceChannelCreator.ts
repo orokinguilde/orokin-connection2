@@ -49,7 +49,7 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
     protected onCreate() {
         GlobalDataManager.instance.register('VoiceChannelCreator', async () =>
             `**Salons observés**\n${this.channelsToWatch.map(c => c.toString()).join('\n')}`
-            + `\n**Salons créés**\n${this.channelsToDispose.map(c => `<#${c.channelId}> créé par <@${c.creatorId}>`).join('\n')}`
+            + `\n**Salons créés**\n${this.channelsToDispose.map(c => `<#${c.channelId}> créé par <@${c.creatorId}> (admins: ${c.admins.map(a => `<@${a}>`).join(', ')})`).join('\n')}`
         );
     }
 

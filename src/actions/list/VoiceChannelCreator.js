@@ -82,7 +82,7 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
         GlobalDataManager_1.GlobalDataManager.instance.register('VoiceChannelCreator', function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, "**Salons observ\u00E9s**\n" + this.channelsToWatch.map(function (c) { return c.toString(); }).join('\n')
-                        + ("\n**Salons cr\u00E9\u00E9s**\n" + this.channelsToDispose.map(function (c) { return "<#" + c.channelId + "> cr\u00E9\u00E9 par <@" + c.creatorId + ">"; }).join('\n'))];
+                        + ("\n**Salons cr\u00E9\u00E9s**\n" + this.channelsToDispose.map(function (c) { return "<#" + c.channelId + "> cr\u00E9\u00E9 par <@" + c.creatorId + "> (admins: " + c.admins.map(function (a) { return "<@" + a + ">"; }).join(', ') + ")"; }).join('\n'))];
             });
         }); });
     };

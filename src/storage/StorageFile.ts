@@ -87,7 +87,7 @@ export class StorageFile {
             await this.retry(`move temp to file`, () => dbx.filesMoveV2({
                 from_path: this.fileIdTemp,
                 to_path: this.fileId,
-            }));
+            }), 10);
 
             console.error(`Save end`);
             process.nextTick(callback);

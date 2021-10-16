@@ -141,7 +141,7 @@ var StorageFile = /** @class */ (function () {
                         return [4 /*yield*/, this.retry("move temp to file", function () { return dbx_1.filesMoveV2({
                                 from_path: _this.fileIdTemp,
                                 to_path: _this.fileId,
-                            }); })];
+                            }); }, 10)];
                     case 6:
                         _a.sent();
                         console.error("Save end");

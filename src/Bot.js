@@ -118,6 +118,10 @@ var IBot = /** @class */ (function () {
                 discord_js_1.Intents.FLAGS.GUILD_MEMBERS,
                 discord_js_1.Intents.FLAGS.GUILD_PRESENCES,
                 discord_js_1.Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+                discord_js_1.Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+                discord_js_1.Intents.FLAGS.GUILD_INTEGRATIONS,
+                discord_js_1.Intents.FLAGS.GUILD_INVITES,
+                discord_js_1.Intents.FLAGS.GUILD_MESSAGE_TYPING,
                 discord_js_1.Intents.FLAGS.GUILD_VOICE_STATES
             ],
             restTimeOffset: 0

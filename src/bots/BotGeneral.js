@@ -54,7 +54,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BotGeneral = void 0;
 var discord_js_1 = require("discord.js");
 var Bot_1 = require("../Bot");
-var moment = require("moment-timezone");
 var config_1 = require("../config");
 var Help_1 = require("../Help");
 var Application = require('../Application');
@@ -262,12 +261,6 @@ var BotGeneral = /** @class */ (function (_super) {
                         }
                     }
                     message.channel.send("**" + success + "** chaine(s) de recrutement r\u00E9ussie(s) / **" + (unsuccess + success) + "** chaine(s) au total (**" + unsuccess + "** en attente)\r\n**" + Math.round(success / (unsuccess + success) * 10000) / 100 + "%** de r\u00E9ussite");
-                }
-                else if (checkForCommand(/^\s*!dbinfo\s*$/img)) {
-                    BotGeneral.adminOnly(message, function () {
-                        var time = _this.saver.dataCreationDate;
-                        message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
-                    });
                 }
                 else if (checkForCommand(/^\s*!nonotif\s+memberadd\s*$/img)) {
                     setCommonSetting(message, function () {

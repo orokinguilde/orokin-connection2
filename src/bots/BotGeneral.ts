@@ -264,13 +264,6 @@ export class BotGeneral extends IBot {
             message.channel.send(`**${success}** chaine(s) de recrutement réussie(s) / **${unsuccess + success}** chaine(s) au total (**${unsuccess}** en attente)\r\n**${Math.round(success / (unsuccess + success) * 10000) / 100}%** de réussite`);
 
         }
-        else if(checkForCommand(/^\s*!dbinfo\s*$/img))
-        {
-            BotGeneral.adminOnly(message, () => {
-                const time = (this as any).saver.dataCreationDate;
-                message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
-            })
-        }
         else if(checkForCommand(/^\s*!nonotif\s+memberadd\s*$/img))
         {
             setCommonSetting(message, () => {

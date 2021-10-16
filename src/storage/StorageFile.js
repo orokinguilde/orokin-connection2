@@ -67,7 +67,7 @@ var StorageFile = /** @class */ (function () {
                     case 0:
                         if (nbTries <= 0) {
                             console.error("fn: [" + debugName + "] timeout");
-                            return [2 /*return*/, cb()];
+                            return [2 /*return*/, cb(false)];
                         }
                         _c.label = 1;
                     case 1:
@@ -76,14 +76,14 @@ var StorageFile = /** @class */ (function () {
                     case 2:
                         _c.sent();
                         console.error("fn: [" + debugName + "] success");
-                        cb();
+                        cb(true);
                         return [3 /*break*/, 4];
                     case 3:
                         ex_1 = _c.sent();
                         notFound = (_b = (_a = ex_1 === null || ex_1 === void 0 ? void 0 : ex_1.error) === null || _a === void 0 ? void 0 : _a.error_summary) === null || _b === void 0 ? void 0 : _b.includes('not_found');
                         if (notFound) {
                             console.error("fn: [" + debugName + "] error but skip because the file doesn't exist");
-                            cb();
+                            cb(true);
                         }
                         else {
                             console.error("fn: [" + debugName + "] error => retry (" + nbTries + ")");
@@ -95,10 +95,10 @@ var StorageFile = /** @class */ (function () {
             });
         });
     };
-    StorageFile.prototype.retry = function (debugName, fn, nbTries) {
+    StorageFile.prototype.retry = function (debugName, fn, throwOnError, nbTries) {
         var _this = this;
         if (nbTries === void 0) { nbTries = Infinity; }
-        return new Promise(function (resolve) { return _this.retryCallback(debugName, fn, resolve, nbTries); });
+        return new Promise(function (resolve, reject) { return _this.retryCallback(debugName, fn, function (isOk) { return isOk || !throwOnError ? resolve() : reject(); }, nbTries); });
     };
     StorageFile.prototype.setContent = function (content, callback) {
         return __awaiter(this, void 0, void 0, function () {
@@ -118,30 +118,30 @@ var StorageFile = /** @class */ (function () {
                                 mode: {
                                     '.tag': 'overwrite'
                                 }
-                            }); })];
+                            }); }, true)];
                     case 2:
                         _a.sent();
                         return [4 /*yield*/, this.retry("delete save2", function () { return dbx_1.filesDeleteV2({
                                 path: _this.fileIdSave2,
-                            }); }, 10)];
+                            }); }, false, 10)];
                     case 3:
                         _a.sent();
                         return [4 /*yield*/, this.retry("move save1 to save2", function () { return dbx_1.filesMoveV2({
                                 from_path: _this.fileIdSave1,
                                 to_path: _this.fileIdSave2,
-                            }); }, 10)];
+                            }); }, false, 10)];
                     case 4:
                         _a.sent();
                         return [4 /*yield*/, this.retry("move file to save1", function () { return dbx_1.filesMoveV2({
                                 from_path: _this.fileId,
                                 to_path: _this.fileIdSave1,
-                            }); }, 10)];
+                            }); }, false, 10)];
                     case 5:
                         _a.sent();
                         return [4 /*yield*/, this.retry("move temp to file", function () { return dbx_1.filesMoveV2({
                                 from_path: _this.fileIdTemp,
                                 to_path: _this.fileId,
-                            }); }, 10)];
+                            }); }, false, 20)];
                     case 6:
                         _a.sent();
                         console.error("Save end");

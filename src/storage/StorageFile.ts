@@ -32,30 +32,30 @@ export class StorageFile {
         return StorageFile._dbx;
     }
 
-    protected async retryCallback(debugName: string, fn: () => Promise<any>, cb: () => void, nbTries: number = Infinity) {
+    protected async retryCallback(debugName: string, fn: () => Promise<any>, cb: (isOk: boolean) => void, nbTries: number = Infinity) {
         if(nbTries <= 0) {
             console.error(`fn: [${debugName}] timeout`);
-            return cb();
+            return cb(false);
         }
 
         try {
             await fn();
             console.error(`fn: [${debugName}] success`);
-            cb();
+            cb(true);
         } catch(ex) {
             const notFound = ex?.error?.error_summary?.includes('not_found');
 
             if(notFound) {
                 console.error(`fn: [${debugName}] error but skip because the file doesn't exist`);
-                cb();
+                cb(true);
             } else {
                 console.error(`fn: [${debugName}] error => retry (${nbTries})`);
                 setTimeout(() => this.retryCallback(debugName, fn, cb, nbTries - 1), 5000);
             }
         }
     }
-    protected retry(debugName: string, fn: () => Promise<any>, nbTries: number = Infinity) {
-        return new Promise<void>(resolve => this.retryCallback(debugName, fn, resolve, nbTries));
+    protected retry(debugName: string, fn: () => Promise<any>, throwOnError: boolean, nbTries: number = Infinity) {
+        return new Promise<void>((resolve, reject) => this.retryCallback(debugName, fn, (isOk) => isOk || !throwOnError ? resolve() : reject(), nbTries));
     }
     
     public async setContent(content: string, callback: (e?: any) => void) {
@@ -68,26 +68,26 @@ export class StorageFile {
                 mode: {
                     '.tag': 'overwrite'
                 }
-            }));
+            }), true);
 
             await this.retry(`delete save2`, () => dbx.filesDeleteV2({
                 path: this.fileIdSave2,
-            }), 10);
+            }), false, 10);
 
             await this.retry(`move save1 to save2`, () => dbx.filesMoveV2({
                 from_path: this.fileIdSave1,
                 to_path: this.fileIdSave2,
-            }), 10);
+            }), false, 10);
 
             await this.retry(`move file to save1`, () => dbx.filesMoveV2({
                 from_path: this.fileId,
                 to_path: this.fileIdSave1,
-            }), 10);
+            }), false, 10);
 
             await this.retry(`move temp to file`, () => dbx.filesMoveV2({
                 from_path: this.fileIdTemp,
                 to_path: this.fileId,
-            }), 10);
+            }), false, 20);
 
             console.error(`Save end`);
             process.nextTick(callback);

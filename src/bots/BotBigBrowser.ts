@@ -129,7 +129,7 @@ export class BotBigBrowser extends IBot {
             
             BotBigBrowser.adminOnly(message, () => {
                 const time = (this as any).saver.dataCreationDate;
-                message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
+                message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time).format('DD/MM/Y HH:mm:ss'));
             })
 
         } else if(checkForCommand(/^\s*!rank templates$/img)) {

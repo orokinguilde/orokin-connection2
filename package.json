@@ -9,6 +9,7 @@
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.1.0",
     "dropbox": "^4.0.9",
+    "emoji-regex": "^10.0.0",
     "isomorphic-fetch": "^2.2.1",
     "moment": "^2.22.0",
     "moment-timezone": "^0.5.33",

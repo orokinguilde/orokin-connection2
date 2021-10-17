@@ -9,6 +9,7 @@ import bannerTemplates, { IBannerTemplateData } from "../BannerTemplate";
 import { Banner } from "../Banner"
 import { ErrorManager } from "../ErrorManager";
 import { GlobalDataManager } from "../GlobalDataManager";
+import emojiRegex = require('emoji-regex')
 
 const BigBrowser = require('../BigBrowser');
 const globals = require('../globals');
@@ -269,11 +270,96 @@ ${createStrLine(result.day)}
 ::: Semaine :::
 ${createStrLine(result.week)}\`\`\``);
             message.delete();
+        } else if(checkForCommand(/^\s*!unreact\s+(.+)\s*$/img)) {
+
+            BotBigBrowser.adminOnly(message, async () => {
+                try {
+                    const channel = await message.guild.channels.fetch(message.reference.channelId);
+                    if(channel.isText()) {
+                        const msg = await channel.messages.fetch(message.reference.messageId, { force: true });
+
+                        message.delete();
+                        
+                        let match: RegExpExecArray;
+                        const emojis: string[] = []
+
+                        {
+                            const regex = emojiRegex();
+                            while(match = regex.exec(message.content)) {
+                                emojis.push(match[0])
+                            }
+                        }
+
+                        {
+                            const regex = /<a?:(.+?):\d+>/img;
+                            while(match = regex.exec(message.content)) {
+                                emojis.push(match[1])
+                            }
+                        }
+
+                        for(const emoji of emojis) {
+                            const reaction = msg.reactions.valueOf().find(r => r.emoji.name === emoji);
+                            if(reaction && reaction.count > 0) {
+                                reaction.remove();
+                            }
+                        }
+                    }
+                } catch(ex) {
+                    message.reply('Il faut répondre au message auquel supprimer les réactions.');
+                }
+            })
+
+        } else if(checkForCommand(/^\s*!react\s+(.+)\s*$/img)) {
+
+            BotBigBrowser.adminOnly(message, async () => {
+                try {
+                    const channel = await message.guild.channels.fetch(message.reference.channelId);
+                    if(channel.isText()) {
+                        const msg = await channel.messages.fetch(message.reference.messageId);
+
+                        message.delete();
+                        
+                        let match: RegExpExecArray;
+                        const emojis: { emoji: string, index: number }[] = []
+
+                        {
+                            const regex = emojiRegex();
+                            while(match = regex.exec(message.content)) {
+                                emojis.push({
+                                    emoji: match[0],
+                                    index: match.index
+                                })
+                            }
+                        }
+
+                        {
+                            const regex = /<a?:(.+?):\d+>/img;
+                            while(match = regex.exec(message.content)) {
+                                emojis.push({
+                                    emoji: match[0],
+                                    index: match.index
+                                })
+                            }
+                        }
+
+                        emojis.sort((a, b) => a.index - b.index);
+
+                        for(const emoji of emojis) {
+                            msg.react(emoji.emoji);
+                        }
+                    }
+                } catch(ex) {
+                    message.reply('Il faut répondre au message auquel ajouter les réactions.');
+                }
+            })
+
         } else if(checkForCommand(/^\s*!dbinfo\s*$/img)) {
+
             BotBigBrowser.adminOnly(message, () => {
                 const time = (this as any).saver.dataCreationDate;
                 message.reply(process.env.APP_SELECTOR + ' :\nDate de création des données : ' + time + ' | ' + moment(time, 'unix').format('DD/MM/Y HH:mm:ss'));
             })
+
         } else if(checkForCommand(/^\s*!server\s+xp\s*$/img)) {
             console.log('SERVER STATS');
 

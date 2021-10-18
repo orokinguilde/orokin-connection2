@@ -62,7 +62,9 @@ exports.IThreadManager = IThreadManager;
 var ThreadManager = /** @class */ (function (_super) {
     __extends(ThreadManager, _super);
     function ThreadManager() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.cache = {};
+        return _this;
     }
     ThreadManager.prototype.executeTicker = function (ctx) {
         return __awaiter(this, void 0, void 0, function () {
@@ -74,38 +76,43 @@ var ThreadManager = /** @class */ (function (_super) {
                         _i = 0, threadIds_1 = threadIds;
                         _c.label = 1;
                     case 1:
-                        if (!(_i < threadIds_1.length)) return [3 /*break*/, 9];
+                        if (!(_i < threadIds_1.length)) return [3 /*break*/, 10];
                         threadId = threadIds_1[_i];
                         found = false;
                         _a = 0, _b = ctx.guilds;
                         _c.label = 2;
                     case 2:
-                        if (!(_a < _b.length)) return [3 /*break*/, 7];
+                        if (!(_a < _b.length)) return [3 /*break*/, 8];
                         guild = _b[_a];
+                        channel = this.cache[threadId];
+                        if (!!channel) return [3 /*break*/, 4];
                         return [4 /*yield*/, guild.channels.fetch(threadId)];
                     case 3:
-                        channel = _c.sent();
-                        if (!channel) return [3 /*break*/, 6];
-                        if (!this.options.keepUnarchived) return [3 /*break*/, 5];
-                        return [4 /*yield*/, channel.setArchived(false)];
+                        channel = (_c.sent());
+                        this.cache[threadId] = channel;
+                        _c.label = 4;
                     case 4:
-                        _c.sent();
-                        _c.label = 5;
+                        if (!channel) return [3 /*break*/, 7];
+                        if (!this.options.keepUnarchived) return [3 /*break*/, 6];
+                        return [4 /*yield*/, channel.setArchived(false)];
                     case 5:
-                        found = true;
-                        return [3 /*break*/, 7];
+                        _c.sent();
+                        _c.label = 6;
                     case 6:
+                        found = true;
+                        return [3 /*break*/, 8];
+                    case 7:
                         _a++;
                         return [3 /*break*/, 2];
-                    case 7:
+                    case 8:
                         if (!found) {
                             console.log("Thread " + threadId + " introuvable");
                         }
-                        _c.label = 8;
-                    case 8:
+                        _c.label = 9;
+                    case 9:
                         _i++;
                         return [3 /*break*/, 1];
-                    case 9: return [2 /*return*/];
+                    case 10: return [2 /*return*/];
                 }
             });
         });

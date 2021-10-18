@@ -66,25 +66,30 @@ var Texter = /** @class */ (function (_super) {
     }
     Texter.prototype.executeTicker = function (ctx) {
         return __awaiter(this, void 0, void 0, function () {
-            var channel, _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var _a, _b, channel;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         if (this.options.date && !this.isCurrentDate(this.options.date)) {
                             return [2 /*return*/];
                         }
+                        if (!!this.channel) return [3 /*break*/, 6];
+                        _a = this;
                         if (!this.options.channelId) return [3 /*break*/, 2];
                         return [4 /*yield*/, this.findChannelById(this.options.channelId, ctx)];
                     case 1:
-                        _a = (_b.sent());
+                        _b = (_c.sent());
                         return [3 /*break*/, 5];
                     case 2: return [4 /*yield*/, this.findMemberById(this.options.memberId, ctx)];
-                    case 3: return [4 /*yield*/, (_b.sent()).createDM()];
+                    case 3: return [4 /*yield*/, (_c.sent()).createDM()];
                     case 4:
-                        _a = _b.sent();
-                        _b.label = 5;
+                        _b = _c.sent();
+                        _c.label = 5;
                     case 5:
-                        channel = _a;
+                        _a.channel = _b;
+                        _c.label = 6;
+                    case 6:
+                        channel = this.channel;
                         if (!channel || !channel.isText()) {
                             return [2 /*return*/];
                         }

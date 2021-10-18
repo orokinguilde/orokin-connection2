@@ -11,13 +11,19 @@ export class ThreadManager extends Action<IThreadManager> implements IActionTick
     public static typeId = 'ThreadManager'
     public static builder = (options) => new ThreadManager(options)
 
+    protected cache: { [threadId: string]: ThreadChannel } = {}
+
     public async executeTicker(ctx: IActionCtx_Ticker<IThreadManager>) {
         const threadIds = Array.isArray(this.options.threadId) ? this.options.threadId : [ this.options.threadId ];
 
         for(const threadId of threadIds) {
             let found = false;
             for(const guild of ctx.guilds) {
-                const channel: ThreadChannel = await guild.channels.fetch(threadId) as any;
+                let channel = this.cache[threadId];
+                if(!channel) {
+                    channel = await guild.channels.fetch(threadId) as any;
+                    this.cache[threadId] = channel;
+                }
                 
                 if(channel) {
                     if(this.options.keepUnarchived) {

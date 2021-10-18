@@ -102,7 +102,11 @@ export class EmbedReactionRole extends Action<EmbedReactionRole_Config> implemen
         }
         return value;
     }
-    //cconf: EmbedReactionRole_Config, client: Client, bigBrowser: BigBrowserV2
+
+    protected cacheChannel: { [channelId: string]: TextChannel } = {};
+    protected cache: { [guildId: string]: GuildMember[] } = {};
+    protected cacheTime = 0;
+
     public async executeTicker(ctx: IActionCtx_Ticker) {
         this.options.deadlineMode = this.options.deadlineMode ?? 'push-new';
 
@@ -115,13 +119,27 @@ export class EmbedReactionRole extends Action<EmbedReactionRole_Config> implemen
         let isReseting = false;
     
         for(const guild of guilds) {
-            const channel = await guild.channels.fetch(this.options.channelId) as TextChannel;
+
+            let channel = this.cacheChannel[this.options.channelId];
+            if(!channel) {
+                channel = await guild.channels.fetch(this.options.channelId) as TextChannel;
+                this.cacheChannel[this.options.channelId] = channel;
+            }
 
             if(!channel) {
                 continue;
             }
 
-            const guildMembers = (await guild.members.fetch()).map(m => m);
+            if(Date.now() - this.cacheTime > 1000 * 60 * 10) {
+                this.cache = {};
+                this.cacheTime = Date.now();
+            }
+
+            if(!this.cache[guild.id]) {
+                this.cache[guild.id] = (await guild.members.fetch()).map(m => m)
+            }
+
+            const guildMembers = this.cache[guild.id];
             const server = ctx.bigBrowser.getServer(guild);
     
             if(!server.customData) {

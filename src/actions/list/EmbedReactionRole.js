@@ -59,7 +59,11 @@ var defaultUserCustomData = function () { return ({}); };
 var EmbedReactionRole = /** @class */ (function (_super) {
     __extends(EmbedReactionRole, _super);
     function EmbedReactionRole() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.cacheChannel = {};
+        _this.cache = {};
+        _this.cacheTime = 0;
+        return _this;
     }
     EmbedReactionRole.prototype.createEmbed = function (info) {
         var embed = new discord_js_1.MessageEmbed();
@@ -99,7 +103,6 @@ var EmbedReactionRole = /** @class */ (function (_super) {
         }
         return value;
     };
-    //cconf: EmbedReactionRole_Config, client: Client, bigBrowser: BigBrowserV2
     EmbedReactionRole.prototype.executeTicker = function (ctx) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
@@ -115,18 +118,34 @@ var EmbedReactionRole = /** @class */ (function (_super) {
                         promises = [];
                         isReseting = false;
                         _loop_1 = function (guild) {
-                            var channel, guildMembers, server, customData, entries, _loop_2, _c, _d, centry;
-                            return __generator(this, function (_e) {
-                                switch (_e.label) {
-                                    case 0: return [4 /*yield*/, guild.channels.fetch(this_1.options.channelId)];
+                            var channel, _c, _d, guildMembers, server, customData, entries, _loop_2, _e, _f, centry;
+                            return __generator(this, function (_g) {
+                                switch (_g.label) {
+                                    case 0:
+                                        channel = this_1.cacheChannel[this_1.options.channelId];
+                                        if (!!channel) return [3 /*break*/, 2];
+                                        return [4 /*yield*/, guild.channels.fetch(this_1.options.channelId)];
                                     case 1:
-                                        channel = _e.sent();
+                                        channel = (_g.sent());
+                                        this_1.cacheChannel[this_1.options.channelId] = channel;
+                                        _g.label = 2;
+                                    case 2:
                                         if (!channel) {
                                             return [2 /*return*/, "continue"];
                                         }
+                                        if (Date.now() - this_1.cacheTime > 1000 * 60 * 10) {
+                                            this_1.cache = {};
+                                            this_1.cacheTime = Date.now();
+                                        }
+                                        if (!!this_1.cache[guild.id]) return [3 /*break*/, 4];
+                                        _c = this_1.cache;
+                                        _d = guild.id;
                                         return [4 /*yield*/, guild.members.fetch()];
-                                    case 2:
-                                        guildMembers = (_e.sent()).map(function (m) { return m; });
+                                    case 3:
+                                        _c[_d] = (_g.sent()).map(function (m) { return m; });
+                                        _g.label = 4;
+                                    case 4:
+                                        guildMembers = this_1.cache[guild.id];
                                         server = ctx.bigBrowser.getServer(guild);
                                         if (!server.customData) {
                                             server.customData = {};
@@ -140,9 +159,9 @@ var EmbedReactionRole = /** @class */ (function (_super) {
                                         }
                                         entries = customData[index];
                                         _loop_2 = function (centry) {
-                                            var entry, serverEntry, message, _f, ex_1, ex_2, _loop_3, _g, _h, inf;
-                                            return __generator(this, function (_j) {
-                                                switch (_j.label) {
+                                            var entry, serverEntry, message, _h, ex_1, ex_2, _loop_3, _j, _k, inf;
+                                            return __generator(this, function (_l) {
+                                                switch (_l.label) {
                                                     case 0:
                                                         entry = entries[centry.id];
                                                         if (!entry) {
@@ -155,41 +174,41 @@ var EmbedReactionRole = /** @class */ (function (_super) {
                                                             customData[centry.id] = {};
                                                         }
                                                         serverEntry = customData[centry.id];
-                                                        _j.label = 1;
+                                                        _l.label = 1;
                                                     case 1:
-                                                        _j.trys.push([1, 5, , 6]);
+                                                        _l.trys.push([1, 5, , 6]);
                                                         if (!entry.messageId) return [3 /*break*/, 3];
                                                         return [4 /*yield*/, channel.messages.fetch(entry.messageId)];
                                                     case 2:
-                                                        _f = (_j.sent());
+                                                        _h = (_l.sent());
                                                         return [3 /*break*/, 4];
                                                     case 3:
-                                                        _f = undefined;
-                                                        _j.label = 4;
+                                                        _h = undefined;
+                                                        _l.label = 4;
                                                     case 4:
-                                                        message = _f;
+                                                        message = _h;
                                                         return [3 /*break*/, 6];
                                                     case 5:
-                                                        ex_1 = _j.sent();
+                                                        ex_1 = _l.sent();
                                                         return [3 /*break*/, 6];
                                                     case 6:
                                                         if (!!message) return [3 /*break*/, 14];
                                                         if (!(this_1.options.deadlineMode === 'flush-reactions' && serverEntry.messageId)) return [3 /*break*/, 11];
-                                                        _j.label = 7;
+                                                        _l.label = 7;
                                                     case 7:
-                                                        _j.trys.push([7, 10, , 11]);
+                                                        _l.trys.push([7, 10, , 11]);
                                                         return [4 /*yield*/, channel.messages.fetch(serverEntry.messageId)];
                                                     case 8:
-                                                        message = _j.sent();
+                                                        message = _l.sent();
                                                         return [4 /*yield*/, Promise.all([
                                                                 this_1.embedEquals(message.embeds[0], centry) ? undefined : message.edit({ embeds: [this_1.createEmbed(centry)] }),
                                                                 message.reactions.removeAll()
                                                             ])];
                                                     case 9:
-                                                        _j.sent();
+                                                        _l.sent();
                                                         return [3 /*break*/, 11];
                                                     case 10:
-                                                        ex_2 = _j.sent();
+                                                        ex_2 = _l.sent();
                                                         return [3 /*break*/, 11];
                                                     case 11:
                                                         if (!!message) return [3 /*break*/, 13];
@@ -197,39 +216,39 @@ var EmbedReactionRole = /** @class */ (function (_super) {
                                                                 embeds: [this_1.createEmbed(centry)]
                                                             })];
                                                     case 12:
-                                                        message = _j.sent();
+                                                        message = _l.sent();
                                                         serverEntry.messageId = message.id;
-                                                        _j.label = 13;
+                                                        _l.label = 13;
                                                     case 13:
                                                         entry.messageId = message.id;
                                                         _loop_3 = function (inf) {
                                                             promises.push(function () { return message.react(inf.emoji); });
                                                         };
-                                                        for (_g = 0, _h = centry.infos; _g < _h.length; _g++) {
-                                                            inf = _h[_g];
+                                                        for (_j = 0, _k = centry.infos; _j < _k.length; _j++) {
+                                                            inf = _k[_j];
                                                             _loop_3(inf);
                                                         }
                                                         return [3 /*break*/, 15];
                                                     case 14:
                                                         promises.push(function () { return _this.mngMsg(message, guildMembers, ctx.bigBrowser, index, centry, userDataKey); });
-                                                        _j.label = 15;
+                                                        _l.label = 15;
                                                     case 15: return [2 /*return*/];
                                                 }
                                             });
                                         };
-                                        _c = 0, _d = this_1.options.entries;
-                                        _e.label = 3;
-                                    case 3:
-                                        if (!(_c < _d.length)) return [3 /*break*/, 6];
-                                        centry = _d[_c];
-                                        return [5 /*yield**/, _loop_2(centry)];
-                                    case 4:
-                                        _e.sent();
-                                        _e.label = 5;
+                                        _e = 0, _f = this_1.options.entries;
+                                        _g.label = 5;
                                     case 5:
-                                        _c++;
-                                        return [3 /*break*/, 3];
+                                        if (!(_e < _f.length)) return [3 /*break*/, 8];
+                                        centry = _f[_e];
+                                        return [5 /*yield**/, _loop_2(centry)];
                                     case 6:
+                                        _g.sent();
+                                        _g.label = 7;
+                                    case 7:
+                                        _e++;
+                                        return [3 /*break*/, 5];
+                                    case 8:
                                         if (isReseting && this_1.options.messageOnReset) {
                                             promises.unshift(function () { return __awaiter(_this, void 0, void 0, function () {
                                                 var chan;

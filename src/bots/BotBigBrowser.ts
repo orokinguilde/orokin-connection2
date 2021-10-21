@@ -331,9 +331,19 @@ ${createStrLine(result.week)}\`\`\``);
                                 })
                             }
                         }
+                        
+                        {
+                            const regex = /[\p{S}]/imgu;
+                            while(match = regex.exec(message.content)) {
+                                emojis.push({
+                                    emoji: match[0],
+                                    index: match.index
+                                })
+                            }
+                        }
 
                         {
-                            const regex = /<a?:(.+?):\d+>/img;
+                            const regex = /<a:(.+?):\d+>/img;
                             while(match = regex.exec(message.content)) {
                                 emojis.push({
                                     emoji: match[0],
@@ -343,6 +353,9 @@ ${createStrLine(result.week)}\`\`\``);
                         }
 
                         emojis.sort((a, b) => a.index - b.index);
+
+                        console.log('react content:', message.content);
+                        console.log('react emojis:', emojis);
 
                         for(const emoji of emojis) {
                             msg.react(emoji.emoji);

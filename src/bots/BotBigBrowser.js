@@ -369,7 +369,7 @@ var BotBigBrowser = /** @class */ (function (_super) {
                     case 14:
                         if (!checkForCommand(/^\s*!react\s+(.+)\s*$/img)) return [3 /*break*/, 15];
                         BotBigBrowser.adminOnly(message, function () { return __awaiter(_this, void 0, void 0, function () {
-                            var channel, msg, match, emojis, regex, regex, _i, emojis_2, emoji, ex_2;
+                            var channel, msg, match, emojis, regex, regex, regex, _i, emojis_2, emoji, ex_2;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
@@ -394,7 +394,16 @@ var BotBigBrowser = /** @class */ (function (_super) {
                                             }
                                         }
                                         {
-                                            regex = /<a?:(.+?):\d+>/img;
+                                            regex = /[\p{S}]/imgu;
+                                            while (match = regex.exec(message.content)) {
+                                                emojis.push({
+                                                    emoji: match[0],
+                                                    index: match.index
+                                                });
+                                            }
+                                        }
+                                        {
+                                            regex = /<a:(.+?):\d+>/img;
                                             while (match = regex.exec(message.content)) {
                                                 emojis.push({
                                                     emoji: match[0],
@@ -403,6 +412,8 @@ var BotBigBrowser = /** @class */ (function (_super) {
                                             }
                                         }
                                         emojis.sort(function (a, b) { return a.index - b.index; });
+                                        console.log('react content:', message.content);
+                                        console.log('react emojis:', emojis);
                                         for (_i = 0, emojis_2 = emojis; _i < emojis_2.length; _i++) {
                                             emoji = emojis_2[_i];
                                             msg.react(emoji.emoji);

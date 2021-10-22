@@ -257,7 +257,7 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                 list.push(cc);
             }
         }
-        return list;
+        return list.filter(function (i) { return !i.isDeleted; });
     };
     VoiceChannelCreator.prototype.getNewChannelName = function (member) {
         var _a;
@@ -268,7 +268,7 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
     VoiceChannelCreator.prototype.executeTicker = function (ctx) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var dataKey, _i, _b, guild, server, oldData, customData, channels, _c, _d, entry, _loop_1, this_1, out_i_1, i, _e, _f, member, channel;
+            var dataKey, _i, _b, guild, server, oldData, customData, channels, _c, _d, voiceChannel, _loop_1, out_i_1, i, _e, _f, member, channel;
             var _this = this;
             return __generator(this, function (_g) {
                 switch (_g.label) {
@@ -312,43 +312,70 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                         _g.label = 5;
                     case 5:
                         if (!(_c < _d.length)) return [3 /*break*/, 15];
-                        entry = _d[_c];
+                        voiceChannel = _d[_c];
                         _loop_1 = function (i) {
-                            var createdChannel, channel;
                             return __generator(this, function (_h) {
                                 switch (_h.label) {
-                                    case 0:
-                                        createdChannel = this_1.channelsToDispose[i];
-                                        return [4 /*yield*/, this_1.findChannelById(createdChannel.channelId, ctx, { force: true })];
+                                    case 0: return [4 /*yield*/, ErrorManager_1.ErrorManager.instance.wrapAsync('VoiceChannelCreator:ItemLoop', function () { return __awaiter(_this, void 0, void 0, function () {
+                                            var createdChannel, channel;
+                                            var _this = this;
+                                            return __generator(this, function (_a) {
+                                                switch (_a.label) {
+                                                    case 0:
+                                                        createdChannel = this.channelsToDispose[i];
+                                                        return [4 /*yield*/, this.findChannelById(createdChannel.channelId, ctx, { force: true })];
+                                                    case 1:
+                                                        channel = _a.sent();
+                                                        if (!createdChannel.isDeleted) return [3 /*break*/, 5];
+                                                        if (!!channel) return [3 /*break*/, 2];
+                                                        this.channelsToDispose.splice(i, 1);
+                                                        --i;
+                                                        return [3 /*break*/, 4];
+                                                    case 2: return [4 /*yield*/, ErrorManager_1.ErrorManager.instance.wrapAsync('VoiceChannelCreator:RetryDeleteChannel', function () { return __awaiter(_this, void 0, void 0, function () {
+                                                            return __generator(this, function (_a) {
+                                                                switch (_a.label) {
+                                                                    case 0: return [4 /*yield*/, channel.delete()];
+                                                                    case 1:
+                                                                        _a.sent();
+                                                                        return [2 /*return*/];
+                                                                }
+                                                            });
+                                                        }); })];
+                                                    case 3:
+                                                        _a.sent();
+                                                        _a.label = 4;
+                                                    case 4: return [3 /*break*/, 7];
+                                                    case 5:
+                                                        if (!(!channel || channel.members.filter(function (m) { return !m.user.bot; }).size === 0)) return [3 /*break*/, 7];
+                                                        return [4 /*yield*/, ErrorManager_1.ErrorManager.instance.wrapAsync('VoiceChannelCreator:DeleteChannel', function () { return __awaiter(_this, void 0, void 0, function () {
+                                                                return __generator(this, function (_a) {
+                                                                    switch (_a.label) {
+                                                                        case 0:
+                                                                            if (!channel) return [3 /*break*/, 2];
+                                                                            return [4 /*yield*/, channel.delete()];
+                                                                        case 1:
+                                                                            _a.sent();
+                                                                            _a.label = 2;
+                                                                        case 2:
+                                                                            createdChannel.isDeleted = true;
+                                                                            return [2 /*return*/];
+                                                                    }
+                                                                });
+                                                            }); })];
+                                                    case 6:
+                                                        _a.sent();
+                                                        _a.label = 7;
+                                                    case 7: return [2 /*return*/];
+                                                }
+                                            });
+                                        }); })];
                                     case 1:
-                                        channel = _h.sent();
-                                        if (!(!channel || channel.members.filter(function (m) { return !m.user.bot; }).size === 0)) return [3 /*break*/, 3];
-                                        return [4 /*yield*/, ErrorManager_1.ErrorManager.instance.wrapAsync('VoiceChannelCreator', function () { return __awaiter(_this, void 0, void 0, function () {
-                                                return __generator(this, function (_a) {
-                                                    switch (_a.label) {
-                                                        case 0:
-                                                            if (!channel) return [3 /*break*/, 2];
-                                                            return [4 /*yield*/, channel.delete()];
-                                                        case 1:
-                                                            _a.sent();
-                                                            _a.label = 2;
-                                                        case 2:
-                                                            this.channelsToDispose.splice(i, 1);
-                                                            --i;
-                                                            return [2 /*return*/];
-                                                    }
-                                                });
-                                            }); })];
-                                    case 2:
                                         _h.sent();
-                                        _h.label = 3;
-                                    case 3:
                                         out_i_1 = i;
                                         return [2 /*return*/];
                                 }
                             });
                         };
-                        this_1 = this;
                         i = 0;
                         _g.label = 6;
                     case 6:
@@ -362,15 +389,15 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                         ++i;
                         return [3 /*break*/, 6];
                     case 9:
-                        _e = 0, _f = entry.members.map(function (m) { return m; });
+                        _e = 0, _f = voiceChannel.members.map(function (m) { return m; });
                         _g.label = 10;
                     case 10:
                         if (!(_e < _f.length)) return [3 /*break*/, 14];
                         member = _f[_e];
-                        return [4 /*yield*/, entry.guild.channels.create(this.getNewChannelName(member), {
+                        return [4 /*yield*/, voiceChannel.guild.channels.create(this.getNewChannelName(member), {
                                 type: "GUILD_VOICE",
-                                parent: entry.parent,
-                                position: entry.calculatedPosition + 1
+                                parent: voiceChannel.parent,
+                                position: voiceChannel.calculatedPosition + 1
                             })];
                     case 11:
                         channel = _g.sent();
@@ -380,7 +407,8 @@ var VoiceChannelCreator = /** @class */ (function (_super) {
                         this.channelsToDispose.push({
                             channelId: channel.id,
                             creatorId: member.id,
-                            admins: []
+                            admins: [],
+                            isDeleted: false
                         });
                         _g.label = 13;
                     case 13:

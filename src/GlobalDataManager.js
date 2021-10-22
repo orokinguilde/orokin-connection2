@@ -53,7 +53,7 @@ var GlobalDataManager = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, Promise.all(this.entries
-                            .filter(function (e) { return e.name === name; })
+                            .filter(function (e) { return e.name.startsWith(name); })
                             .map(function (e) { return e.getter(); }))];
                     case 1:
                         values = _a.sent();

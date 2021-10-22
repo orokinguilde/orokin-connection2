@@ -15,6 +15,7 @@ export interface IVoiceChannelCreator_ServerCustomData_CreatedChannel {
     channelId: string
     creatorId: string
     admins: string[]
+    isDeleted: boolean
 }
 export interface IVoiceChannelCreator_ServerCustomData {
     createdChannels: IVoiceChannelCreator_ServerCustomData_CreatedChannel[]
@@ -177,7 +178,7 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
                 list.push(cc);
             }
         }
-        return list;
+        return list.filter(i => !i.isDeleted);
     }
 
     protected getNewChannelName(member: GuildMember) {
@@ -219,35 +220,48 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
             }
         }
 
-        for(const entry of this.channelsToWatch) {
+        for(const voiceChannel of this.channelsToWatch) {
             for(let i = 0; i < this.channelsToDispose.length; ++i) {
-                const createdChannel = this.channelsToDispose[i];
-                const channel = await this.findChannelById(createdChannel.channelId, ctx, { force: true });
+                await ErrorManager.instance.wrapAsync('VoiceChannelCreator:ItemLoop', async () => {
+                    const createdChannel = this.channelsToDispose[i];
+                    const channel = await this.findChannelById(createdChannel.channelId, ctx, { force: true });
 
-                if(!channel || channel.members.filter(m => !m.user.bot).size === 0) {
-                    await ErrorManager.instance.wrapAsync('VoiceChannelCreator', async () => {
-                        if(channel) {
-                            await channel.delete();
+                    if(createdChannel.isDeleted) {
+                        if(!channel) {
+                            this.channelsToDispose.splice(i, 1);
+                            --i;
+                        } else {
+                            await ErrorManager.instance.wrapAsync('VoiceChannelCreator:RetryDeleteChannel', async () => {
+                                await channel.delete();
+                            })
                         }
+                    } else {
+                        if(!channel || channel.members.filter(m => !m.user.bot).size === 0) {
+                            await ErrorManager.instance.wrapAsync('VoiceChannelCreator:DeleteChannel', async () => {
+                                if(channel) {
+                                    await channel.delete();
+                                }
 
-                        this.channelsToDispose.splice(i, 1);
-                        --i;
-                    })
-                }
+                                createdChannel.isDeleted = true;
+                            })
+                        }
+                    }
+                })
             }
 
-            for(const member of entry.members.map(m => m)) {
-                const channel = await entry.guild.channels.create(this.getNewChannelName(member), {
+            for(const member of voiceChannel.members.map(m => m)) {
+                const channel = await voiceChannel.guild.channels.create(this.getNewChannelName(member), {
                     type: "GUILD_VOICE",
-                    parent: entry.parent,
-                    position: entry.calculatedPosition + 1
+                    parent: voiceChannel.parent,
+                    position: voiceChannel.calculatedPosition + 1
                 })
                 await member.voice.setChannel(channel, 'Channel créé automatiquement');
 
                 this.channelsToDispose.push({
                     channelId: channel.id,
                     creatorId: member.id,
-                    admins: []
+                    admins: [],
+                    isDeleted: false
                 })
             }
         }

@@ -20,7 +20,7 @@ export class GlobalDataManager {
     public async get(name: string, join: string): Promise<string>
     public async get(name: string, join?: string) {
         const values = await Promise.all(this.entries
-            .filter(e => e.name === name)
+            .filter(e => e.name.startsWith(name))
             .map(e => e.getter()))
 
         if(join) {

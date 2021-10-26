@@ -41,7 +41,10 @@ export class VoiceChannelCreator extends Action implements IActionTicker<Option>
     protected get embedsWrongPlace() {
         return [{
             image: {
-                url: 'https://tenor.com/view/wrong-place-wrong-time-them-wrong-timing-bad-timing-amazon-prime-gif-21090576'
+                url: [
+                    'https://c.tenor.com/KT41ASI2UJcAAAAC/wrong-place-wrong-time-them.gif',
+                    'https://cdn.discordapp.com/attachments/483003722830577671/897808140421169152/nonono.gif'
+                ][Math.floor(Math.random() * 2)]
             }
         }]
     }
